@@ -7,6 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from keras.callbacks import EarlyStopping
 
+import warnings
+warnings.filterwarnings('ignore')
+
 #data
 path = "C:\\_data\\DACON\\ddarung\\"
 train_csv = pd.read_csv(path+"train.csv",index_col=['id'])  
@@ -32,12 +35,18 @@ def fit_outlier(data):
         lower_bound = q1 - iqr
         
         series[series > upper_bound] = np.nan
-        series[series > q1] = np.nan
+        series[series < lower_bound] = np.nan
         print(series.isna().sum())
+        series = series.interpolate()
         data[label] = series
-        return data
+        
+    data = data.fillna(data.ffill())
+    data = data.fillna(data.bfill())
+    return data
 
+print(x.isna().sum())
 x = fit_outlier(x)
+print(x.isna().sum())
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,shuffle=False,random_state=333)
 
