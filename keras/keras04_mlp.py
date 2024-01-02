@@ -8,7 +8,7 @@ x = np.array([[1,2,3,4,5,6,7,8,9,10],
              ).T
 # x.T == x.transpose(x) == x.swapaxes(x,0,1)
 y = np.array([1,2,3,4,5,6,7,8,9,10])
-print(x.shape)  # (2,10)
+print(x.shape)  # (10,2)
 print(y.shape)  # (10,)
 
 #model
