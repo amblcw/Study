@@ -38,6 +38,6 @@ loss = model.evaluate(x_test,y_test)
 result = model.predict([7,11000000])
 print(f"LOSS: {loss}\nRESULT: {result}")
 
-# LOSS: 4.623264878572675e-12
-# RESULT: [[6.9999990e+00]
-#  [1.0999997e+07]]
+# LOSS: 3.031649096259942e-13
+# RESULT: [[7.0e+00]
+#  [1.1e+07]]
