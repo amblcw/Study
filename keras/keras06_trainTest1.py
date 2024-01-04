@@ -35,3 +35,4 @@ print(f"LOSS: {loss}\nRESULT: {result}")
 # LOSS: 0.0006753153284080327
 # RESULT: [[7.0500989e+00]
 #  [1.0854442e+07]]
+# 
