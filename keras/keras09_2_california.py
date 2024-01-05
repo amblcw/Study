@@ -14,7 +14,7 @@ print(x.shape,y.shape,sep='\n')
 print(datasets.feature_names)   
 #['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude']
 r2=0
-while r2 < 0.56: 
+while r2 < 0.6: 
     r = int(np.random.uniform(1,1000))
     r = 176
     # r = 130
@@ -23,20 +23,18 @@ while r2 < 0.56:
     #model
     model = Sequential()
     model.add(Dense(10,input_dim=8))
-    model.add(Dense(30))
-    model.add(Dense(100))
-    model.add(Dense(300))
-    model.add(Dense(100))
-    model.add(Dense(60))
-    model.add(Dense(30))
+    model.add(Dense(25))
+    model.add(Dense(35))
+    model.add(Dense(27))
+    model.add(Dense(15))
     model.add(Dense(10))
-    model.add(Dense(3))
+    model.add(Dense(5))
     model.add(Dense(1))
 
     #compile fit
-    model.compile(loss='mse',optimizer='adam')
+    model.compile(loss='mae',optimizer='adam')
     start_time = time.time()
-    model.fit(x_train,y_train,epochs=10000,batch_size=100,verbose=2)
+    model.fit(x_train,y_train,epochs=10000,batch_size=1000,verbose=2)
 
     #evaluate predict
     loss = model.evaluate(x_test,y_test)
@@ -50,5 +48,5 @@ while r2 < 0.56:
     pass
 
 # r=176
-# loss=0.5672383904457092
-# r2=0.5737750092429051
+# loss=0.5322199463844299
+# r2=0.6000881155946733

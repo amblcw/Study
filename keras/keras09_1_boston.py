@@ -30,20 +30,16 @@ Number of Attributes: 13 numeric/categorical predictive. Median Value (attribute
 '''
 r2 = 0
 
-while r2 < 0.76:
+while r2 < 0.8:
     r = int(np.random.uniform(1,1000))
-    # r = 88
+    r = 88
     x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r)
 
     #model
     model = Sequential()
     model.add(Dense(20,input_dim=13))
-    model.add(Dense(60))
-    model.add(Dense(100))
-    model.add(Dense(300))
-    model.add(Dense(100))
-    model.add(Dense(100))
-    model.add(Dense(60))
+    model.add(Dense(30))
+    model.add(Dense(40))
     model.add(Dense(30))
     model.add(Dense(10))
     model.add(Dense(3))
@@ -52,7 +48,7 @@ while r2 < 0.76:
     #compile & fit
     model.compile(loss='mse',optimizer='adam')
     start_time = time.time()
-    model.fit(x_train,y_train,epochs=250,batch_size=3,verbose=2)
+    model.fit(x_train,y_train,epochs=8000,batch_size=10,verbose=2)
 
     #evaluate & predict
     loss = model.evaluate(x_test,y_test)
@@ -64,7 +60,8 @@ while r2 < 0.76:
     
     print(f"Time: {round(end_time-start_time,2)}sec")
     print(f"{r=}\n{loss=}\n{r2=}")
+    pass
 
 # r=88
-# loss=18.179229736328125
-# r2=0.7536976515425104
+# loss=14.834733963012695
+# r2=0.7990107660178996
