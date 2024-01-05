@@ -23,6 +23,7 @@ while r2 < 0.6:
     #model
     model = Sequential()
     model.add(Dense(10,input_dim=8))
+    model.add(Dense(17))
     model.add(Dense(25))
     model.add(Dense(35))
     model.add(Dense(27))
@@ -32,9 +33,9 @@ while r2 < 0.6:
     model.add(Dense(1))
 
     #compile fit
-    model.compile(loss='mae',optimizer='adam')
+    model.compile(loss='mse',optimizer='adam')
     start_time = time.time()
-    model.fit(x_train,y_train,epochs=10000,batch_size=1000,verbose=2)
+    model.fit(x_train,y_train,epochs=10000,batch_size=500,verbose=2)
 
     #evaluate predict
     loss = model.evaluate(x_test,y_test)
@@ -50,3 +51,7 @@ while r2 < 0.6:
 # r=176
 # loss=0.5322199463844299
 # r2=0.6000881155946733
+
+# r=176 
+# loss=0.5211321711540222   mae로 훈련, mse가 더 잘 나옴
+# r2=0.5541717141267914
