@@ -16,7 +16,9 @@ def make_count_down(start_count):
         
     return reducer
 
-count_down = make_count_down(10)
+count_down1 = make_count_down(10)
+count_down2 = make_count_down(20)
 
 for i in range(10):
-    print(count_down())
+    print(count_down1(),end=' ')
+    print(count_down2())

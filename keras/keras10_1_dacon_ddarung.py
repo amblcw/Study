@@ -74,55 +74,56 @@ r2_list = []
 submit_list = []
 
 r2=0
-# for i in range(10):
+for i in range(10):
 # while r2<0.69:
-r = int(np.random.uniform(1,1000))
-r = 285
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r)
-print(f"{x_train.shape=} , {y_train.shape=}")   #x_train.shape=(1167, 9) , y_train.shape=(1167,)
+    r = int(np.random.uniform(1,1000))
+    r = 285
+    x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r)
+    print(f"{x_train.shape=} , {y_train.shape=}")   #x_train.shape=(1167, 9) , y_train.shape=(1167,)
 
-# model
-model = Sequential()
-# model.add(Dense(1,input_dim=9))
-model.add(Dense(16,input_dim=9))
-# model.add(Dense(32))
-# model.add(Dense(48))
-# model.add(Dense(64))
-# model.add(Dense(96))
-# model.add(Dense(128))
-# model.add(Dense(198))
-# model.add(Dense(256))
-# model.add(Dense(198))
-# model.add(Dense(128))
-# model.add(Dense(96))
-# model.add(Dense(64))
-# model.add(Dense(48))
-# model.add(Dense(32))
-# model.add(Dense(16))
-model.add(Dense(8))
-model.add(Dense(4))
-model.add(Dense(2))
-model.add(Dense(1))
+    # model
+    model = Sequential()
+    # model.add(Dense(1,input_dim=9))
+    model.add(Dense(16,input_dim=9))
+    # model.add(Dense(32))
+    # model.add(Dense(48))
+    # model.add(Dense(64))
+    # model.add(Dense(96))
+    # model.add(Dense(128))
+    # model.add(Dense(198))
+    # model.add(Dense(256))
+    # model.add(Dense(198))
+    # model.add(Dense(128))
+    # model.add(Dense(96))
+    # model.add(Dense(64))
+    # model.add(Dense(48))
+    # model.add(Dense(32))
+    # model.add(Dense(16))
+    model.add(Dense(8))
+    model.add(Dense(4))
+    model.add(Dense(2))
+    model.add(Dense(1))
 
-#compile & fit
-model.compile(loss='mse',optimizer='adam')
-model.fit(x_train,y_train,epochs=1024,batch_size=4,verbose=2)
+    #compile & fit
+    model.compile(loss='mse',optimizer='adam')
+    model.fit(x_train,y_train,epochs=1024,batch_size=4,verbose=2)
 
-#evaluate & predict
-loss = model.evaluate(x_test,y_test)
-y_predict = model.predict(x_test)
-r2 = r2_score(y_test,y_predict)
-y_submit = model.predict(test_csv)
+    #evaluate & predict
+    loss = model.evaluate(x_test,y_test)
+    y_predict = model.predict(x_test)
+    r2 = r2_score(y_test,y_predict)
+    y_submit = model.predict(test_csv)
 
-print(f"{r=}\nRMSE: {math.sqrt(loss)}\n{r2=}")
-time.sleep(1.5)
+    print(f"{r=}\nRMSE: {math.sqrt(loss)}\n{r2=}")
+    time.sleep(1.5)
 
-
-# print(y_submit)
-# print(y_submit.shape)   #(751, 1)
-loss_list.append(loss)
-r2_list.append(r2)
-submit_list.append(y_submit)
+    # print(y_submit)
+    # print(y_submit.shape)   #(751, 1)
+    loss_list.append(loss)
+    r2_list.append(r2)
+    submit_list.append(y_submit)
+    
+    #####여기까지 반복문#####
 
 print(loss_list,r2_list,sep='\n')
 print(f"LOSS mean: {np.mean(loss_list)}\nR2 mean: {np.mean(r2_list)}")
