@@ -7,6 +7,7 @@ import pandas as pd
 import datetime
 import time
 import math
+from sklearn.model_selection import cross_val_score
 
 #data
 path = "C:\\_data\\KAGGLE\\bike-sharing-demand\\"
@@ -20,11 +21,12 @@ y = train_csv['count']
 print(x.shape, y.shape)
 # loss = 99999
 # while loss > 23500:
+# for i in range(10):
 r = int(np.random.uniform(1,1000))
 # r=264
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r)
 
-x_train, x_val, y_train, y_val = train_test_split(x_train,y_train,train_size=0.8,shuffle=False)
+x_train, x_val, y_train, y_val = train_test_split(x_train,y_train,train_size=0.7,shuffle=False)
 
 print(f"{x_train.shape=},{x_test.shape=}")
 
@@ -44,9 +46,9 @@ model.add(Dense(16,input_dim=8,activation='relu'))
 # model.add(Dense(128))
 # model.add(Dense(64))
 model.add(Dense(32,activation='relu'))
-model.add(Dense(16))#,activation='relu'))
-model.add(Dense(8))#,activation='relu'))
-model.add(Dense(4))#,activation='relu'))
+model.add(Dense(16,activation='relu'))
+model.add(Dense(8,activation='relu'))
+model.add(Dense(4,activation='relu'))
 model.add(Dense(2,activation='relu'))
 model.add(Dense(1,activation='relu'))
 # model.add(Dense(10,input_dim=8))
@@ -67,7 +69,7 @@ model.add(Dense(1,activation='relu'))
 
 #compile & fit
 model.compile(loss='mse',optimizer='adam')
-model.fit(x_train,y_train,epochs=1024,batch_size=64,verbose=2,validation_data=(x_val,y_val))
+model.fit(x_train,y_train,epochs=1024,batch_size=32,verbose=2,validation_data=(x_val,y_val))
 
 #evaluate & predict 
 loss = model.evaluate(x_test,y_test)
@@ -100,7 +102,7 @@ def RMSLE(y_test,y_predict):
     return np.sqrt(mean_squared_log_error(y_test,y_predict))
 
 if num_of_minus['count'] == 0:    
-    print("RMSE: ",RMSLE(y_test,y_predict))
+    print("RMSLE: ",RMSLE(y_test,y_predict))
 else:
     print("음수갯수: ",num_of_minus['count'])
     for i in range(len(y_submit)):
