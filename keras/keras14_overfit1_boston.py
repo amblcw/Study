@@ -2,7 +2,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.datasets import load_boston    # pip install scikit-learn==1.1.3
 import time
 import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ r2 = 0
 
 # while r2 < 0.8:
 r = int(np.random.uniform(1,1000))
-# r = 88
+r = 88
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r)
 
 #model
@@ -46,8 +46,23 @@ model.add(Dense(1))
 #compile & fit
 model.compile(loss='mse',optimizer='adam')
 start_time = time.time()
-model.fit(x_train,y_train,epochs=2048,batch_size=10,validation_split=0.3,verbose=2)
-
+hist = model.fit(x_train,y_train,epochs=16,batch_size=10,validation_split=0.3,verbose=2)
+# print(f"{hist.history=}")#\n{datasets=}")
+# print("=============================")
+# print(hist.history['loss'])
+# print(hist.history['val_loss'])
+plt.rcParams['font.family'] ='Malgun Gothic'
+plt.rcParams['axes.unicode_minus'] =False
+plt.figure(figsize=(9,6))
+plt.plot(hist.history['loss'],color='red',label='loss',marker='.')
+plt.plot(hist.history['val_loss'],color='blue',label='val_loss',marker='.')
+# plt.plot(range(128),np.array([hist.history['loss'],hist.history['val_loss']]).T,label=['loss','val_loss'])
+plt.legend(loc='upper right')
+plt.title('보스턴 loss')
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.grid()
+plt.show()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test)
 result = model.predict(x)
@@ -56,9 +71,13 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test,y_predict)
 end_time = time.time()
 
+def RMSE(y_test,y_predict):
+    return np.sqrt(mean_squared_error(y_test,y_predict))
+
 print(f"Time: {round(end_time-start_time,2)}sec")
-print(f"{r=}\n{loss=}\n{r2=}")
-pass
+print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict)}")
+
+
 
 #16 32 16 8 1 layers
 # r=113
@@ -69,3 +88,9 @@ pass
 # r=707
 # loss=14.15937614440918
 # r2=0.7852475293021834
+
+# epo=2048
+# r=88
+# loss=12.932721138000488
+# r2=0.8247802724639635
+# RMSE: 3.596209327723187
