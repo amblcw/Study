@@ -34,13 +34,13 @@ model.add(Dense(1))
 #compile fit
 model.compile(loss='mse',optimizer='adam')
 start_time = time.time()
-es = EarlyStopping(monitor='val_loss',mode='min',patience=20)
+es = EarlyStopping(monitor='val_loss',mode='min',patience=20,restore_best_weights=True,verbose=1)
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es])
 
 #evaluate predict
-loss = model.evaluate(x_test,y_test)
-result = model.predict(x)
-y_predict = model.predict(x_test)
+loss = model.evaluate(x_test,y_test,verbose=0)
+result = model.predict(x,verbose=0)
+y_predict = model.predict(x_test,verbose=0)
 
 r2 = r2_score(y_test,y_predict)
 end_time = time.time()
@@ -72,3 +72,13 @@ plt.show()
 # r=176
 # loss=0.4645490050315857
 # r2=0.650936286442668
+
+# r=176
+# loss=0.45143747329711914
+# r2=0.6607882232154847
+
+# Epoch 236: early stopping
+# Time: 35.14sec
+# r=176
+# loss=0.45041927695274353
+# r2=0.661553367308052

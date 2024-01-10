@@ -48,13 +48,13 @@ model.compile(loss='mse',optimizer='adam')
 start_time = time.time()
 
 from keras.callbacks import EarlyStopping
-es = EarlyStopping(monitor='val_loss',mode='min',patience=30,verbose=1)
+es = EarlyStopping(monitor='val_loss',mode='min',patience=50,verbose=1,restore_best_weights=True)
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=10,validation_split=0.3,verbose=2,callbacks=[es])
 
 #evaluate & predict
-loss = model.evaluate(x_test,y_test)
-result = model.predict(x)
-y_predict = model.predict(x_test)
+loss = model.evaluate(x_test,y_test,verbose=0)
+result = model.predict(x,verbose=0)
+y_predict = model.predict(x_test,verbose=0)
 
 r2 = r2_score(y_test,y_predict)
 end_time = time.time()
@@ -112,3 +112,10 @@ plt.show()
 # loss=14.206158638000488
 # r2=0.8075270309831843
 # RMSE: 3.7691058627454215
+
+# Epoch 197: early stopping
+# Time: 8.06sec
+# r=88
+# loss=13.1826171875
+# r2=0.8213945466114984
+# RMSE: 3.6307874062998877
