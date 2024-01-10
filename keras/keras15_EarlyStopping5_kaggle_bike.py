@@ -24,7 +24,7 @@ print(x.shape, y.shape)
 
 r = int(np.random.uniform(1,1000))
 r=662
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r)
 
 # x_train, x_val, y_train, y_val = train_test_split(x_train,y_train,train_size=0.7,shuffle=False)
 
@@ -33,19 +33,27 @@ print(f"{x_train.shape=},{x_test.shape=}")
 
 #model
 model = Sequential()
-model.add(Dense(512,input_dim=8))
-model.add(Dense(256))
-model.add(Dense(128))
+model.add(Dense(128,input_dim=8))
 model.add(Dense(64))
 model.add(Dense(32))
-model.add(Dense(16,activation='relu'))
-model.add(Dense(8,activation='relu'))
+model.add(Dense(16))
+model.add(Dense(8))
+model.add(Dense(4,activation='relu'))
+model.add(Dense(2,activation='relu'))
 model.add(Dense(1))
+# model.add(Dense(512,input_dim=8))
+# model.add(Dense(256))
+# model.add(Dense(128))
+# model.add(Dense(64))
+# model.add(Dense(32))
+# model.add(Dense(16,activation='relu'))
+# model.add(Dense(8,activation='relu'))
+# model.add(Dense(1))
 
 
 #compile & fit
 model.compile(loss='mse',optimizer='adam')
-es = EarlyStopping(monitor='val_loss',mode='min',patience=20,verbose=1)
+es = EarlyStopping(monitor='val_loss',mode='min',patience=30,verbose=1)
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=32,verbose=2,validation_split=0.3,callbacks=[es])
 
 #evaluate & predict 
@@ -81,7 +89,6 @@ else:
             y_submit[i] = 0
     
 plt.rcParams['font.family'] = 'Malgun Gothic'
-plt.rcParams['axes.unicode_minus']=False
 plt.title('kaggle bike')
 plt.xlabel('epochs')
 plt.ylabel('loss')

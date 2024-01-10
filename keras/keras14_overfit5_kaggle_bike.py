@@ -76,7 +76,6 @@ else:
             y_submit[i] = 0
     
 plt.rcParams['font.family'] = 'Malgun Gothic'
-plt.rcParams['axes.unicode_minus']=False
 plt.title('kaggle bike')
 plt.xlabel('epochs')
 plt.ylabel('loss')

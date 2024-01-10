@@ -46,7 +46,6 @@ r2 = r2_score(y_test,y_predict)
 print(f"{loss=}\n{r2=}")
 
 plt.rcParams['font.family'] = 'Malgun Gothic'
-plt.rcParams['axes.unicode_minus']=False
 plt.title('따릉이')
 plt.xlabel('epochs')
 plt.ylabel('loss')
