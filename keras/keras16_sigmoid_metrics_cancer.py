@@ -17,9 +17,9 @@ x = datasets.data
 y = datasets.target 
 df_y = pd.DataFrame(y)
 
-print(df_y)
+# print(df_y)
 # print(x,y,x.shape,y.shape,sep='\n')
-# print(np.unique(y))
+print(np.unique(y,return_counts=True)) #(array([0, 1]), array([212, 357], dtype=int64))
 zero_num = len(y[np.where(y == 0)]) #y[np.where(조건)]은 조건에 맞는 값들의 인덱스 리스트를 반환
 one_num = len(y[np.where(y == 1)])
 print(f"0: {zero_num}, 1: {one_num}")
@@ -44,7 +44,7 @@ model.add(Dense(1, activation='sigmoid')) #이진분류에서는 꼭 마지막 �
 #compile & fit
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy']) #이진분류는 무조건 loss='binary_crossentropy'
 es = EarlyStopping(monitor='val_accuracy',mode='auto',patience=400,restore_best_weights=True,verbose=1)
-hist = model.fit(x_train,y_train,epochs=2048,verbose=2,validation_split=0.35,batch_size=16,callbacks=[es])
+hist = model.fit(x_train,y_train,epochs=2048,verbose=2,validation_split=0.3,batch_size=16,callbacks=[es])
 
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)
