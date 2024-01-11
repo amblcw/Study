@@ -28,6 +28,7 @@ y = datasets.target
 # y = pd.get_dummies(y)
 # ohe = OneHotEncoder(sparse=False)
 # y = ohe.fit_transform(y.reshape(-1,1))
+print(np.unique(y,return_counts=True))
 y = to_categorical(y)
 
 # print(y,y.shape,sep='\n')
@@ -40,6 +41,8 @@ keras 첫번째 열이 미심직어 찍어보니
 print(np.count_nonzero(y[:,0])) # 0
 따라서 첫번째 열 잘라내고 슬라이싱
 '''
+# print(y.shape)
+
 y = y[:,1:]
 # print(y,y.shape,sep='\n')       # (581012, 7)
 # print(np.count_nonzero(y[:,0])) # 211840
@@ -49,7 +52,10 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_st
 
 #model
 model = Sequential()
-model.add(Dense(128,input_dim=54,activation='relu'))
+model.add(Dense(512,input_dim=54,activation='relu'))
+# model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
@@ -77,6 +83,6 @@ plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
 plt.legend()
 plt.show()
 
-# r=696 
-# LOSS: 0.24115876853466034
-# ACC:  0.906577014870571(0.9065769910812378 by loss[1])
+# r=994
+# LOSS: 0.1615818589925766
+# ACC:  0.9583371580686616(0.9583371877670288 by loss[1])

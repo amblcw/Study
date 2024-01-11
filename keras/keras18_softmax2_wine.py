@@ -41,7 +41,7 @@ model.add(Dense(3, activation='softmax'))
 #compile & fit
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='max',patience=50,restore_best_weights=True)
-hist = model.fit(x_train,y_train,epochs=2048,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es])
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es])
 
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)
