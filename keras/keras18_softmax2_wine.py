@@ -30,7 +30,7 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_st
 
 #model
 model = Sequential()
-model.add(Dense(128,input_dim=13,activation='relu'))
+model.add(Dense(128,input_dim=13))
 # model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -50,6 +50,14 @@ y_test = np.argmax(y_test,axis=1)
 
 print(f"{r=} \nLOSS: {loss[0]} \nACC:  {accuracy_score(y_test,y_predict)}({loss[1]} by loss[1])")
 
+plt.figure(figsize=(12,9))
+plt.title("Wine Classification")
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.plot(hist.history['acc'],label='acc',color='red')
+plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
+plt.legend()
+plt.show()
 
 # r=398
 # LOSS: 0.13753800094127655
