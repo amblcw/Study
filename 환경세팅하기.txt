@@ -1,0 +1,9 @@
+1.vscode 설치
+2.anaconda 설치
+3.scikit-learn지우고 1.1.3으로 설치(보스턴 데이터셋 사용하기 위함)
+4.rainbow csv, edit csv 설치(vscode 에서)
+5.python extension pack 설치(vscode 에서)
+6.Nvidia 드라이버 최신버전으로 (546.33ver)
+7.vscode에서 ctrl alt P 누르고 python: selection interpriter를 base:conda로 변경
+8.pip install tensorflow 하기
+9.git 설치하기
