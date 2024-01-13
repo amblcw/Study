@@ -30,6 +30,7 @@ print(datasets.loc[datasets["시가"].astype(int) >= 1100])   # 위와 같음
 print(datasets[datasets["시가"] >= '1100']) # 결과는 같으나 위험함 파이썬의 문자열 대소 비교는 조심해야함
 print("===== 시가 1100원 이상 뽑기 (종가만 출력) =====")
 print(datasets[datasets["시가"].astype(int) >= 1100]['종가'])
+print(datasets[datasets["시가"].astype(int) >= 1100 , '종가'])  # 위와 같음
 # 059    3000
 # 033     500
 # 045    6000
