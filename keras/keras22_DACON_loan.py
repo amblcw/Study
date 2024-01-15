@@ -167,12 +167,12 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 #model
 model = Sequential()
-model.add(Dense(512, input_shape=(13,)))
+model.add(Dense(512, input_shape=(13,)))#, activation='sigmoid'))
 model.add(Dense(256))#, activation='relu'))
 model.add(Dense(128))#, activation='relu'))
 model.add(Dense(64))#, activation='relu'))
 model.add(Dense(32))#, activation='sigmoid'))
-model.add(Dense(16))#, activation='relu'))
+model.add(Dense(16, activation='relu'))
 # model.add(Dense(8, activation='relu'))
 model.add(Dense(7, activation='softmax'))
 
@@ -185,8 +185,8 @@ x_test =np.asarray(x_test).astype(np.float32)
 test_csv =np.asarray(test_csv).astype(np.float32)
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_acc',mode='auto',patience=100,restore_best_weights=True,verbose=1)
-hist = model.fit(x_train, y_train, epochs=8192, batch_size=1024, validation_split=0.2, verbose=2, callbacks=[es])
+es = EarlyStopping(monitor='val_acc',mode='auto',patience=200,restore_best_weights=True,verbose=1)
+hist = model.fit(x_train, y_train, epochs=8192, batch_size=2048, validation_split=0.2, verbose=2, callbacks=[es])
 
 #evaluate & predict
 loss = model.evaluate(x_test, y_test, verbose=0)
@@ -199,13 +199,14 @@ y_test = np.argmax(y_test,axis=1)
 print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 
 # y = y.to_frame(['대출등급'])
-y_predict = y_predict.reshape(-1,1)
-ohe = OneHotEncoder(sparse=False)
-y_predict = ohe.fit_transform(y_predict)
+# y_predict = y_predict.reshape(-1,1)
+# ohe = OneHotEncoder(sparse=False)
+# ohe_y_predict = ohe.fit_transform(y_predict)
 
-print(ohe_y_test.shape, y_predict.shape)
-
-f1 = f1_score(ohe_y_test,y_predict)
+# print(ohe_y_test.shape, ohe_y_predict.shape)
+# print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
+# f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
+f1 = f1_score(y_test,y_predict,average='weighted')
 print("=========================\nF1: ",f1)
 
 y_submit = label_encoder.inverse_transform(y_submit)
@@ -213,18 +214,18 @@ y_submit = label_encoder.inverse_transform(y_submit)
 import datetime
 dt = datetime.datetime.now()
 submission_csv['대출등급'] = y_submit
-submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_ACC{loss[1]:.4f}.csv",index=False)
+submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
 
 plt.figure(figsize=(12,9))
 plt.title("DACON lClassification")
 plt.xlabel('epochs')
 plt.ylabel('loss')
 plt.plot(hist.history['acc'],label='acc',color='red')
-plt.plot(hist.history['val_acc'],label='val_acc',color='red')
+plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
 # plt.plot(hist.history['loss'],label='loss',color='red')
 # plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
 plt.legend()
-plt.show()
+# plt.show()
 
 # r=657
 #  LOSS: 1237.2230224609375
