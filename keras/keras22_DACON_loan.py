@@ -185,31 +185,30 @@ x_test =np.asarray(x_test).astype(np.float32)
 test_csv =np.asarray(test_csv).astype(np.float32)
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
+es = EarlyStopping(monitor='val_acc',mode='auto',patience=100,restore_best_weights=True,verbose=1)
 hist = model.fit(x_train, y_train, epochs=8192, batch_size=1024, validation_split=0.2, verbose=2, callbacks=[es])
 
 #evaluate & predict
-loss = model.evaluate(x_test, y_test)
-# y_predict = np.argmax(model.predict(x_test),axis=1)
-y_predict = model.predict(x_test)
-print(np.unique(y_predict,return_counts=True))
-# for data in y_predict:
-#     print(data)
+loss = model.evaluate(x_test, y_test, verbose=0)
+y_predict = model.predict(x_test,verbose=0)
 y_predict = np.argmax(y_predict,axis=1)
-
-y_submit = np.argmax(model.predict(test_csv),axis=1)
+y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
+ohe_y_test = y_test
 y_test = np.argmax(y_test,axis=1)
 
-print(np.unique(y_test,return_counts=True))
-print(np.unique(y_predict,return_counts=True))
-
-
-# f1 = f1_score(y_test,y_predict)
 print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 
-print(np.unique(y_submit,return_counts=True))
+# y = y.to_frame(['대출등급'])
+y_predict = y_predict.reshape(-1,1)
+ohe = OneHotEncoder(sparse=False)
+y_predict = ohe.fit_transform(y_predict)
+
+print(ohe_y_test.shape, y_predict.shape)
+
+f1 = f1_score(ohe_y_test,y_predict)
+print("=========================\nF1: ",f1)
+
 y_submit = label_encoder.inverse_transform(y_submit)
-print(np.unique(y_submit,return_counts=True))
 
 import datetime
 dt = datetime.datetime.now()
@@ -220,11 +219,13 @@ plt.figure(figsize=(12,9))
 plt.title("DACON lClassification")
 plt.xlabel('epochs')
 plt.ylabel('loss')
-plt.plot(hist.history['loss'],label='loss',color='red')
-plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
+plt.plot(hist.history['acc'],label='acc',color='red')
+plt.plot(hist.history['val_acc'],label='val_acc',color='red')
+# plt.plot(hist.history['loss'],label='loss',color='red')
+# plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
 plt.legend()
 plt.show()
 
-# r=732
-#  LOSS: 3.398134708404541
-# ACC:  0.4292093515396118
+# r=657
+#  LOSS: 1237.2230224609375
+# ACC:  0.5243353843688965
