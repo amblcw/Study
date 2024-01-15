@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score
 from keras.callbacks import EarlyStopping
+import matplotlib.pyplot as plt
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -42,28 +43,32 @@ submission_csv = pd.read_csv(path+"sample_submission.csv")
 # print(np.unique(train_csv['대출등급'],return_counts=True),end="\n======================\n")
 # (array(['A', 'B', 'C', 'D', 'E', 'F', 'G'], dtype=object), array([16772, 28817, 27623, 13354,  7354,  1954,   420], dtype=int64))
 
-train_csv = train_csv[train_csv['주택소유상태'] != 'ANY'] #ANY랑 결혼은 딱 한개 존재하기에 그냥 제거
-test_csv = test_csv[test_csv['대출목적'] != '결혼']
+train_csv = train_csv[train_csv['주택소유상태'] != 'ANY'] #ANY은딱 한개 존재하기에 그냥 제거
+# test_csv = test_csv[test_csv['대출목적'] != '결혼']
+test_csv.loc[test_csv['대출목적'] == '결혼' ,'대출목적'] = '기타' #결혼은 제거하면 개수가 안맞기에 기타로 대체
 
+# x.loc[x['type'] == 'red', 'type'] = 1
 # print(np.unique(train_csv['주택소유상태'],return_counts=True))
 # print(np.unique(test_csv['주택소유상태'],return_counts=True),end="\n======================\n")
 # print(np.unique(train_csv['대출목적'],return_counts=True))
 # print(np.unique(test_csv['대출목적'],return_counts=True),end="\n======================\n")
 
 #대출기간 처리
-train_loan_time = train_csv['대출기간']
-train_loan_time = train_loan_time.str.split()
-for i in range(len(train_loan_time)):
-    train_loan_time.iloc[i] = int(train_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경
+train_csv['대출기간'] = train_csv['대출기간'].replace({' 36 months' : 36 , ' 60 months' : 60 }).astype(int)
+test_csv['대출기간'] = test_csv['대출기간'].replace({' 36 months' : 36 , ' 60 months' : 60 }).astype(int)
+# train_loan_time = train_csv['대출기간']
+# train_loan_time = train_loan_time.str.split()
+# for i in range(len(train_loan_time)):
+#     train_loan_time.iloc[i] = int(train_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경
   
-train_csv['대출기간'] = train_loan_time 
+# train_csv['대출기간'] = train_loan_time 
     
-test_loan_time = test_csv['대출기간']
-test_loan_time = test_loan_time.str.split()
-for i in range(len(test_loan_time)):
-    test_loan_time.iloc[i] = int(test_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경    
+# test_loan_time = test_csv['대출기간']
+# test_loan_time = test_loan_time.str.split()
+# for i in range(len(test_loan_time)):
+#     test_loan_time.iloc[i] = int(test_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경    
 
-test_csv['대출기간'] = test_loan_time
+# test_csv['대출기간'] = test_loan_time
 
 #근로기간 처리
 train_working_time = train_csv['근로기간']
@@ -129,18 +134,24 @@ train_csv['대출등급'] = train_loan_grade
 
 # print(train_csv.isna().sum(),test_csv.isna().sum(), sep='\n') #결측치 제거 완료 확인함
 
-# for label in train_csv:                                       #모든 데이터가 정수 또는 실수로 변경됨을 확인함
+# for label in train_csv:                                       #모든 데이터가  또는 실수로 변경됨을 확인함
 #     for data in train_csv[label]:
 #         if type(data) != type(1) and type(data) != type(1.1):
 #             print("not int, not float : ",data)
 
 
-x = np.asarray(train_csv.drop(['대출등급'],axis=1)).astype(np.float32)
-y = np.asarray(train_csv['대출등급']).astype(np.float32)
-# print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))
+# for label in test_csv:
+#     print(label)
+#     print(f"train[{label}]: ",np.unique(train_csv[label],return_counts=True))
+#     print(f"test[{label}]",np.unique(test_csv[label],return_counts=True))
+x = train_csv.drop(['대출등급'],axis=1)
+y = train_csv['대출등급']
 
-# y = y.to_frame(['대출등급'])
-y = y.reshape(-1,1)
+print(f"{test_csv.shape=}")
+print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))
+
+y = y.to_frame(['대출등급'])
+# y = y.reshape(-1,1)
 ohe = OneHotEncoder(sparse=False)
 y = ohe.fit_transform(y)
 
@@ -156,14 +167,22 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 #model
 model = Sequential()
-model.add(Dense(128, input_shape=(13,), activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(8, activation='relu'))
+model.add(Dense(512, input_shape=(13,)))
+model.add(Dense(256))#, activation='relu'))
+model.add(Dense(128))#, activation='relu'))
+model.add(Dense(64))#, activation='relu'))
+model.add(Dense(32))#, activation='sigmoid'))
+model.add(Dense(16))#, activation='relu'))
+# model.add(Dense(8, activation='relu'))
 model.add(Dense(7, activation='softmax'))
 
 #compile & fit
+print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
+    {np.unique(test_csv,return_counts=True)}\n")
+
+x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
+x_test =np.asarray(x_test).astype(np.float32)
+test_csv =np.asarray(test_csv).astype(np.float32)
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
@@ -171,8 +190,13 @@ hist = model.fit(x_train, y_train, epochs=8192, batch_size=1024, validation_spli
 
 #evaluate & predict
 loss = model.evaluate(x_test, y_test)
-y_predict = np.argmax(model.predict(x_test),axis=1)
-test_csv = np.asarray(test_csv).astype(np.float32)
+# y_predict = np.argmax(model.predict(x_test),axis=1)
+y_predict = model.predict(x_test)
+print(np.unique(y_predict,return_counts=True))
+# for data in y_predict:
+#     print(data)
+y_predict = np.argmax(y_predict,axis=1)
+
 y_submit = np.argmax(model.predict(test_csv),axis=1)
 y_test = np.argmax(y_test,axis=1)
 
@@ -180,9 +204,27 @@ print(np.unique(y_test,return_counts=True))
 print(np.unique(y_predict,return_counts=True))
 
 
-f1 = f1_score(y_test,y_predict)
-print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}\nF1:   {f1}")
+# f1 = f1_score(y_test,y_predict)
+print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 
 print(np.unique(y_submit,return_counts=True))
 y_submit = label_encoder.inverse_transform(y_submit)
 print(np.unique(y_submit,return_counts=True))
+
+import datetime
+dt = datetime.datetime.now()
+submission_csv['대출등급'] = y_submit
+submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_ACC{loss[1]:.4f}.csv",index=False)
+
+plt.figure(figsize=(12,9))
+plt.title("DACON lClassification")
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.plot(hist.history['loss'],label='loss',color='red')
+plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
+plt.legend()
+plt.show()
+
+# r=732
+#  LOSS: 3.398134708404541
+# ACC:  0.4292093515396118
