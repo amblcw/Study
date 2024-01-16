@@ -202,7 +202,10 @@ while f1 < 0.6:
 
     model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
     es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
-    hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es])
+    from keras.callbacks import ModelCheckpoint
+    mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
+                        filepath="c:/_data/_save/MCP/keras26_dacon_dechul.hdf5")
+    hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es,mcp])
 
     #evaluate & predict
     loss = model.evaluate(x_test, y_test, verbose=0)    

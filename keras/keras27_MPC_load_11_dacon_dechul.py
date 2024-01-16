@@ -159,72 +159,49 @@ y = ohe.fit_transform(y)
 
 f1 = 0
 
-while f1 < 0.6:
-    r = int(np.random.uniform(1,1000))
+r = int(np.random.uniform(1,1000))
 
-    x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
 
-    from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-    # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-    # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-    # scaler = MaxAbsScaler().fit(x_train)    #
-    scaler = RobustScaler().fit(x_train)    #
+from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = MaxAbsScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
-    x_train = scaler.transform(x_train)
-    x_test = scaler.transform(x_test)
-    test_csv = scaler.transform(test_csv)
-    
-    print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
-    # x_train.shape=(67405, 13)
-    # x_test.shape=(28888, 13)
-    # y_train.shape=(67405, 7)
-    # y_test.shape=(28888, 7)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
 
-    #model
-    model = Sequential()
-    model.add(Dense(512, input_shape=(13,),activation='tanh'))#, activation='sigmoid'))
-    # model.add(Dense(256, activation='relu'))
-    # model.add(Dense(256, activation='relu'))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(16, activation='relu'))
-    # model.add(Dense(8, activation='relu'))
-    model.add(Dense(7, activation='softmax'))
+print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+# x_train.shape=(67405, 13)
+# x_test.shape=(28888, 13)
+# y_train.shape=(67405, 7)
+# y_test.shape=(28888, 7)
+from keras.models import load_model
+model = load_model("../_data/_save/MCP/keras26_dacon_dechul.hdf5")
 
-    #compile & fit
-    print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
-        {np.unique(test_csv,return_counts=True)}\n")
+#evaluate & predict
+loss = model.evaluate(x_test, y_test, verbose=0)    
+y_predict = model.predict(x_test,verbose=0)
+y_predict = np.argmax(y_predict,axis=1)
+y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
+ohe_y_test = y_test
+y_test = np.argmax(y_test,axis=1)
 
-    x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-    x_test =np.asarray(x_test).astype(np.float32)
-    test_csv =np.asarray(test_csv).astype(np.float32)
+print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 
-    model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-    es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
-    hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es])
+# y = y.to_frame(['대출등급'])
+# y_predict = y_predict.reshape(-1,1)
+# ohe = OneHotEncoder(sparse=False)
+# ohe_y_predict = ohe.fit_transform(y_predict)
 
-    #evaluate & predict
-    loss = model.evaluate(x_test, y_test, verbose=0)    
-    y_predict = model.predict(x_test,verbose=0)
-    y_predict = np.argmax(y_predict,axis=1)
-    y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
-    ohe_y_test = y_test
-    y_test = np.argmax(y_test,axis=1)
-
-    print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
-
-    # y = y.to_frame(['대출등급'])
-    # y_predict = y_predict.reshape(-1,1)
-    # ohe = OneHotEncoder(sparse=False)
-    # ohe_y_predict = ohe.fit_transform(y_predict)
-
-    # print(ohe_y_test.shape, ohe_y_predict.shape)
-    # print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
-    # f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
-    f1 = f1_score(y_test,y_predict,average='weighted')
-    print("=========================\nF1: ",f1)
-    time.sleep(1.5)
+# print(ohe_y_test.shape, ohe_y_predict.shape)
+# print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
+# f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
+f1 = f1_score(y_test,y_predict,average='weighted')
+print("=========================\nF1: ",f1)
+time.sleep(1.5)
 
 y_submit = label_encoder.inverse_transform(y_submit)
 
@@ -232,17 +209,6 @@ import datetime
 dt = datetime.datetime.now()
 submission_csv['대출등급'] = y_submit
 submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
-
-plt.figure(figsize=(12,9))
-plt.title("DACON lClassification")
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.plot(hist.history['acc'],label='acc',color='red')
-plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
-# plt.plot(hist.history['loss'],label='loss',color='red')
-# plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
-plt.legend()
-# plt.show()
 
 # r=657
 #  LOSS: 1237.2230224609375
