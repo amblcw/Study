@@ -184,9 +184,10 @@ while f1 < 0.6:
     model = Sequential()
     model.add(Dense(512, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
     model.add(Dense(256, activation='relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(Dense(128, activation='relu'))
     model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='sigmoid'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dense(16, activation='relu'))
     # model.add(Dense(8, activation='relu'))
     model.add(Dense(7, activation='softmax'))
@@ -241,7 +242,7 @@ plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
 # plt.plot(hist.history['loss'],label='loss',color='red')
 # plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
 plt.legend()
-plt.show()
+# plt.show()
 
 # r=657
 #  LOSS: 1237.2230224609375

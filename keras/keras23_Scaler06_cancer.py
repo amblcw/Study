@@ -29,10 +29,10 @@ print(pd.value_counts(y))  #위와 동일
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,shuffle=False)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-# scaler = RobustScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -79,3 +79,15 @@ print(f"ACCURACY: {loss[1]}")
 # Epoch 1018: early stopping
 # 6/6 [==============================] - 0s 603us/step
 # ACCURACY: 0.9766082167625427
+
+# MinMaxScaler
+# ACCURACY: 0.9707602262496948
+
+# StandardScaler
+# ACCURACY: 0.9707602262496948
+
+# MaxAbsScaler
+# ACCURACY: 0.9707602262496948
+
+# RobustScaler
+# ACCURACY: 0.9649122953414917

@@ -36,10 +36,10 @@ y = train_csv['Outcome']
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,shuffle=False)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-# scaler = RobustScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -109,3 +109,19 @@ plt.show()
 # Epoch 526: early stopping
 # LOSS: 1.219661831855774
 # ACC: 0.7653061151504517
+
+# MinMaxScaler
+# LOSS: 0.5364712476730347
+# ACC: 0.7193877696990967
+
+# StandardScaler
+# LOSS: 0.5941564440727234
+# ACC: 0.7397959232330322
+
+# MaxAbsScaler
+# LOSS: 0.5516800284385681
+# ACC: 0.7193877696990967
+
+# RobustScaler
+# LOSS: 0.58819979429245
+# ACC: 0.7448979616165161

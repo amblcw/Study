@@ -41,10 +41,10 @@ while acc < 0.56:
     x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r,stratify=y)
 
     from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-    scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+    # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
     # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
     # scaler = MaxAbsScaler().fit(x_train)    #
-    # scaler = RobustScaler().fit(x_train)    #
+    scaler = RobustScaler().fit(x_train)    #
 
     x_train = scaler.transform(x_train)
     x_test = scaler.transform(x_test)
@@ -121,3 +121,19 @@ plt.legend()
 # r=433
 # LOSS: 1.0544521808624268
 #  ACC:  0.5572727272727273(0.557272732257843 by loss[1])
+
+# MinMaxScaler
+# LOSS: 1.0109286308288574
+#  ACC:  0.5690909090909091(0.5690909028053284 by loss[1])
+
+# StandardScaler
+# LOSS: 1.0394665002822876
+#  ACC:  0.5745454545454546(0.5745454430580139 by loss[1])
+
+# MaxAbsScaler
+# LOSS: 1.0278842449188232
+#  ACC:  0.56(0.5600000023841858 by loss[1])
+
+# RobustScaler
+# LOSS: 1.058943510055542
+#  ACC:  0.5636363636363636(0.5636363625526428 by loss[1])
