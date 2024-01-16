@@ -1,4 +1,4 @@
-from keras.models import Sequential, load_model
+from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -31,6 +31,7 @@ scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일�
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
+from keras.models import load_model
 model = load_model("../_data/_save/MCP/keras26_boston.hdf5")
 
 #evaluate & predict

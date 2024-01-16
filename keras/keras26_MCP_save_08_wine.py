@@ -50,7 +50,10 @@ model.add(Dense(3, activation='softmax'))
 #compile & fit
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='max',patience=50,restore_best_weights=True)
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es])
+from keras.callbacks import ModelCheckpoint
+mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
+                      filepath="c:/_data/_save/MCP/keras26_wine.hdf5")
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es,mcp])
 
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)

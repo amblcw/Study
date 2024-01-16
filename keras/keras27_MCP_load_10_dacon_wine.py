@@ -74,15 +74,6 @@ import datetime
 dt = datetime.datetime.now()
 submit_csv.to_csv(path+f"wine_{dt.day}day{dt.hour:2}{dt.minute:2}_ACC{loss[1]:.4f}.csv",index=False)
 
-#그래프 출력
-plt.figure(figsize=(12,9))
-plt.title("DACON Wine Classification")
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.plot(hist.history['loss'],label='loss',color='red')
-plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
-plt.legend()
-# plt.show()
 
 # r=894
 # LOSS: 2.3342490196228027
