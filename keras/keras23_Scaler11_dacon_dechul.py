@@ -3,7 +3,7 @@ from keras.layers import Dense
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
@@ -164,8 +164,12 @@ while f1 < 0.6:
 
     x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
 
-    scaler = StandardScaler()
-    scaler.fit(x_train)
+    from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
+    # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+    # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+    # scaler = MaxAbsScaler().fit(x_train)    #
+    scaler = RobustScaler().fit(x_train)    #
+
     x_train = scaler.transform(x_train)
     x_test = scaler.transform(x_test)
     test_csv = scaler.transform(test_csv)
@@ -182,8 +186,8 @@ while f1 < 0.6:
     model.add(Dense(256, activation='relu'))
     model.add(Dense(128, activation='relu'))
     model.add(Dense(64, activation='relu'))
-    model.add(Dense(32))#, activation='sigmoid'))
-    model.add(Dense(16))#, activation='relu'))
+    model.add(Dense(32, activation='sigmoid'))
+    model.add(Dense(16, activation='relu'))
     # model.add(Dense(8, activation='relu'))
     model.add(Dense(7, activation='softmax'))
 
@@ -242,3 +246,16 @@ plt.show()
 # r=657
 #  LOSS: 1237.2230224609375
 # ACC:  0.5243353843688965
+
+# MinMaxScaler
+# F1:  0.8378815912825547
+
+# StandardScaler
+# F1:  0.8308539115878224
+
+# MaxAbsScaler
+# F1:  0.8334220011728465
+
+# RobustScaler
+# F1:  0.8429713541136693
+

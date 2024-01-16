@@ -25,8 +25,8 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_st
 
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
+# scaler = MaxAbsScaler().fit(x_train)    #
+# scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -82,7 +82,22 @@ plt.show()
 # r2=0.8213945466114984
 # RMSE: 3.6307874062998877
 
+# MinMax
 # r=88
 # loss=[5.607363700866699, 1.73788583278656]
 # r2=0.9240283091852217
 # RMSE: 2.3679872456140494
+
+# StandardScaler
+# loss=[4.916057586669922, 1.7392468452453613]
+# r2=0.9333945146886241
+# RMSE: 2.217218335403849
+
+# MaxAbsScaler
+# loss=[8.462682723999023, 2.279984474182129]
+# r2=0.885342850431518
+# RMSE: 2.909069072695939
+
+# RobustScaler
+# loss=[0.27136003971099854, 0.27136003971099854]
+# r2=0.796099072829003

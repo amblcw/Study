@@ -23,10 +23,10 @@ r = 176
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-# scaler = RobustScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -76,3 +76,15 @@ plt.show()
 # MinMaxScaler
 # loss=[0.27136003971099854, 0.27136003971099854]
 # r2=0.796099072829003
+
+# StandardScaler
+# loss=[0.26987117528915405, 0.26987117528915405]
+# r2=0.7972178874447766
+
+# MaxAbsScaler
+# loss=[0.3393670916557312, 0.3393670916557312]
+# r2=0.7449983684198338
+
+# RobustScaler
+# loss=[0.293599396944046, 0.293599396944046]
+# r2=0.7793883660319727
