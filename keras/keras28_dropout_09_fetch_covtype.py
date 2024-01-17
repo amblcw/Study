@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense,Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.datasets import fetch_covtype
@@ -65,6 +65,7 @@ model.add(Dense(512,input_dim=54,activation='relu'))
 # model.add(Dense(512, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.7))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
@@ -76,7 +77,7 @@ model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='auto',patience=200,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/fetch_covtype/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/fetch_covtype/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=4096,batch_size=8192,validation_split=0.2, verbose=2,callbacks=[es,mcp])
 
 #evaluate & predict
@@ -114,3 +115,7 @@ plt.show()
 # RobustScaler
 # LOSS: 0.20406576991081238
 # ACC:  0.956461125390123(0.9564611315727234 by loss[1])
+
+# r=283
+# LOSS: 0.19267921149730682
+# ACC:  0.9600009179364788(0.9600009322166443 by loss[1])

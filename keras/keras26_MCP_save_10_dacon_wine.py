@@ -73,7 +73,7 @@ while acc < 0.56:
     es = EarlyStopping(monitor='val_loss',mode='auto',patience=200,restore_best_weights=True,verbose=1)
     from keras.callbacks import ModelCheckpoint
     mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                        filepath="c:/_data/_save/MCP/keras26_dacon_wine.hdf5")
+                        filepath="c:/_data/_save/MCP/dacon_wine"+"{epoch:04d}{val_loss:.4f}.hdf5")
     print(x_train.shape,y_train.shape)
     hist = model.fit(x_train,y_train,epochs=4096,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 

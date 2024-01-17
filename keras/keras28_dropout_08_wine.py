@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense,Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.datasets import load_wine
@@ -43,6 +43,7 @@ model.add(Dense(128,input_dim=13))
 # model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(16, activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(3, activation='softmax'))
@@ -52,7 +53,7 @@ model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='max',patience=50,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/wine/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/wine/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es,mcp])
 
 #evaluate & predict

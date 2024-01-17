@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 import numpy as np
 from sklearn.metrics import r2_score, mean_squared_error, mean_squared_log_error
 from sklearn.model_selection import train_test_split
@@ -44,11 +44,14 @@ print(f"{x_train.shape=},{x_test.shape=}")
 #model
 model = Sequential()
 model.add(Dense(800, input_dim = 8, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(600, ))#activation='relu'))
 model.add(Dense(400, ))#activation='relu'))
+model.add(Dropout(0.3))
 model.add(Dense(200, ))#activation='relu'))
 model.add(Dense(128, ))#activation='relu'))
 model.add(Dense(64, ))#activation='relu'))
+model.add(Dropout(0.1))
 model.add(Dense(32, ))#activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(1))
@@ -68,7 +71,7 @@ model.compile(loss='mse',optimizer='adam',metrics=['mse'])
 es = EarlyStopping(monitor='val_loss',mode='min',patience=30,verbose=1,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/kaggle_bike/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/kaggle_bike/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=32,verbose=2,validation_split=0.3,callbacks=[es,mcp])
 
 #evaluate & predict 

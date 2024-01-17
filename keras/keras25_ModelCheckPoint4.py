@@ -1,3 +1,4 @@
+# 세이브파일명 만들기
 from keras.models import Sequential, load_model
 from keras.layers import Dense
 import numpy as np
@@ -11,6 +12,8 @@ warnings.filterwarnings('ignore')
 
 import datetime
 dt = datetime.datetime.now()
+
+
 
 datasets = load_boston()
 x = datasets.data
@@ -38,14 +41,24 @@ model.add(Dense(1))
 
 # model.summary()
 
-#compile & fit
+# print(type(dt),dt)   #2024-01-17 10:52:40.184440
+# date = dt.strftime("%m%d_%H%M")
+# print(date)
+# path = "../_data/_save/MCP/"
+# filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+# filepath = "".join([path,'k25_',date,'_',filename])
+# #compile & fit
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='val_loss',mode='min',patience=10,verbose=1,restore_best_weights=False)
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',verbose=1,save_best_only=True,
-                      filepath="../_data/_save/MCP/keras25_MCP3.hdf5")
+                    #   filepath=filepath)
+                      filepath=f"../_data/_save/MCP/k25/{dt.day}{dt.hour}_"+"{epoch:04d}-{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=10,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 model.save("../_data/_save/keras25_3_save_model.h5")  #가중치와 모델 모두 담겨있다
+
+
+# filename2 = path+f"{dt.month:02}{dt.day:02}_{dt.hour:02}{dt.minute:02}"
 
 #evaluate & predict
 print("============ 1. 기본출력 ============")
@@ -59,29 +72,29 @@ def RMSE(y_test,y_predict):
 
 print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict)}")
 
-print("========== 2. LOAD_MODEL ==========")
-model2 = load_model("../_data/_save/keras25_3_save_model.h5")
-loss2 = model2.evaluate(x_test,y_test,verbose=0)
-y_predict2 = model2.predict(x_test,verbose=0)
+# print("========== 2. LOAD_MODEL ==========")
+# model2 = load_model("../_data/_save/keras25_3_save_model.h5")
+# loss2 = model2.evaluate(x_test,y_test,verbose=0)
+# y_predict2 = model2.predict(x_test,verbose=0)
 
-r2 = r2_score(y_test,y_predict)
+# r2 = r2_score(y_test,y_predict)
 
-def RMSE(y_test,y_predict):
-    return np.sqrt(mean_squared_error(y_test,y_predict))
+# def RMSE(y_test,y_predict):
+#     return np.sqrt(mean_squared_error(y_test,y_predict))
 
-print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
+# print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
 
-print("========== 2. LOAD_MODEL ==========")
-model2 = load_model("../_data/_save/MCP/keras25_MCP3.hdf5")
-loss2 = model2.evaluate(x_test,y_test,verbose=0)
-y_predict2 = model2.predict(x_test,verbose=0)
+# print("========== 2. LOAD_MODEL ==========")
+# model2 = load_model("../_data/_save/MCP/keras25_MCP3.hdf5")
+# loss2 = model2.evaluate(x_test,y_test,verbose=0)
+# y_predict2 = model2.predict(x_test,verbose=0)
 
-r2 = r2_score(y_test,y_predict)
+# r2 = r2_score(y_test,y_predict)
 
-def RMSE(y_test,y_predict):
-    return np.sqrt(mean_squared_error(y_test,y_predict))
+# def RMSE(y_test,y_predict):
+#     return np.sqrt(mean_squared_error(y_test,y_predict))
 
-print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
+# print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
 # print(hist.history['val_loss'])
 
 # plt.rcParams['font.family'] ='Malgun Gothic'

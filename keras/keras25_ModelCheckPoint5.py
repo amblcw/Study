@@ -1,3 +1,6 @@
+# save_best_only
+# restore_best_weight
+# 에 대한 고찰
 from keras.models import Sequential, load_model
 from keras.layers import Dense
 import numpy as np
@@ -11,6 +14,8 @@ warnings.filterwarnings('ignore')
 
 import datetime
 dt = datetime.datetime.now()
+
+
 
 datasets = load_boston()
 x = datasets.data
@@ -38,14 +43,24 @@ model.add(Dense(1))
 
 # model.summary()
 
-#compile & fit
+# print(type(dt),dt)   #2024-01-17 10:52:40.184440
+# date = dt.strftime("%m%d_%H%M")
+# print(date)
+# path = "../_data/_save/MCP/"
+# filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+# filepath = "".join([path,'k25_',date,'_',filename])
+# #compile & fit
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss',mode='min',patience=10,verbose=1,restore_best_weights=False)
+es = EarlyStopping(monitor='val_loss',mode='min',patience=10,verbose=1,restore_best_weights=True)
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',verbose=1,save_best_only=True,
-                      filepath="../_data/_save/MCP/keras25_MCP3.hdf5")
-hist = model.fit(x_train,y_train,epochs=1024,batch_size=10,validation_split=0.3,verbose=2,callbacks=[es,mcp])
+                    #   filepath=filepath)
+                      filepath=f"../_data/_save/MCP/k25/{dt.day}{dt.hour}_"+"{epoch:04d}-{loss:.4f}.hdf5")
+hist = model.fit(x_train,y_train,epochs=1000,batch_size=10,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 model.save("../_data/_save/keras25_3_save_model.h5")  #가중치와 모델 모두 담겨있다
+
+
+# filename2 = path+f"{dt.month:02}{dt.day:02}_{dt.hour:02}{dt.minute:02}"
 
 #evaluate & predict
 print("============ 1. 기본출력 ============")
@@ -59,45 +74,32 @@ def RMSE(y_test,y_predict):
 
 print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict)}")
 
-print("========== 2. LOAD_MODEL ==========")
-model2 = load_model("../_data/_save/keras25_3_save_model.h5")
-loss2 = model2.evaluate(x_test,y_test,verbose=0)
-y_predict2 = model2.predict(x_test,verbose=0)
+print(hist.history['val_loss'])
 
-r2 = r2_score(y_test,y_predict)
+# save_best_only        =True
+# restore_best_weight   =True
+# 갱신된 epo만 저장, 최고가중치 마지막에 저장
 
-def RMSE(y_test,y_predict):
-    return np.sqrt(mean_squared_error(y_test,y_predict))
+# save_best_only        =True
+# restore_best_weight   =False
+# 갱신된 epo만 저장
 
-print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
+# save_best_only        =False
+# restore_best_weight   =True
+# 모든 epo별로 전부 저장
 
-print("========== 2. LOAD_MODEL ==========")
-model2 = load_model("../_data/_save/MCP/keras25_MCP3.hdf5")
-loss2 = model2.evaluate(x_test,y_test,verbose=0)
-y_predict2 = model2.predict(x_test,verbose=0)
+# save_best_only        =False
+# restore_best_weight   =False
+# 모든 epo별로 전부 저장
 
-r2 = r2_score(y_test,y_predict)
+# 기본출력(restore_best_weight 안되어있음)
+# r=88
+# loss=[6.097459316253662, 1.8482483625411987]        
+# r2=0.9173882207844651
+# RMSE: 2.4693033788182004
 
-def RMSE(y_test,y_predict):
-    return np.sqrt(mean_squared_error(y_test,y_predict))
-
-print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict2)}")
-# print(hist.history['val_loss'])
-
-# plt.rcParams['font.family'] ='Malgun Gothic'
-# plt.rcParams['axes.unicode_minus'] =False
-# plt.figure(figsize=(9,6))
-# plt.plot(hist.history['loss'],color='red',label='loss',marker='.')
-# plt.plot(hist.history['val_loss'],color='blue',label='val_loss',marker='.')
-# plt.legend(loc='upper right')
-# plt.title('보스턴 loss')
-# plt.xlabel('epochs')
-# plt.ylabel('loss')
-# plt.grid()
-# plt.show()
-
-# StandardScaler
-# loss=[4.916057586669922, 1.7392468452453613]
-# r2=0.9333945146886241
-# RMSE: 2.217218335403849
-
+# mcp출력(마지막으로 갱신된 val_loss로)
+# r=88
+# loss=[6.302283763885498, 1.876548171043396]
+# r2=0.9146131446215406
+# RMSE: 2.510434951014859

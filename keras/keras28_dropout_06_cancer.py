@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.datasets import load_breast_cancer
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -41,11 +41,12 @@ x_test = scaler.transform(x_test)
 model = Sequential()
 # model.add(Dense(256,input_dim=30, activation='relu'))
 model.add(Dense(512,input_dim=30,activation='relu'))
-# model.add(Dense(1024))
 model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.3))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) #이진분류에서는 꼭 마지막 레이어에 sigmoid 넣어야함
@@ -55,7 +56,7 @@ model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy']) 
 es = EarlyStopping(monitor='val_accuracy',mode='auto',patience=400,restore_best_weights=True,verbose=1)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/cancer/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/cancer/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=2048,verbose=2,validation_split=0.3,batch_size=16,callbacks=[es,mcp])
 
 #evaluate & predict
@@ -94,3 +95,6 @@ print(f"ACCURACY: {loss[1]}")
 
 # RobustScaler
 # ACCURACY: 0.9649122953414917
+
+# Dropout
+# ACCURACY: 0.9824561476707458

@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -34,12 +34,14 @@ test_csv = scaler.transform(test_csv)
 #model
 model = Sequential()
 model.add(Dense(512,input_dim=9,activation='sigmoid'))
+model.add(Dropout(0.2))
 model.add(Dense(512,activation='relu'))
 # model.add(Dense(512,activation='relu'))
 # model.add(Dense(256,activation='relu'))
 # model.add(Dense(256,activation='relu'))
 model.add(Dense(256,activation='relu'))
 model.add(Dense(256,activation='relu'))
+model.add(Dropout(0.5))
 model.add(Dense(128,activation='relu'))
 model.add(Dense(64,activation='relu'))
 model.add(Dense(1))
@@ -50,7 +52,7 @@ model.compile(loss='mse',optimizer='adam',metrics=['mse'])
 es = EarlyStopping(monitor='val_loss',mode='min',verbose=1,patience=1024,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/dacon_ddarung/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/dacon_ddarung/k28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=8192,batch_size=16,validation_split=0.35,verbose=2,callbacks=[es,mcp])
 
 #evaluate & predeict
@@ -61,7 +63,7 @@ y_submit = model.predict(test_csv,verbose=0)
 import datetime
 dt = datetime.datetime.now()
 submission_csv['count'] = y_submit
-submission_csv.to_csv(path+f"submission_{dt.day}day{dt.hour}-{dt.minute}.csv",index=False)
+submission_csv.to_csv(path+f"submission_{dt.day}day{dt.hour}-{dt.minute}_loss{loss[0]}.csv",index=False)
 
 r2 = r2_score(y_test,y_predict)
 print(f"{loss=}\n{r2=}")
@@ -114,3 +116,7 @@ plt.show()
 # RobustScaler
 # loss=[1260.279296875, 1260.279296875]
 # r2=0.7846772156960977
+
+# Dropout
+# loss=[1309.819091796875, 1309.819091796875]
+# r2=0.7762131732898645

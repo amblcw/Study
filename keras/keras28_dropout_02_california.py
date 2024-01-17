@@ -1,6 +1,6 @@
 from sklearn.datasets import fetch_california_housing
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -35,8 +35,10 @@ x_test = scaler.transform(x_test)
 model = Sequential()
 model.add(Dense(32,input_dim=8,activation='relu'))
 model.add(Dense(64,activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(32,activation='relu'))
 model.add(Dense(16,activation='relu'))
+model.add(Dropout(0.1))
 model.add(Dense(8,activation='relu'))
 model.add(Dense(1))
 
@@ -46,7 +48,7 @@ start_time = time.time()
 es = EarlyStopping(monitor='val_loss',mode='min',patience=20,restore_best_weights=True,verbose=1)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/california/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/california/k28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 
 #evaluate predict
@@ -91,3 +93,8 @@ plt.show()
 # RobustScaler
 # loss=[0.293599396944046, 0.293599396944046]
 # r2=0.7793883660319727
+
+# dropout
+# r=176
+# loss=[0.2723971903324127, 0.2723971903324127]       
+# r2=0.7953197636967315

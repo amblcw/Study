@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 import numpy as np
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
@@ -28,8 +28,10 @@ x_test = scaler.transform(x_test)
 model = Sequential()
 model.add(Dense(16,input_dim=10,activation='relu'))
 model.add(Dense(8))
+model.add(Dropout(0.3))
 model.add(Dense(4))
 model.add(Dense(2))
+model.add(Dropout(0.4))
 model.add(Dense(1))
 
 #compile & fit
@@ -37,7 +39,7 @@ model.compile(loss='mse',optimizer='adam',metrics=['mse'])
 es = EarlyStopping(monitor='val_loss',mode='min',patience=20,verbose=1,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/diabets/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/diabets/keras28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=16,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 
 #evaluate & predict
@@ -84,3 +86,7 @@ plt.show()
 # RobustScaler
 # loss=[3311.09033203125, 3311.09033203125]
 # r2=0.4300550918011412
+
+# Dropout
+# loss=[4871.73974609375, 4871.73974609375]
+# r2=0.1614172552569837

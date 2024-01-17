@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense,Dropout
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -59,7 +59,7 @@ model.add(Dense(512, input_dim=6, activation='relu'))
 # model.add(Dense(256, activation='relu'))
 # model.add(Dense(512, activation='relu'))
 # model.add(Dense(256, activation='relu'))
-# model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.3))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
@@ -80,7 +80,7 @@ model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='max',patience=400,restore_best_weights=True,verbose=1)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                      filepath="c:/_data/_save/MCP/dacon_diabets/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/dacon_diabets/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=2048,batch_size=4,validation_split=0.2,callbacks=[es,mcp],verbose=2)
 
 #evaluate & predict
@@ -128,3 +128,7 @@ plt.show()
 # RobustScaler
 # LOSS: 0.58819979429245
 # ACC: 0.7448979616165161
+
+# Dropout
+# LOSS: 0.5326249599456787
+# ACC: 0.7244898080825806

@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
@@ -31,13 +31,12 @@ scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일�
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-# print(np.min(x_train),np.max(x_train))
-# print(np.min(x_test),np.max(x_test))
-
 #model
 model = Sequential()
 model.add(Dense(32,input_dim=13,activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(16,activation='relu'))
+model.add(Dropout(0.1))
 model.add(Dense(8,activation='relu'))
 model.add(Dense(1))
 
@@ -48,7 +47,7 @@ start_time = time.time()
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='val_loss',mode='min',patience=50,verbose=1,restore_best_weights=True)
 mcp = ModelCheckpoint(monitor='val_loss',mode='auto',save_best_only=True,verbose=1,
-                      filepath="c:/_data/_save/MCP/boston/"+"{epoch:04d}{val_loss:.4f}.hdf5")
+                      filepath="c:/_data/_save/MCP/boston/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=10,validation_split=0.3,verbose=2,callbacks=[es,mcp])
 
 #evaluate & predict
