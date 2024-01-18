@@ -1,5 +1,5 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
+from keras.models import Sequential,Model
+from keras.layers import Dense, Dropout,Input
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -179,17 +179,32 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_train.shape=(67405, 7)
 # y_test.shape=(28888, 7)
 
-model = Sequential()
-model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
-model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
-model.add(Dense(6, activation='relu'))
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))    
-model.add(Dense(7, activation='softmax'))
+# model = Sequential()
+# model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
+# model.add(Dropout(0.05))
+# model.add(Dense(16, activation='relu'))
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dropout(0.05))
+# model.add(Dense(6, activation='relu'))
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dropout(0.05))
+# model.add(Dense(16, activation='relu'))    
+# model.add(Dense(7, activation='softmax'))
+
+input = Input(shape=(13,))
+d1 = Dense(1024, activation='relu')(input)
+dr1 = Dropout(0.05)(d1)
+d2 = Dense(16, activation='relu')(dr1)
+d3 = Dense(1024, activation='relu')(d2)
+dr2 = Dropout(0.05)(d3)
+d4 = Dense(6, activation='relu')(dr2)
+d5 = Dense(1024, activation='relu')(d4)
+dr3 = Dropout(0.05)(d5)
+d6 = Dense(16, activation='relu')(dr3)
+output = Dense(7, activation='sofrmax')(d6)
+
+model = Model(inputs=input,outputs=output)
+
 
 #compile & fit
 print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\

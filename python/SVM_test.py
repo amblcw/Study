@@ -8,6 +8,8 @@ from sklearn.metrics import f1_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import matplotlib.pyplot as plt
 import time
+from sklearn import svm
+from sklearn.multiclass import OneVsOneClassifier
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -152,12 +154,6 @@ y = train_csv['대출등급']
 print(f"{test_csv.shape=}")
 print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))
 
-y = y.to_frame(['대출등급'])
-# y = y.reshape(-1,1)
-ohe = OneHotEncoder(sparse=False)
-y = ohe.fit_transform(y)
-
-f1 = 0
 
 r = int(np.random.uniform(1,1000))
 
@@ -179,41 +175,18 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_train.shape=(67405, 7)
 # y_test.shape=(28888, 7)
 
-model = Sequential()
-model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
-model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
-model.add(Dense(6, activation='relu'))
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))    
-model.add(Dense(7, activation='softmax'))
 
-#compile & fit
-print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
-    {np.unique(test_csv,return_counts=True)}\n")
+model = OneVsOneClassifier(svm.SVC())
+model.fit(x_train,y_train)
 
-x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-x_test =np.asarray(x_test).astype(np.float32)
-test_csv =np.asarray(test_csv).astype(np.float32)
-
-model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
-mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
-                    filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es])
 
 #evaluate & predict
-loss = model.evaluate(x_test, y_test, verbose=0)    
-y_predict = model.predict(x_test,verbose=0)
-y_predict = np.argmax(y_predict,axis=1)
-y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
-ohe_y_test = y_test
-y_test = np.argmax(y_test,axis=1)
+y_predict = model.predict(x_test)
+y_submit = model.predict(test_csv)
 
-print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
+f1 = f1_score(y_test,y_predict, average='weighted')
+
+
 
 # y = y.to_frame(['대출등급'])
 # y_predict = y_predict.reshape(-1,1)
@@ -225,7 +198,6 @@ print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 # f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
 f1 = f1_score(y_test,y_predict,average='weighted')
 print("=========================\nF1: ",f1)
-time.sleep(1.5)
 
 y_submit = label_encoder.inverse_transform(y_submit)
 
@@ -234,16 +206,6 @@ dt = datetime.datetime.now()
 submission_csv['대출등급'] = y_submit
 submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
 
-plt.figure(figsize=(12,9))
-plt.title("DACON lClassification")
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.plot(hist.history['acc'],label='acc',color='red')
-plt.plot(hist.history['val_acc'],label='val_acc',color='blue')
-# plt.plot(hist.history['loss'],label='loss',color='red')
-# plt.plot(hist.history['val_loss'],label='val_loss',color='blue')
-plt.legend()
-# plt.show()
 
 # r=657
 #  LOSS: 1237.2230224609375
