@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from keras.callbacks import EarlyStopping
 from keras.utils import to_categorical
 import sklearn.preprocessing
-
+import time
 path = "C:\\_data\\DACON\\와인품질분류\\"
 train_csv = pd.read_csv(path+"train.csv",index_col=0)
 test_csv = pd.read_csv(path+"test.csv",index_col=0)
@@ -76,20 +76,22 @@ test_csv =np.asarray(test_csv).astype(np.float32)
 #     print(row)
 
 #compile & fit
+start_time = time.time()
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_loss',mode='auto',patience=200,restore_best_weights=True,verbose=1)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                     filepath="c:/_data/_save/MCP/dacon_wine"+"{epoch:04d}{val_loss:.4f}.hdf5")
 print(x_train.shape,y_train.shape)
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es,mcp])
-
+hist = model.fit(x_train,y_train,epochs=123456,batch_size=64,validation_split=0.3,verbose=2)#,callbacks=[es,mcp])
+end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)
 y_predict = np.argmax(model.predict(x_test),axis=1)
 y_submit = np.argmax(model.predict(test_csv),axis=1)+3
 y_test = np.argmax(y_test,axis=1)
 
+print(f"Time: {round(end_time-start_time,2)}sec")
 print(f"{r=} \nLOSS: {loss[0]}\n ACC:  {accuracy_score(y_test,y_predict)}({loss[1]} by loss[1])")
 import time
 time.sleep(1.5)
@@ -147,3 +149,6 @@ plt.legend()
 # RobustScaler
 # LOSS: 1.058943510055542
 #  ACC:  0.5636363636363636(0.5636363625526428 by loss[1])
+
+# CPU Time: 443.28sec
+# GPU Time: 762.75sec

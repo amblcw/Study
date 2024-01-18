@@ -278,3 +278,5 @@ plt.legend()
 # RobustScaler
 # F1:  0.8429713541136693
 
+# CPU Time: 436.51sec
+# GPU Time: 282.74sec

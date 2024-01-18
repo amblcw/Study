@@ -73,7 +73,7 @@ es = EarlyStopping(monitor='val_accuracy',mode='auto',patience=400,restore_best_
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/cancer/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=123456,verbose=2,validation_split=0.3,batch_size=16)#,callbacks=[es,mcp])
+hist = model.fit(x_train,y_train,epochs=1234,verbose=2,validation_split=0.3,batch_size=16)#,callbacks=[es,mcp])
 end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)

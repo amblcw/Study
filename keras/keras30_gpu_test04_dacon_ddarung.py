@@ -64,7 +64,7 @@ es = EarlyStopping(monitor='val_loss',mode='min',verbose=1,patience=1024,restore
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/dacon_ddarung/k28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=123456,batch_size=16,validation_split=0.35,verbose=2,callbacks=[es,mcp])
+hist = model.fit(x_train,y_train,epochs=1234,batch_size=16,validation_split=0.35,verbose=2,callbacks=[es,mcp])
 end_time = time.time()
 #evaluate & predeict
 loss = model.evaluate(x_test,y_test,verbose=0)
@@ -133,3 +133,6 @@ plt.show()
 # Dropout
 # loss=[1309.819091796875, 1309.819091796875]
 # r2=0.7762131732898645
+
+# CPU Time: 101.72sec
+# GPU Time: 125.57sec

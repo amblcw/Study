@@ -10,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping
 from sklearn.metrics import accuracy_score
+import time
 
 datasets = load_wine()
 x = datasets.data
@@ -59,18 +60,20 @@ output = Dense(3, activation='softmax')(d5)
 model = Model(inputs=input,outputs=output)
 
 #compile & fit
+start_time = time.time()
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='max',patience=50,restore_best_weights=True)
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/wine/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es,mcp])
-
+hist = model.fit(x_train,y_train,epochs=123456,batch_size=1,validation_split=0.2,verbose=2)#,callbacks=[es,mcp])
+end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)
 y_predict = np.argmax(model.predict(x_test,verbose=0),axis=1)
 y_test = np.argmax(y_test,axis=1)
 
+print(f"Time: {round(end_time-start_time,2)}sec")
 print(f"{r=} \nLOSS: {loss[0]} \nACC:  {accuracy_score(y_test,y_predict)}({loss[1]} by loss[1])")
 
 plt.figure(figsize=(12,9))

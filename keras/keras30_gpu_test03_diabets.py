@@ -53,7 +53,7 @@ es = EarlyStopping(monitor='val_loss',mode='min',patience=20,verbose=1,restore_b
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/diabets/keras28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=123456,batch_size=16,validation_split=0.3,verbose=2)#,callbacks=[es,mcp])
+hist = model.fit(x_train,y_train,epochs=1234,batch_size=16,validation_split=0.3,verbose=2)#,callbacks=[es,mcp])
 end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=2)
@@ -74,33 +74,5 @@ plt.legend()
 plt.grid()
 plt.show()
 
-# Epoch 142: early stopping
-# 2/2 - 0s - loss: 2985.1555 - 16ms/epoch - 8ms/step
-# 2/2 [==============================] - 0s 1ms/step
-# loss=2985.155517578125
-# r2=0.4861588420968208
-
-# Epoch 144: early stopping
-# 2/2 - 0s - loss: 2990.7566 - 17ms/epoch - 8ms/step
-# loss=2990.756591796875
-# r2=0.48519479541792887
-
-# MinMaxScaler
-# loss=[3074.141357421875, 3074.141357421875]
-# r2=0.4708415493700161
-
-# StandardScaler
-# loss=[3104.548583984375, 3104.548583984375]
-# r2=0.4656075327141054
-
-# MaxAbsScaler
-# loss=[3132.462158203125, 3132.462158203125]
-# r2=0.46080266606836406
-
-# RobustScaler
-# loss=[3311.09033203125, 3311.09033203125]
-# r2=0.4300550918011412
-
-# Dropout
-# loss=[4871.73974609375, 4871.73974609375]
-# r2=0.1614172552569837
+# CPU Time: 33.29sec
+# GPU Time: 59.25sec

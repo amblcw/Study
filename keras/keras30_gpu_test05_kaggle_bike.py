@@ -80,7 +80,7 @@ es = EarlyStopping(monitor='val_loss',mode='min',patience=30,verbose=1,restore_b
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/kaggle_bike/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=123456,batch_size=32,verbose=2,validation_split=0.3)#,callbacks=[es,mcp])
+hist = model.fit(x_train,y_train,epochs=123,batch_size=32,verbose=2,validation_split=0.3)#,callbacks=[es,mcp])
 end_time = time.time()
 #evaluate & predict 
 loss = model.evaluate(x_test,y_test,verbose=0)
@@ -162,3 +162,6 @@ else:
 # loss=[39731.94921875, 39731.94921875]
 # r2=0.17045145049558763
 # RMSLE:  1.2225427797423805
+
+# CPU Time: 122.87sec
+# GPU Time: 42.43sec
