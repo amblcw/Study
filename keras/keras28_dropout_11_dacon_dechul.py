@@ -165,9 +165,9 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_st
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
+# scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -182,13 +182,16 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 model = Sequential()
 model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
 model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
 model.add(Dense(6, activation='relu'))
 model.add(Dense(1024, activation='relu'))
 model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))    
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.05))
+model.add(Dense(6, activation='relu'))   
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.05))
+model.add(Dense(16, activation='relu'))   
 model.add(Dense(7, activation='softmax'))
 
 #compile & fit
