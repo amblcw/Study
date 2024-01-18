@@ -207,6 +207,7 @@ model = Model(inputs=input,outputs=output)
 
 
 #compile & fit
+start_time = time.time()
 print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
     {np.unique(test_csv,return_counts=True)}\n")
 
@@ -218,8 +219,8 @@ model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                     filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es])
-
+hist = model.fit(x_train, y_train, epochs=123456, batch_size=2048, validation_split=0.4, verbose=2)#, callbacks=[es])
+end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test, y_test, verbose=0)    
 y_predict = model.predict(x_test,verbose=0)
@@ -228,6 +229,7 @@ y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
 ohe_y_test = y_test
 y_test = np.argmax(y_test,axis=1)
 
+print(f"Time: {round(end_time-start_time,2)}sec")
 print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 
 # y = y.to_frame(['대출등급'])

@@ -31,3 +31,11 @@ nvidia-smi 입력해서 작동하는지 버전이랑확인
   deactivate <- 이러면 빠져나올 수 있음
   conda search python 하면 설치가능한 파이썬 모두 확인가능 
   conda install python=버전 <- 하면 파이썬 버전 변경가능
+
+#가상환경 삭제
+conda remove --name 가상환경이름 --all
+
+###### 현재 가상환경 ######
+CUDA 11.4
+python 3.9
+tensorflow-gpu==2.9
