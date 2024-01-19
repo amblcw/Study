@@ -161,13 +161,13 @@ f1 = 0
 
 r = int(np.random.uniform(1,1000))
 
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.95,random_state=r,stratify=y)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
+# scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -179,31 +179,32 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_train.shape=(67405, 7)
 # y_test.shape=(28888, 7)
 
-# model = Sequential()
-# model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
-# model.add(Dropout(0.05))
-# model.add(Dense(16, activation='relu'))
-# model.add(Dense(1024, activation='relu'))
-# model.add(Dropout(0.05))
-# model.add(Dense(6, activation='relu'))
-# model.add(Dense(1024, activation='relu'))
-# model.add(Dropout(0.05))
-# model.add(Dense(16, activation='relu'))    
-# model.add(Dense(7, activation='softmax'))
+model = Sequential()
+model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
+model.add(Dropout(0.1))
+model.add(Dense(6, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.1))
+model.add(Dense(6, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.1))
+model.add(Dense(6, activation='relu'))    
+model.add(Dense(7, activation='softmax'))
 
-input = Input(shape=(13,))
-d1 = Dense(1024, activation='relu')(input)
-dr1 = Dropout(0.05)(d1)
-d2 = Dense(16, activation='relu')(dr1)
-d3 = Dense(1024, activation='relu')(d2)
-dr2 = Dropout(0.05)(d3)
-d4 = Dense(6, activation='relu')(dr2)
-d5 = Dense(1024, activation='relu')(d4)
-dr3 = Dropout(0.05)(d5)
-d6 = Dense(16, activation='relu')(dr3)
-output = Dense(7, activation='softmax')(d6)
+# input = Input(shape=(13,))
+# d1 = Dense(1024, activation='relu')(input)
+# dr1 = Dropout(0.15)(d1)
+# d2 = Dense(512, activation='relu')(dr1)
+# d3 = Dense(128, activation='relu')(d2)
+# # dr2 = Dropout(0.15)(d3)
+# d4 = Dense(6, activation='relu')(d3)
+# d5 = Dense(126, activation='relu')(d4)
+# d6 = Dense(512, activation='relu')(d5)
+# dr3 = Dropout(0.15)(d6)
+# d7 = Dense(1024, activation='relu')(dr3)
+# output = Dense(7, activation='softmax')(d7)
 
-model = Model(inputs=input,outputs=output)
+# model = Model(inputs=input,outputs=output)
 
 
 #compile & fit
@@ -219,7 +220,7 @@ model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                     filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train, y_train, epochs=123456, batch_size=2048, validation_split=0.4, verbose=2)#, callbacks=[es])
+hist = model.fit(x_train, y_train, epochs=30000, batch_size=2048, validation_split=0.2, verbose=2, callbacks=[es])
 end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test, y_test, verbose=0)    

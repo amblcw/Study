@@ -74,7 +74,7 @@ es = EarlyStopping(monitor='val_acc',mode='max',patience=400,restore_best_weight
 from keras.callbacks import ModelCheckpoint
 mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
                       filepath="c:/_data/_save/MCP/dacon_diabets/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit(x_train,y_train,epochs=123456,batch_size=4,validation_split=0.2,verbose=2)#,callbacks=[es,mcp])
+hist = model.fit(x_train,y_train,epochs=1234,batch_size=4,validation_split=0.2,verbose=2)#,callbacks=[es,mcp])
 end_time = time.time()
 #evaluate & predict
 loss = model.evaluate(x_test,y_test,verbose=0)
@@ -126,3 +126,6 @@ plt.show()
 # Dropout
 # LOSS: 0.5326249599456787
 # ACC: 0.7244898080825806
+
+# CPU Time: 118.22sec
+# GPU Time: 187.01sec

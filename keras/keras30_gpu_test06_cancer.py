@@ -116,3 +116,6 @@ print(f"ACCURACY: {loss[1]}")
 
 # Dropout
 # ACCURACY: 0.9824561476707458
+
+# CPU Time: 93.94sec
+# GPU Time: 73.73sec

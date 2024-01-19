@@ -104,3 +104,6 @@ plt.legend()
 # RobustScaler
 # LOSS: 0.15712764859199524
 # ACC:  0.9722222222222222(0.9722222089767456 by loss[1])
+
+# CPU Time: 106.29sec
+# GPU Time: 357.62sec

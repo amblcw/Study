@@ -145,9 +145,9 @@ train_csv['대출등급'] = train_loan_grade
 #     print(label)
 #     print(f"train[{label}]: ",np.unique(train_csv[label],return_counts=True))
 #     print(f"test[{label}]",np.unique(test_csv[label],return_counts=True))
-x = train_csv.drop(['대출등급'],axis=1)
-
+x = train_csv.drop(['대출등급','근로기간'],axis=1)
 y = train_csv['대출등급']
+test_csv = test_csv.drop(['근로기간'],axis=1)
 
 print(f"{test_csv.shape=}")
 print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))
@@ -165,6 +165,15 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_st
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = MaxAbsScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
+
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
+
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
 # scaler = RobustScaler().fit(x_train)    #
@@ -180,19 +189,25 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_test.shape=(28888, 7)
 
 model = Sequential()
-model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
+model.add(Dense(1024, input_shape=(12,),activation='relu'))#, activation='sigmoid'))
 model.add(Dropout(0.05))
 model.add(Dense(6, activation='relu'))
 model.add(Dense(1024, activation='relu'))
 model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))
+model.add(Dense(6, activation='relu'))
 model.add(Dense(1024, activation='relu'))
 model.add(Dropout(0.05))
 model.add(Dense(6, activation='relu'))   
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.05))
-model.add(Dense(16, activation='relu'))   
 model.add(Dense(7, activation='softmax'))
+# model.add(Dense(1024, input_dim=12, activation='relu'))
+# model.add(Dense(512, activation='relu'))
+# model.add(Dense(6, activation='relu'))
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dense(512, activation='relu'))
+# model.add(Dense(6, activation='relu'))
+# model.add(Dense(512, activation='relu'))
+# model.add(Dense(7, activation='softmax'))
+
 
 #compile & fit
 print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
