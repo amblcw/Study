@@ -28,23 +28,15 @@ y_test = to_categorical(y_test)
 
 # model
 model = Sequential()
-model.add(Conv2D(filters=32,kernel_size=(2,2),padding='same',input_shape=x_train.shape[1:],activation='swish'))
+model.add(Conv2D(filters=32,kernel_size=(2,2),padding='same', strides=2, input_shape=x_train.shape[1:],activation='swish'))
 model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
 model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(MaxPooling2D())
 model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
+model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same', strides=2,activation='swish'))
 model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
 model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(MaxPooling2D())
 model.add(Dropout(0.1))
 model.add(Flatten())
 model.add(Dense(512,activation='swish'))
@@ -90,3 +82,13 @@ plt.show()
 # failed to allocate memory
 #          [[{{node sequential/conv2d/Sigmoid}}]]
 # Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+# stride, padding
+# time: 79.19280099868774sec
+# LOSS: 1.3080848455429077
+# ACC:  0.5947999954223633
+
+# MaxPooling2D
+# time: 86.988853931427sec
+# LOSS: 1.2076947689056396
+# ACC:  0.6406000256538391

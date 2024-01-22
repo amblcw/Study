@@ -26,30 +26,22 @@ x_test = x_test.astype(np.float32) / 255
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
+x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2]*x_train.shape[3])
+x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2]*x_test.shape[3])
+
+print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+# x_train.shape=(50000, 3072)
+# x_test.shape=(10000, 3072)
+# y_train.shape=(50000, 10)
+# y_test.shape=(10000, 10)
 # model
 model = Sequential()
-model.add(Conv2D(filters=32,kernel_size=(2,2),padding='same',input_shape=x_train.shape[1:],activation='swish'))
-model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Flatten())
-model.add(Dense(512,activation='swish'))
-model.add(Dropout(0.1))
-model.add(Dense(10,activation='softmax'))
+model.add(Dense(4096, input_shape=(3072,), activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(10, activation='softmax'))
 
 # compile & fit
 start_time = time.time()
@@ -90,3 +82,18 @@ plt.show()
 # failed to allocate memory
 #          [[{{node sequential/conv2d/Sigmoid}}]]
 # Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+# stride, padding
+# time: 79.19280099868774sec
+# LOSS: 1.3080848455429077
+# ACC:  0.5947999954223633
+
+# MaxPooling2D
+# time: 86.988853931427sec
+# LOSS: 1.2076947689056396
+# ACC:  0.6406000256538391
+
+# DNN
+# time: 54.351216316223145sec
+# LOSS: 1.4030587673187256
+# ACC:  0.5339999794960022
