@@ -145,9 +145,8 @@ train_csv['대출등급'] = train_loan_grade
 #     print(label)
 #     print(f"train[{label}]: ",np.unique(train_csv[label],return_counts=True))
 #     print(f"test[{label}]",np.unique(test_csv[label],return_counts=True))
-x = train_csv.drop(['대출등급','근로기간'],axis=1)
+x = train_csv.drop(['대출등급'],axis=1)
 y = train_csv['대출등급']
-test_csv = test_csv.drop(['근로기간'],axis=1)
 
 print(f"{test_csv.shape=}")
 print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))

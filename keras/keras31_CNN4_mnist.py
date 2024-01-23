@@ -4,7 +4,7 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Flatten, Dropout
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, MinMaxScaler
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping
 import time
@@ -24,12 +24,25 @@ import time
 # print(pd.value_counts(y_test))
 # 1    1135 # 2    1032 # 7    1028 # 3    1010 # 9    1009 # 4     982 # 0     980 # 8     974 # 6     958 # 5     892
 
-# standard = StandardScaler().fit(x_train)
-# x_train = standard.transform(x_train)
-# x_test = standard.transform(x_test)
 
+
+### 스케일링이 복잡하다 ####
+# x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2]) #scaler.fit()이 최대 2차원만 받기에 reshape했음
+# x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2])
+
+# scaler = MinMaxScaler().fit(x_train)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
+
+# x_train = np.asarray(x_train.reshape(60000,28,28,1)).astype(np.float32)
+# x_test = np.asarray(x_test.reshape(60000,28,28,1)).astype(np.float32)
+
+### 간단한 스케일링 방법 ###
 x_train = np.asarray(x_train.reshape(60000,28,28,1)).astype(np.float32)/255
 x_test = np.asarray(x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2],1)).astype(np.float32)/255
+
+# print(np.min(x_train),np.max(x_train))  #0.0 1.0
+
 print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 y_train = to_categorical(y_train, num_classes=10)
