@@ -25,7 +25,7 @@ nvidia-smi 입력해서 작동하는지 버전이랑확인
 3. cmd 에서 nvcc -V를 입력, 버전이랑 잘 나오면 성공
 
 #가상환경 설치
-1.cmd에 conda create -n tf215_GPU python=3.11.5 anaconda
+1.cmd에 conda create -n tf215_GPU python=3.9 anaconda
 2.conda env list로 확인해보기
 3.activate 가상환경이름   <- 이렇게 하면 실행됨
   deactivate <- 이러면 빠져나올 수 있음
