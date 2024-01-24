@@ -3,6 +3,8 @@ from keras.layers import Conv2D, Dense
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 
+
+
 train_data_gen = ImageDataGenerator(
     rescale=1./255,
     horizontal_flip=True,   # 수평으로 뒤집는다.
@@ -29,6 +31,7 @@ xy_train = train_data_gen.flow_from_directory(
     batch_size=10,          #batch_size만큼 잘라서 인덱스에 담아주지만 통짜로 잘라서 하고싶으면 160(모든데이터 개수)을 입력하면된다
     # batch_size=160,         
     class_mode='binary',
+    color_mode='grayscale',
     shuffle=True,
 )
 # print(xy_train)
@@ -39,7 +42,7 @@ xy_train = train_data_gen.flow_from_directory(
 # xy_train[0]에는 batch_size만큼 이미지가 담겨있으며, y값도 같이 담겨있음
 # print(xy_train[16])#<- error, 총 데이터 160개에서 batch_size만큼인 10개씩 담겼으므로 마지막 인덱스는 15
 # print(xy_train[0][1])     #xy_train[0][0]은 첫번째 배치의 x값, xy_train[0][1]은 첫번째 배치의 y값
-print(xy_train[0][0].shape) #(10, 200, 200, 3) 
+print(xy_train[0][0].shape) #(10, 200, 200, 1)
 print(type(xy_train))       #<class 'keras.preprocessing.image.DirectoryIterator'>
 print(type(xy_train[0]))    #<class 'tuple'>
 print(type(xy_train[0][0])) #<class 'numpy.ndarray'>
