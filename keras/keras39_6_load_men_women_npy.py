@@ -9,14 +9,15 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 import time
+import os
 
 # start_time = time.time()
-path = "C:\\_data\\KAGGLE\\men_women\\data"
+path = "C:\\_data\\KAGGLE\\men_women\\"
 
 BATCH_SIZE = int(1000)
 IMAGE_SIZE = int(130)
 
-load_path = path+f"data_{IMAGE_SIZE}px_"
+load_path = path+f"datadata_{IMAGE_SIZE}px_"
 x = np.load(load_path+"x.npy")
 y = np.load(load_path+"y.npy")
 
@@ -28,14 +29,14 @@ x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.2, random_s
 hist = []
 
 model = Sequential()
-model.add(Conv2D(32,(3,3),padding='valid',strides=2,input_shape=x_train.shape[1:]))
+model.add(Conv2D(64,(3,3),padding='valid',strides=2,input_shape=x_train.shape[1:]))
 model.add(MaxPooling2D())
-model.add(Conv2D(32,(3,3),padding='valid',strides=2))
+model.add(Conv2D(64,(3,3),padding='valid',strides=2))
 model.add(BatchNormalization())
 model.add(MaxPooling2D())
-model.add(Dropout(0.15))
-model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
-model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
+model.add(Dropout(0.25))
+model.add(Conv2D(64,(2,2),padding='valid',activation='relu'))
+model.add(Conv2D(64,(2,2),padding='valid',activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D())
 model.add(Dropout(0.15))
@@ -43,16 +44,16 @@ model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
 model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D())
-model.add(Dropout(0.15))
+model.add(Dropout(0.05))
 model.add(Flatten())
-model.add(Dense(2048,activation='relu'))
-model.add(Dense(256,activation='relu'))
+model.add(Dense(4096,activation='relu'))
+model.add(Dense(512,activation='relu'))
 model.add(Dense(1,activation='sigmoid'))
 
 # compile & fit
 s_time = time.time()
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_acc',mode='auto',patience=100,restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
 hist = model.fit(x_train,y_train,epochs=1024,batch_size=48,validation_data=(x_test,y_test),verbose=2,callbacks=[es])
 e_time = time.time()
 

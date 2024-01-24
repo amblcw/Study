@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 import time
+import os
 
 # start_time = time.time()
 path = "C:\\_data\\KAGGLE\\cat-and-dog-classification-harper2022\\"
@@ -70,7 +71,15 @@ print(y_prediect.shape)
 print(f"LOSS: {loss[0]:.6f}\nACC:  {loss[1]:.6f}")
 model.save(path+f"model_save\\acc_{loss[1]:.6f}.h5")
 
-y_submit = pd.DataFrame({'id':range(5000),'Target':y_prediect})
+forder_dir = path+"test\\test"
+id_list = os.listdir(forder_dir)
+for i, id in enumerate(id_list):
+    id_list[i] = int(id.split('.')[0])
+
+for id in id_list:
+    print(id)
+
+y_submit = pd.DataFrame({'id':id_list,'Target':y_prediect})
 print(y_submit)
 y_submit.to_csv(path+f"submit\\acc_{loss[1]:.6f}.csv",index=False)
 
