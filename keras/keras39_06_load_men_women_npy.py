@@ -46,8 +46,8 @@ model.add(BatchNormalization())
 model.add(MaxPooling2D())
 model.add(Dropout(0.05))
 model.add(Flatten())
-model.add(Dense(4096,activation='relu'))
-model.add(Dense(512,activation='relu'))
+model.add(Dense(2048,activation='relu'))
+# model.add(Dense(512,activation='relu'))
 model.add(Dense(1,activation='sigmoid'))
 
 # compile & fit

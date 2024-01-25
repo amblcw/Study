@@ -37,3 +37,41 @@ def image_scaler(x_train:np.array, x_test:np.array, scaler:str):
     x_test = x_test.reshape(xt0, xt1, xt2, xt3)
     
     return x_train, x_test
+
+
+def merge_image(img_iter):
+    '''
+    argment:
+        img_iter : ImageDataGenerator's iterator
+    return:
+        data, label
+    '''
+    x = []
+    y = []
+    failed_i = []
+    
+    for i in range(len(img_iter)):
+        try:
+            xy = img_iter.next()
+            new_x = np.array(xy[0])
+            new_y = np.array(xy[1])
+            if i == 0:                  #바로 병합시키려 하면 shape가 동일하지않다는 오류가 나기에 최초 1회는 그대로 대입
+                x = new_x
+                y = new_y
+                continue
+            
+            if len(new_y.shape) == 1:   #만약 new_y.shape = (N,) 형태라면, 즉 이진분류라면
+                x = np.vstack([x,new_x])
+                y = np.hstack([y,new_y])
+            else:                       #이진분류가 아니니 다중분류라면
+                x = np.vstack([x,new_x])
+                y = np.vstack([y,new_y])
+                
+        except:
+            print("faied i: ",i)
+            failed_i.append(i)
+        print("i: ",i)
+        print(f"{x.shape=}\n{y.shape=}")    
+        
+    print("failed i list: ",failed_i)
+    return x, y
