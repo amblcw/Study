@@ -35,6 +35,7 @@ xy_train = train_data_gen.flow_from_directory(
     batch_size=BATCH_SIZE,        #batch_size 너무 크게주면 에러나옴
     class_mode='binary',
     shuffle=False
+    
 )
 
 test_data_gen = ImageDataGenerator( #테스트는 실제 데이터여야 의미가 있기에 변형을 하지 않는다

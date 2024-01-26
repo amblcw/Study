@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 
-x = 2222
-print(f"{x:02}")
+a = np.array([]).reshape(1,1,1,0)
+print(a.shape)
 
 #테스트 테스트

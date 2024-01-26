@@ -39,11 +39,12 @@ def image_scaler(x_train:np.array, x_test:np.array, scaler:str):
     return x_train, x_test
 
 
-def merge_image(img_iter):
+def merge_image(img_iter, fail_stop=False):
     '''
-    argment:
+    argments:
         img_iter : ImageDataGenerator's iterator
-    return:
+        fail_stop: True면 예외 발생시 함수를 중지시킵니다
+    returns:
         data, label
     '''
     x = []
@@ -67,9 +68,12 @@ def merge_image(img_iter):
                 x = np.vstack([x,new_x])
                 y = np.vstack([y,new_y])
                 
-        except:
+        except Exception as e:
             print("faied i: ",i)
             failed_i.append(i)
+            if fail_stop:
+                raise
+                
         print("i: ",i)
         print(f"{x.shape=}\n{y.shape=}")    
         

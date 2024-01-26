@@ -32,6 +32,8 @@ model.add(Flatten())
 model.add(Dense(1024,activation='relu'))
 model.add(Dense(3,activation='softmax'))
 
+model.summary()
+
 # compile & fit
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='auto',patience=10,verbose=1)
@@ -42,6 +44,6 @@ loss = model.evaluate(x_test,y_test,verbose=0)
 
 print(f"{r=}\nLOSS: {loss[0]}\nACC:  {loss[1]}")
 
-# r=448
-# LOSS: 0.00020501828112173826
+# r=860
+# LOSS: 0.0001959040528163314
 # ACC:  1.0

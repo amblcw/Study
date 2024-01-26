@@ -15,6 +15,12 @@ path = "C:\\_data\\image\\rps\\"
 
 xy_data_gen = ImageDataGenerator(
     rescale=1./255,
+    horizontal_flip=True,
+    vertical_flip=True,
+    zoom_range=0.2,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    fill_mode='nearest'
 )
 xy_data = xy_data_gen.flow_from_directory(
     path,
