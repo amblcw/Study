@@ -16,7 +16,7 @@ train_path = path+"train\\"
 test_path = path+"test\\"
 
 BATCH_SIZE = int(1000)
-IMAGE_SIZE = int(100)
+IMAGE_SIZE = int(110)
 
 train_data_gen = ImageDataGenerator(
     rescale=1./255,
