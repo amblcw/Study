@@ -63,6 +63,6 @@ print(f"{x.shape=},{y.shape=}")
 save_path = path+f"data_{IMAGE_SIZE}px"
 np.save(save_path+"_aug_x.npy",arr=x)
 np.save(save_path+"_aug_y.npy",arr=y)
-np.save(save_path+"_test_x.npy",arr=y)
-np.save(save_path+"_test_y.npy",arr=y)
+np.save(save_path+"_test_x.npy",arr=x_test)
+np.save(save_path+"_test_y.npy",arr=y_test)
 
