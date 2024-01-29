@@ -41,6 +41,7 @@ def image_scaler(x_train:np.array, x_test:np.array, scaler:str):
 
 def merge_image(img_iter, fail_stop=False):
     '''
+    IDG를 돌려 나눠진 이미지데이터를 병합해주는 함수입니다
     argments:
         img_iter : ImageDataGenerator's iterator
         fail_stop: True면 예외 발생시 함수를 중지시킵니다
@@ -79,3 +80,26 @@ def merge_image(img_iter, fail_stop=False):
         
     print("failed i list: ",failed_i)
     return x, y
+
+def split_x(dataset, time_step:int):
+    '''
+    시계열데이터를 time_step만큼 잘라주는 함수입니다
+    arguments
+        dataset  : arraylike
+        time_step: int
+    return
+        np.array
+    '''
+    result = []
+    num = len(dataset) - time_step + 1
+    if num <= 0: #자르는 것이 불가능한 time_step이 들어온 경우
+        raise Exception(f"time_step:{time_step}이 너무 큽니다")
+    
+    for i in range(num):
+        result.append(dataset[i : i+time_step])
+    result = np.array(result)    
+    
+    if len(result.shape) == 2: #feature가 1개라서 결과가 2차원인 경우
+        result = result.reshape(result.shape[0],result.shape[1],1)
+    
+    return result
