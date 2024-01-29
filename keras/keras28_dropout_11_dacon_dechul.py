@@ -201,15 +201,6 @@ model.add(Dense(1024, activation='relu'))
 model.add(Dropout(0.05))
 model.add(Dense(16, activation='relu'))    
 model.add(Dense(7, activation='softmax'))
-# model.add(Dense(1024, input_dim=12, activation='relu'))
-# model.add(Dense(512, activation='relu'))
-# model.add(Dense(6, activation='relu'))
-# model.add(Dense(1024, activation='relu'))
-# model.add(Dense(512, activation='relu'))
-# model.add(Dense(6, activation='relu'))
-# model.add(Dense(512, activation='relu'))
-# model.add(Dense(7, activation='softmax'))
-
 
 #compile & fit
 print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\

@@ -49,5 +49,5 @@ aug_data = aug_data_gen.flow(
     save_to_dir="C:/_data/temp"
 )
 
-aug_x, aug_y = aug_data.next()
+aug_x, aug_y = aug_data.next()  #한번 실행해야 저장된다
 
