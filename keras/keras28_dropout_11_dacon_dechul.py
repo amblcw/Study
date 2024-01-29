@@ -234,7 +234,7 @@ print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
 # print(ohe_y_test.shape, ohe_y_predict.shape)
 # print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
 # f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
-f1 = f1_score(y_test,y_predict,average='weighted')
+f1 = f1_score(y_test,y_predict,average='macro')
 print("=========================\nF1: ",f1)
 time.sleep(1.5)
 
