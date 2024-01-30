@@ -196,9 +196,7 @@ test_csv = scaler.transform(test_csv)
 print(np.unique(y_train,return_counts=True))
 print(np.unique(y_test,return_counts=True))
 
-x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
-x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
-test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
+
 
 print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # x_train.shape=(67405, 13)
@@ -215,6 +213,9 @@ ed_time = time.time()
 print("time: ",ed_time-st_time)
 print(np.unique(y_train,return_counts=True))
 
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
 model = Sequential()
 model.add(LSTM(512, input_shape=(13,1),activation='tanh'))#, activation='sigmoid'))
@@ -282,3 +283,8 @@ plt.legend()
 
 # RobustScaler
 # F1:  0.8429713541136693
+
+# RNN 
+#  LOSS: 0.49167320132255554
+# ACC:  0.8357217311859131
+# F1:   0.7951592423866837

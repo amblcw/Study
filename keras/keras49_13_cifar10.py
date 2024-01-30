@@ -1,6 +1,6 @@
 from keras.datasets import cifar10
 from keras.models import Sequential, load_model
-from keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
+from keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization, LSTM
 import numpy as np
 import pandas as pd
 from keras.utils import to_categorical
@@ -20,33 +20,34 @@ import matplotlib.pyplot as plt
 
 # acc > 0.77
 
-x_train = x_train.astype(np.float32) / 255
-x_test = x_test.astype(np.float32) / 255
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],x_train.shape[2]*x_train.shape[3]).astype(np.float32) / 255
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2]*x_test.shape[3]).astype(np.float32) / 255
 
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
 # model
 model = Sequential()
-model.add(Conv2D(filters=32,kernel_size=(2,2),padding='same',input_shape=x_train.shape[1:],activation='swish'))
-model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.1))
-model.add(Flatten())
+# model.add(Conv2D(filters=32,kernel_size=(2,2),padding='same',input_shape=x_train.shape[1:],activation='swish'))
+# model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
+# model.add(Conv2D(32,(2,2),padding='same',activation='swish'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D(pool_size=(2,2)))
+# model.add(Dropout(0.1))
+# model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
+# model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
+# model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D(pool_size=(2,2)))
+# model.add(Dropout(0.1))
+# model.add(Conv2D(filters=64,kernel_size=(2,2),padding='same',activation='swish'))
+# model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
+# model.add(Conv2D(64,(2,2),padding='same',activation='swish'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D(pool_size=(2,2)))
+# model.add(Dropout(0.1))
+# model.add(Flatten())
+model.add(LSTM(32,input_shape=x_train.shape[1:],activation='swish'))
 model.add(Dense(512,activation='swish'))
 model.add(Dropout(0.1))
 model.add(Dense(10,activation='softmax'))
@@ -90,3 +91,8 @@ plt.show()
 # failed to allocate memory
 #          [[{{node sequential/conv2d/Sigmoid}}]]
 # Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+# RNN 
+# time: 321.08525466918945sec
+# LOSS: 1.2891615629196167
+# ACC:  0.552299976348877

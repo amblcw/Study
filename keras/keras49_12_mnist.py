@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Conv2D, Flatten, Dropout
+from keras.layers import Dense, Conv2D, Flatten, Dropout, LSTM
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, MinMaxScaler
 from keras.utils import to_categorical
@@ -38,8 +38,8 @@ import time
 # x_test = np.asarray(x_test.reshape(60000,28,28,1)).astype(np.float32)
 
 ### 간단한 스케일링 방법 ###
-x_train = np.asarray(x_train.reshape(60000,28,28,1)).astype(np.float32)/255
-x_test = np.asarray(x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2],1)).astype(np.float32)/255
+x_train = np.asarray(x_train.reshape(60000,28,28)).astype(np.float32)/255
+x_test = np.asarray(x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2])).astype(np.float32)/255
 
 # print(np.min(x_train),np.max(x_train))  #0.0 1.0
 
@@ -57,11 +57,12 @@ y_test = to_categorical(y_test, num_classes=10)
 
 # model
 model = Sequential()
-model.add(Conv2D(filters=30, kernel_size=(2,2), input_shape=(28,28,1))) #Conv2D(filter:출력갯수,kernel_size=(2,2),input_shape=(28,28,1))
-# model.add(Dropout(0.05))
-model.add(Conv2D(20, (2,2)))
-model.add(Conv2D(10, (2,2)))
-model.add(Flatten())                                #일렬로 쭉 펴야마지막에 (batch_size, 10)을 맞춰줄수있다
+# model.add(Conv2D(filters=30, kernel_size=(2,2), input_shape=(28,28,1))) #Conv2D(filter:출력갯수,kernel_size=(2,2),input_shape=(28,28,1))
+# # model.add(Dropout(0.05))
+# model.add(Conv2D(20, (2,2)))
+# model.add(Conv2D(10, (2,2)))
+# model.add(Flatten())                                #일렬로 쭉 펴야마지막에 (batch_size, 10)을 맞춰줄수있다
+model.add(LSTM(30,input_shape=(28,28)))
 model.add(Dense(1000, activation='relu'))           
 model.add(Dropout(0.05))
 # model.add(Dense(100, activation='relu'))
@@ -106,3 +107,8 @@ print(f"LOSS: {loss[0]}\nACC:  {loss[1]}")
 
 # LOSS: 0.22471864521503448
 # ACC:  0.983299970626831
+
+# RNN 
+# time: 98.54098010063171sec
+# LOSS: 0.12344855070114136
+# ACC:  0.9781000018119812

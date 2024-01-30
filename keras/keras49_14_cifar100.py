@@ -1,6 +1,6 @@
 from keras.datasets import cifar100
 from keras.models import Sequential, load_model
-from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, BatchNormalization
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, BatchNormalization, LSTM
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from keras.utils import to_categorical
@@ -11,8 +11,8 @@ import numpy as np
 
 (x_train, y_train), (x_test, y_test) = cifar100.load_data()
 
-x_train = x_train.astype(np.float32) / 255
-x_test = x_test.astype(np.float32) / 255
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],x_train.shape[2]*x_train.shape[3]).astype(np.float32) / 255
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2]*x_test.shape[3]).astype(np.float32) / 255
 
 # plt.imshow(x_train[0], 'gray')
 # plt.show()
@@ -30,48 +30,31 @@ y_test = to_categorical(y_test)
 
 # model
 model = Sequential()
-model.add(Conv2D(32, (2,2), padding='same', input_shape=x_train.shape[1:], activation='relu'))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.25))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.25))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.25))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.1))
-model.add(Dense(100, activation='softmax'))
-
-# model = Sequential()
 # model.add(Conv2D(32, (2,2), padding='same', input_shape=x_train.shape[1:], activation='relu'))
+# model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D(pool_size=(2,2)))
+# model.add(Dropout(0.25))
 # model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
 # model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
 # model.add(BatchNormalization())
 # model.add(MaxPooling2D(pool_size=(2,2)))
 # model.add(Dropout(0.25))
-# model.add(Conv2D(64, (2,2), padding='same',activation='relu'))
-# model.add(Conv2D(64, (2,2), padding='same',activation='relu'))
-# model.add(Conv2D(64, (2,2), padding='same',activation='relu'))
+# model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
+# model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D(pool_size=(2,2)))
+# model.add(Dropout(0.25))
+# model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
+# model.add(Conv2D(32, (2,2), padding='same',activation='relu'))
 # model.add(BatchNormalization())
 # model.add(MaxPooling2D(pool_size=(2,2)))
 # model.add(Dropout(0.25))
 # model.add(Flatten())
-# model.add(Dense(1024, activation='relu'))
-# model.add(Dropout(0.1))
-# model.add(Dense(100, activation='softmax'))
+model.add(LSTM(32,input_shape=x_train.shape[1:],activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.1))
+model.add(Dense(100, activation='softmax'))
 
 # compile & fit
 start_time = time.time()
@@ -105,3 +88,8 @@ plt.show()
 # time: 280.78862738609314sec
 # LOSS: 10.030982971191406
 # ACC:  0.26170000433921814
+
+# RNN 
+# time: 146.5282576084137sec
+# LOSS: 3.5405492782592773
+# ACC:  0.25440001487731934
