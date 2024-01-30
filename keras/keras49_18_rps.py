@@ -16,8 +16,8 @@ y_test = np.load(load_path+"_test_y.npy")
 
 x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],x_train.shape[2]*x_train.shape[3]).astype(np.float32) / 255
 x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2]*x_test.shape[3]).astype(np.float32) / 255
-y_train = y_train.reshape(y_train.shape[0],y_train.shape[1],y_train.shape[2]*y_train.shape[3]).astype(np.float32) / 255
-y_test = y_test.reshape(y_test.shape[0],y_test.shape[1],y_test.shape[2]*y_test.shape[3]).astype(np.float32) / 255
+# y_train = y_train.reshape(y_train.shape[0],y_train.shape[1],y_train.shape[2]*y_train.shape[3]).astype(np.float32) / 255
+# y_test = y_test.reshape(y_test.shape[0],y_test.shape[1],y_test.shape[2]*y_test.shape[3]).astype(np.float32) / 255
 
 print(f"{x_train.shape=} {x_test.shape=}") #x.shape=(2520, 150, 150, 3) y.shape=(2520, 3)
 

@@ -23,10 +23,12 @@ y_train = np.load(load_path+"aug_y.npy")
 x_test = np.load(load_path+"test_x.npy")
 y_test = np.load(load_path+"test_y.npy")
 
+print(y_train.shape)
+
 x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],x_train.shape[2]*x_train.shape[3]).astype(np.float32) / 255
 x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2]*x_test.shape[3]).astype(np.float32) / 255
-y_train = y_train.reshape(y_train.shape[0],y_train.shape[1],y_train.shape[2]*y_train.shape[3]).astype(np.float32) / 255
-y_test = y_test.reshape(y_test.shape[0],y_test.shape[1],y_test.shape[2]*y_test.shape[3]).astype(np.float32) / 255
+# y_train = y_train.reshape(y_train.shape[0],y_train.shape[1],y_train.shape[2]*y_train.shape[3]).astype(np.float32) / 255
+# y_test = y_test.reshape(y_test.shape[0],y_test.shape[1],y_test.shape[2]*y_test.shape[3]).astype(np.float32) / 255
 
 hist = []
 
@@ -87,5 +89,9 @@ if hist != []:
 # ACC:  0.852278
 
 # augment
+# LOSS: 0.000000
+# ACC:  1.000000
+
+# RNN 
 # LOSS: 0.000000
 # ACC:  1.000000

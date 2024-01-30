@@ -3,7 +3,7 @@
 
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential, load_model
-from keras.layers import Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
+from keras.layers import Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization, LSTM
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -22,7 +22,7 @@ x = np.load(load_path+"_aug_x.npy")
 y = np.load(load_path+"_aug_y.npy")
 
 x = x.reshape(x.shape[0],x.shape[1],x.shape[2]*x.shape[3]).astype(np.float32) / 255
-y = y.reshape(y.shape[0],y.shape[1],y.shape[2]*y.shape[3]).astype(np.float32) / 255
+# y = y.reshape(y.shape[0],y.shape[1],y.shape[2]*y.shape[3]).astype(np.float32) / 255
 # test = test.reshape(test.shape[0],test.shape[1],test.shape[2]*test.shape[3]).astype(np.float32) / 255
 
 print("x, y shape: ",x.shape,y.shape)  #(1027, 300, 300, 3) (1027, 2) onehot이 되어있음
@@ -34,23 +34,24 @@ hist = []
 
 # model
 model = Sequential()
-model.add(Conv2D(32,(3,3),padding='valid',strides=2,input_shape=x_train.shape[1:]))
-model.add(MaxPooling2D())
-model.add(Conv2D(32,(3,3),padding='valid',strides=2))
-model.add(BatchNormalization())
-model.add(MaxPooling2D())
-model.add(Dropout(0.15))
-model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
-model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D())
-model.add(Dropout(0.15))
-model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
-model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D())
-model.add(Dropout(0.15))
-model.add(Flatten())
+# model.add(Conv2D(32,(3,3),padding='valid',strides=2,input_shape=x_train.shape[1:]))
+# model.add(MaxPooling2D())
+# model.add(Conv2D(32,(3,3),padding='valid',strides=2))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D())
+# model.add(Dropout(0.15))
+# model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
+# model.add(Conv2D(32,(2,2),padding='valid',activation='relu'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D())
+# model.add(Dropout(0.15))
+# model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
+# model.add(Conv2D(64,(2,2),padding='same',activation='relu'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D())
+# model.add(Dropout(0.15))
+# model.add(Flatten())
+model.add(LSTM(32,input_shape=x_train.shape[1:]))
 model.add(Dense(2048,activation='relu'))
 model.add(Dense(256,activation='relu'))
 model.add(Dense(1,activation='sigmoid'))
