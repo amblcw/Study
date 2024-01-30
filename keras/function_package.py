@@ -99,6 +99,8 @@ def split_x(dataset, time_step:int):
         result.append(dataset[i : i+time_step])
     result = np.array(result)    
     
+    if len(result.shape) == 1: #y같이 벡터형태인 경우
+        result = result.reshape(1,result.shape[0],1)
     if len(result.shape) == 2: #feature가 1개라서 결과가 2차원인 경우
         result = result.reshape(result.shape[0],result.shape[1],1)
     
