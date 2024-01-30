@@ -64,7 +64,7 @@ x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
 
 #model
 model = Sequential()
-model.add(LSTM(512,input_dim=54,activation='relu'))
+model.add(LSTM(512,input_shape=(54,1),activation='relu'))
 # model.add(Dense(512, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))

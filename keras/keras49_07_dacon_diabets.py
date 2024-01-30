@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, LSTM
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -45,6 +45,10 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
+
 #model
 model = Sequential()
 # model.add(Dense(32, input_dim=8, activation='relu'))
@@ -53,7 +57,7 @@ model = Sequential()
 # model.add(Dense(4, activation='relu'))
 # model.add(Dense(2, activation='relu'))
 # model.add(Dense(1, activation='sigmoid'))
-model.add(Dense(512, input_dim=6, activation='relu'))
+model.add(LSTM(512, input_shape=(6,1), activation='relu'))
 # model.add(Dense(256, activation='relu'))
 # model.add(Dense(512, activation='relu'))
 # model.add(Dense(256, activation='relu'))

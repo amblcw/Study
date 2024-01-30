@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, LSTM
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.datasets import load_wine
@@ -37,9 +37,13 @@ scaler = RobustScaler().fit(x_train)    #
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+# test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
+
 #model
 model = Sequential()
-model.add(Dense(128,input_dim=13))
+model.add(LSTM(128,input_shape=(13,1)))
 # model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
