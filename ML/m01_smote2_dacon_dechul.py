@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, BatchNormalization
+from keras.layers import Dense, Dropout, BatchNormalization, LSTM
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -196,6 +196,10 @@ test_csv = scaler.transform(test_csv)
 print(np.unique(y_train,return_counts=True))
 print(np.unique(y_test,return_counts=True))
 
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
+
 print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # x_train.shape=(67405, 13)
 # x_test.shape=(28888, 13)
@@ -213,31 +217,14 @@ print(np.unique(y_train,return_counts=True))
 
 
 model = Sequential()
-model.add(Dense(1024, input_shape=(13,),activation='swish'))#, activation='sigmoid'))
-model.add(Dense(1024, activation='swish'))
-# model.add(BatchNormalization())
-# model.add(Dropout(0.05))
-model.add(Dense(256, activation='swish'))
-model.add(Dense(256, activation='swish'))
-model.add(Dense(256, activation='swish'))
-# model.add(BatchNormalization())
-# model.add(Dropout(0.05))
-model.add(Dense(64, activation='swish'))
-model.add(Dense(64, activation='swish'))  
-model.add(Dense(64, activation='swish'))  
-# model.add(BatchNormalization())
-model.add(Dense(7, activation='softmax'))
-
-# model = Sequential()
-# model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
-# model.add(Dense(512, activation='relu'))
+model.add(LSTM(512, input_shape=(13,1),activation='tanh'))#, activation='sigmoid'))
 # model.add(Dense(256, activation='relu'))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dense(64, activation='relu'))
-# model.add(Dense(32, activation='relu'))  
-# model.add(Dense(16, activation='relu'))    
-# model.add(Dense(7, activation='softmax'))
-
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+# model.add(Dense(8, activation='relu'))
+model.add(Dense(7, activation='softmax'))
 #compile & fit
 x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
 x_test =np.asarray(x_test).astype(np.float32)

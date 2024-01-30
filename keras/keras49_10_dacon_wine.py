@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, LSTM
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -35,56 +35,60 @@ test_csv.loc[test_csv['type'] == 'red', 'type'] = 1
 test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
 # print(test_csv)
 acc = 0
-while acc < 0.56:
-    r = int(np.random.uniform(1,1000))
-    # r = 894
-    x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r,stratify=y)
+# while acc < 0.56:
+r = int(np.random.uniform(1,1000))
+# r = 894
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r,stratify=y)
 
-    from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-    # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-    # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-    # scaler = MaxAbsScaler().fit(x_train)    #
-    scaler = RobustScaler().fit(x_train)    #
+from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = MaxAbsScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
-    x_train = scaler.transform(x_train)
-    x_test = scaler.transform(x_test)
-    test_csv = scaler.transform(test_csv)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
 
-    #model
-    model = Sequential()
-    # model.add(Dense(1024,input_dim=12, activation='relu'))
-    model.add(Dense(512,input_dim=12, activation='relu'))
-    model.add(Dense(256, activation='relu'))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dense(7, activation='softmax'))
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
-    x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-    x_test =np.asarray(x_test).astype(np.float32)
-    test_csv =np.asarray(test_csv).astype(np.float32)
+#model
+model = Sequential()
+# model.add(Dense(1024,input_dim=12, activation='relu'))
+model.add(LSTM(512,input_shape=(12,1), activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(7, activation='softmax'))
 
-    # for row in x_train:
-    #     print(row)
+x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
+x_test =np.asarray(x_test).astype(np.float32)
+test_csv =np.asarray(test_csv).astype(np.float32)
 
-    #compile & fit
-    model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-    es = EarlyStopping(monitor='val_loss',mode='auto',patience=200,restore_best_weights=True,verbose=1)
-    print(x_train.shape,y_train.shape)
-    hist = model.fit(x_train,y_train,epochs=4096,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es])
+# for row in x_train:
+#     print(row)
 
-    #evaluate & predict
-    loss = model.evaluate(x_test,y_test,verbose=0)
-    y_predict = np.argmax(model.predict(x_test),axis=1)
-    y_submit = np.argmax(model.predict(test_csv),axis=1)+3
-    y_test = np.argmax(y_test,axis=1)
-    
-    print(f"{r=} \nLOSS: {loss[0]}\n ACC:  {accuracy_score(y_test,y_predict)}({loss[1]} by loss[1])")
-    import time
-    time.sleep(1.5)
-    
-    acc = loss[1]
+#compile & fit
+model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=200,restore_best_weights=True,verbose=1)
+print(x_train.shape,y_train.shape)
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=64,validation_split=0.3,verbose=2,callbacks=[es])
+
+#evaluate & predict
+loss = model.evaluate(x_test,y_test,verbose=0)
+y_predict = np.argmax(model.predict(x_test),axis=1)
+y_submit = np.argmax(model.predict(test_csv),axis=1)+3
+y_test = np.argmax(y_test,axis=1)
+
+print(f"{r=} \nLOSS: {loss[0]}\n ACC:  {accuracy_score(y_test,y_predict)}({loss[1]} by loss[1])")
+import time
+time.sleep(1.5)
+
+acc = loss[1]
 
 print(np.unique(y_submit,return_counts=True))
 

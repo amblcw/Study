@@ -1,11 +1,11 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, BatchNormalization, LSTM
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 import matplotlib.pyplot as plt
 import time
 
@@ -18,6 +18,10 @@ train_csv = pd.read_csv(path+"train.csv",index_col=0)
 test_csv = pd.read_csv(path+"test.csv",index_col=0)
 submission_csv = pd.read_csv(path+"sample_submission.csv")
 
+trian_have_house = train_csv['대출등급']
+label_encoder = LabelEncoder()
+trian_have_house = label_encoder.fit_transform(trian_have_house)
+'''
 # print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
 # print(train_csv.columns, test_csv.columns,sep='\n',end="\n======================\n")
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
@@ -146,7 +150,6 @@ train_csv['대출등급'] = train_loan_grade
 #     print(f"train[{label}]: ",np.unique(train_csv[label],return_counts=True))
 #     print(f"test[{label}]",np.unique(test_csv[label],return_counts=True))
 x = train_csv.drop(['대출등급'],axis=1)
-
 y = train_csv['대출등급']
 
 print(f"{test_csv.shape=}")
@@ -154,77 +157,97 @@ print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16
 
 y = y.to_frame(['대출등급'])
 # y = y.reshape(-1,1)
-ohe = OneHotEncoder(sparse=False)
-y = ohe.fit_transform(y)
+# ohe = OneHotEncoder(sparse=False)
+# y = ohe.fit_transform(y)
+'''
+
+data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
+# np.save(data_path+"x.npy",arr=x)
+# np.save(data_path+"y.npy",arr=y)
+# np.save(data_path+"test_csv.npy",arr=test_csv)
+
+x = np.load(data_path+"x.npy")
+y = np.load(data_path+"y.npy")
+test_csv = np.load(data_path+"test_csv.npy")
 
 f1 = 0
+r = int(np.random.uniform(1,1000))
 
-while f1 < 0.6:
-    r = int(np.random.uniform(1,1000))
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r,stratify=y)
 
-    x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
+from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = MaxAbsScaler().fit(x_train)    #
+scaler = RobustScaler().fit(x_train)    #
 
-    from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-    # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-    # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-    # scaler = MaxAbsScaler().fit(x_train)    #
-    scaler = RobustScaler().fit(x_train)    #
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
 
-    x_train = scaler.transform(x_train)
-    x_test = scaler.transform(x_test)
-    test_csv = scaler.transform(test_csv)
-    
-    print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
-    # x_train.shape=(67405, 13)
-    # x_test.shape=(28888, 13)
-    # y_train.shape=(67405, 7)
-    # y_test.shape=(28888, 7)
+# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = MaxAbsScaler().fit(x_train)    #
+# scaler = RobustScaler().fit(x_train)    #
 
-    #model
-    model = Sequential()
-    model.add(Dense(512, input_shape=(13,),activation='tanh'))#, activation='sigmoid'))
-    # model.add(Dense(256, activation='relu'))
-    # model.add(Dense(256, activation='relu'))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(16, activation='relu'))
-    # model.add(Dense(8, activation='relu'))
-    model.add(Dense(7, activation='softmax'))
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
+print(np.unique(y_train,return_counts=True))
+print(np.unique(y_test,return_counts=True))
 
-    #compile & fit
-    print(f"{np.unique(x_train,return_counts=True)}\n{np.unique(x_test,return_counts=True)}\n{np.unique(y_train,return_counts=True)}\n{np.unique(y_test,return_counts=True)}\n\
-        {np.unique(test_csv,return_counts=True)}\n")
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
+test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
-    x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-    x_test =np.asarray(x_test).astype(np.float32)
-    test_csv =np.asarray(test_csv).astype(np.float32)
+print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+# x_train.shape=(67405, 13)
+# x_test.shape=(28888, 13)
+# y_train.shape=(67405, 7)
+# y_test.shape=(28888, 7)
 
-    model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-    es = EarlyStopping(monitor='val_acc',mode='auto',patience=2048,restore_best_weights=True,verbose=1)
-    hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_split=0.4, verbose=2, callbacks=[es])
+from imblearn.over_sampling import SMOTE, BorderlineSMOTE
+st_time = time.time()
+smote = BorderlineSMOTE(random_state=r)
+print(type(x_train),type(y_train))
+x_train, y_train = smote.fit_resample(x_train,y_train)
+ed_time = time.time()
+print("time: ",ed_time-st_time)
+print(np.unique(y_train,return_counts=True))
 
-    #evaluate & predict
-    loss = model.evaluate(x_test, y_test, verbose=0)    
-    y_predict = model.predict(x_test,verbose=0)
-    y_predict = np.argmax(y_predict,axis=1)
-    y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
-    ohe_y_test = y_test
-    y_test = np.argmax(y_test,axis=1)
 
-    print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}")#\nF1:   {f1}")
+model = Sequential()
+model.add(LSTM(512, input_shape=(13,1),activation='tanh'))#, activation='sigmoid'))
+# model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+# model.add(Dense(8, activation='relu'))
+model.add(Dense(7, activation='softmax'))
+#compile & fit
+x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
+x_test =np.asarray(x_test).astype(np.float32)
+test_csv =np.asarray(test_csv).astype(np.float32)
 
-    # y = y.to_frame(['대출등급'])
-    # y_predict = y_predict.reshape(-1,1)
-    # ohe = OneHotEncoder(sparse=False)
-    # ohe_y_predict = ohe.fit_transform(y_predict)
+model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['acc'])
+es = EarlyStopping(monitor='val_acc',mode='auto',patience=200,restore_best_weights=True,verbose=1)
+# mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
+#                     filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
+hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_data=(x_test,y_test), verbose=2, callbacks=[es])
 
-    # print(ohe_y_test.shape, ohe_y_predict.shape)
-    # print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
-    # f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
-    f1 = f1_score(y_test,y_predict,average='weighted')
-    print("=========================\nF1: ",f1)
-    time.sleep(1.5)
+#evaluate & predict
+# y_test = y_test.reshape(-1)
+print("x_test, y_test: ",x_test.shape,y_test.shape)
+
+loss = model.evaluate(x_test, y_test, verbose=0)    
+y_predict = model.predict(x_test,verbose=0)
+y_predict = np.argmax(y_predict,axis=1)
+y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
+
+
+f1 = f1_score(y_test,y_predict,average='macro')
+print(f"{r=}\n LOSS: {loss[0]}\nACC:  {loss[1]}\nF1:   {f1}")
 
 y_submit = label_encoder.inverse_transform(y_submit)
 
@@ -259,4 +282,3 @@ plt.legend()
 
 # RobustScaler
 # F1:  0.8429713541136693
-
