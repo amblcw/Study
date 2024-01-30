@@ -28,10 +28,11 @@ def split_xy(data, time_step, y_col):
     result_x = []
     result_y = []
     
-    num = len(data) - time_step
+    num = len(data) - time_step                 # x만자른다면 len(data)-time_step+1이지만 y도 잘라줘야하므로 +1이 없어야함
     for i in range(num):
-        result_x.append(data[i : i+time_step])
-        result_y.append(data.iloc[i+time_step][y_col])
+        result_x.append(data[i : i+time_step])  # i 부터  time_step 개수 만큼 잘라서 result_x에 추가
+        y_row = data.iloc[i+time_step]          # i+time_step번째 행, 즉 result_x에 추가해준 바로 다음순번 행
+        result_y.append(y_row[y_col])           # i+time_step번째 행에서 원하는 열의 값만 result_y에 추가
     
     return np.array(result_x), np.array(result_y)
 
