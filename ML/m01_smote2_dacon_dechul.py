@@ -21,8 +21,8 @@ submission_csv = pd.read_csv(path+"sample_submission.csv")
 trian_have_house = train_csv['대출등급']
 label_encoder = LabelEncoder()
 trian_have_house = label_encoder.fit_transform(trian_have_house)
-'''
-# print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
+
+""" # print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
 # print(train_csv.columns, test_csv.columns,sep='\n',end="\n======================\n")
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
 #        '최근_2년간_연체_횟수', '총상환원금', '총상환이자', '총연체금액', '연체계좌수', '대출등급'],
@@ -61,19 +61,6 @@ test_csv.loc[test_csv['대출목적'] == '결혼' ,'대출목적'] = '기타' #�
 #대출기간 처리
 train_csv['대출기간'] = train_csv['대출기간'].replace({' 36 months' : 36 , ' 60 months' : 60 }).astype(int)
 test_csv['대출기간'] = test_csv['대출기간'].replace({' 36 months' : 36 , ' 60 months' : 60 }).astype(int)
-# train_loan_time = train_csv['대출기간']
-# train_loan_time = train_loan_time.str.split()
-# for i in range(len(train_loan_time)):
-#     train_loan_time.iloc[i] = int(train_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경
-  
-# train_csv['대출기간'] = train_loan_time 
-    
-# test_loan_time = test_csv['대출기간']
-# test_loan_time = test_loan_time.str.split()
-# for i in range(len(test_loan_time)):
-#     test_loan_time.iloc[i] = int(test_loan_time.iloc[i][0]) #앞쪽 숫자만 따서 int로 변경    
-
-# test_csv['대출기간'] = test_loan_time
 
 #근로기간 처리
 train_working_time = train_csv['근로기간']
@@ -145,10 +132,61 @@ train_csv['대출등급'] = train_loan_grade
 #             print("not int, not float : ",data)
 
 
-# for label in test_csv:
-#     print(label)
-#     print(f"train[{label}]: ",np.unique(train_csv[label],return_counts=True))
-#     print(f"test[{label}]",np.unique(test_csv[label],return_counts=True))
+# print(train_csv.quantile(q=0.25))
+# print(train_csv.quantile(q=0.75))
+# 대출금액            10200000.00
+# 대출기간                  36.00
+# 근로기간                   3.00
+# 주택소유상태                 0.00
+# 연간소득            57600000.00
+# 부채_대비_소득_비율           12.65
+# 총계좌수                  17.00
+# 대출목적                   1.00
+# 최근_2년간_연체_횟수           0.00
+# 총상환원금             307572.00
+# 총상환이자             134616.00
+# 총연체금액                  0.00
+# 연체계좌수                  0.00
+# 대출등급                   1.00
+# Name: 0.25, dtype: float64
+# 대출금액            2.400000e+07
+# 대출기간            6.000000e+01
+# 근로기간            3.000000e+01
+# 주택소유상태          2.000000e+00
+# 연간소득            1.128000e+08
+# 부채_대비_소득_비율     2.554000e+01
+# 총계좌수            3.200000e+01
+# 대출목적            3.000000e+00
+# 최근_2년간_연체_횟수    0.000000e+00
+# 총상환원금           1.055076e+06
+# 총상환이자           5.702280e+05
+# 총연체금액           0.000000e+00
+# 연체계좌수           0.000000e+00
+# 대출등급            2.000000e+00
+# Name: 0.75, dtype: float64
+"""
+q1 = train_csv.quantile(q=0.25)
+q3 = train_csv.quantile(q=0.75)
+iqr = q3 - q1
+lower_limit = q1 - 1.5*iqr
+upper_limit = q3 + 1.5*iqr
+
+print(lower_limit)
+print(upper_limit)    
+
+print(train_csv.max())
+print(train_csv.min())
+for label in train_csv:
+    if label in ['연간소득','부채_대비_소득_비율']:
+        lower = lower_limit[label]
+        upper = upper_limit[label]
+        
+        train_csv.loc[train_csv[label]<lower, label] = lower
+        train_csv.loc[train_csv[label]>upper, label] = upper
+
+print(train_csv.max())
+print(train_csv.min())
+
 x = train_csv.drop(['대출등급'],axis=1)
 y = train_csv['대출등급']
 
@@ -158,8 +196,8 @@ print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16
 y = y.to_frame(['대출등급'])
 # y = y.reshape(-1,1)
 # ohe = OneHotEncoder(sparse=False)
-# y = ohe.fit_transform(y)
-'''
+# y = ohe.fit_transform(y) 
+
 
 data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
 # np.save(data_path+"x.npy",arr=x)
