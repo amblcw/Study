@@ -106,21 +106,31 @@ def split_x(dataset, time_step:int):
     
     return result
 
-def split_xy(dataset,time_step):
+def split_xy(dataset,time_step,y_col='None'):
     '''
     아직 시계열 데이터 등에 대한건 더 개선 필요
     '''
     result = []
-    time_step += 1 #y까지 포함해서 잘라야하기에 +1
+    result_y = []
     num = len(dataset) - time_step + 1
-    if num <= 0: #자르는 것이 불가능한 time_step이 들어온 경우
+    if y_col == 'None':
+        time_step += 1  # y까지 포함해서 잘라야하기에 +1
+    else:
+        num += 1        # y들어갈거 생각하면 1칸 비워줘야하기에
+
+    if num <= 0: # 자르는 것이 불가능한 time_step이 들어온 경우
         raise Exception(f"time_step:{time_step}이 너무 큽니다")
     
     for i in range(num):
         result.append(dataset[i : i+time_step])
     result = np.array(result)    
     
-    if len(result.shape) == 2: #feature가 1개라서 결과가 2차원인 경우
+    if len(result.shape) == 2: # feature가 1개라서 결과가 2차원인 경우
         result = result.reshape(result.shape[0],result.shape[1],1)
     
-    return result[:,:-1,:] , result[:,-1,0]
+    
+    
+    if y_col == 'None':
+        return result[:,:-1,:] , result[:,-1,0]
+    else:
+        pass
