@@ -213,13 +213,13 @@ print(np.unique(y_train,return_counts=True))
 
 
 model = Sequential()
-model.add(Dense(1024, input_shape=(13,),activation='swish'))#, activation='sigmoid'))
-model.add(Dense(1024, activation='swish'))
+model.add(Dense(128, input_shape=(13,),activation='swish'))#, activation='sigmoid'))
+model.add(Dense(128, activation='swish'))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
-model.add(Dense(256, activation='swish'))
-model.add(Dense(256, activation='swish'))
-model.add(Dense(256, activation='swish'))
+model.add(Dense(64, activation='swish'))
+model.add(Dense(128, activation='swish'))
+model.add(Dense(64, activation='swish'))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
 model.add(Dense(64, activation='swish'))
@@ -299,3 +299,8 @@ plt.legend()
 
 # RobustScaler
 # F1:  0.8429713541136693
+
+# r=521
+#  LOSS: 0.33680108189582825
+# ACC:  0.8795430660247803
+# F1:   0.8339690794373145
