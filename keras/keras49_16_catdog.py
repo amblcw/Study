@@ -25,7 +25,7 @@ y = np.load(load_path+"aug_y.npy")
 test = np.load(load_path+"test.npy")
 
 x = x.reshape(x.shape[0],x.shape[1],x.shape[2]*x.shape[3]).astype(np.float32) / 255
-y = y.reshape(y.shape[0],y.shape[1],y.shape[2]*y.shape[3]).astype(np.float32) / 255
+# y = y.reshape(y.shape[0],y.shape[1],y.shape[2]*y.shape[3]).astype(np.float32) / 255
 test = test.reshape(test.shape[0],test.shape[1],test.shape[2]*test.shape[3]).astype(np.float32) / 255
 
 print(x.shape,y.shape)

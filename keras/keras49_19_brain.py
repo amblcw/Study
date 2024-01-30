@@ -82,3 +82,7 @@ if hist != []:
 # augment
 # LOSS: 0.000000
 # ACC:  1.000000
+
+# RNN 
+# LOSS: 0.639779
+# ACC:  0.645833
