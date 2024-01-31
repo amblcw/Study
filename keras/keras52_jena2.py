@@ -57,7 +57,7 @@ model.add(Dense(1))
 
 # compile & fit
 model.compile(loss='mse',optimizer='adam')
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=10,restore_best_weights=True)
 hist = model.fit(x_train,y_train,epochs=4096,batch_size=128,validation_split=0.2,verbose=2,callbacks=[es])
 
 # model = load_model("C:\_data\KAGGLE\Jena_Climate_Dataset\model_save\\r2_0.9994.h5")
