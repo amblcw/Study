@@ -1,0 +1,114 @@
+import numpy as np
+import pandas as pd
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, Flatten, Dropout, LSTM, Conv1D
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, MinMaxScaler
+from keras.utils import to_categorical
+from keras.callbacks import EarlyStopping
+import time
+
+# data
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+# print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+# x_train.shape=(60000, 28, 28)
+# x_test.shape=(10000, 28, 28)
+# y_train.shape=(60000,)
+# y_test.shape=(10000,)
+
+# plt.imshow(x_train[0], 'gray')
+# plt.show()
+# print(np.unique(y_train, return_counts=True))
+# (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=uint8), array([5923, 6742, 5958, 6131, 5842, 5421, 5918, 6265, 5851, 5949],dtype=int64)
+# print(pd.value_counts(y_test))
+# 1    1135 # 2    1032 # 7    1028 # 3    1010 # 9    1009 # 4     982 # 0     980 # 8     974 # 6     958 # 5     892
+
+
+
+### 스케일링이 복잡하다 ####
+# x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2]) #scaler.fit()이 최대 2차원만 받기에 reshape했음
+# x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2])
+
+# scaler = MinMaxScaler().fit(x_train)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
+
+# x_train = np.asarray(x_train.reshape(60000,28,28,1)).astype(np.float32)
+# x_test = np.asarray(x_test.reshape(60000,28,28,1)).astype(np.float32)
+
+### 간단한 스케일링 방법 ###
+x_train = np.asarray(x_train.reshape(60000,28,28)).astype(np.float32)/255
+x_test = np.asarray(x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2])).astype(np.float32)/255
+
+# print(np.min(x_train),np.max(x_train))  #0.0 1.0
+
+print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+
+y_train = to_categorical(y_train, num_classes=10)
+y_test = to_categorical(y_test, num_classes=10)
+
+# y_train = y_train.reshape(-1,1)
+# ohe = OneHotEncoder(sparse=False)
+# y_train = ohe.fit_transform(y_train)
+# print(type(y_train))
+
+
+
+# model
+model = Sequential()
+# model.add(Conv2D(filters=30, kernel_size=(2,2), input_shape=(28,28,1))) #Conv2D(filter:출력갯수,kernel_size=(2,2),input_shape=(28,28,1))
+# # model.add(Dropout(0.05))
+# model.add(Conv2D(20, (2,2)))
+# model.add(Conv2D(10, (2,2)))
+model.add(Conv1D(32,2,input_shape=x_train.shape[1:]))
+model.add(LSTM(32,activation='relu'))
+model.add(Dense(1000, activation='relu'))           
+model.add(Dropout(0.05))
+# model.add(Dense(100, activation='relu'))
+model.add(Dense(units=10, activation='softmax'))
+# Dense input_shape = (batch_size, input_dim),              output_shape = (batch_size, units)
+# Conv2D input_shape = (batch_size, rows, colums, channels),output_shape = (channels, new_rows, new_colums, filters)
+
+model.summary()
+'''
+# Param = {(kenel_width * kenel_height) * channels + 1(bias 숫자)} * filters
+
+ Layer (type)                Output Shape              Param #
+=================================================================
+ conv2d (Conv2D)             (None, 27, 27, 30)        150          {(2*2)*1 +1}*30 =150
+
+ conv2d_1 (Conv2D)           (None, 26, 26, 20)        2420         {(2*2)*30 + 1}*20 = 2420
+
+ flatten (Flatten)           (None, 13520)             0
+
+ dense (Dense)               (None, 1000)              13521000
+
+ dropout (Dropout)           (None, 1000)              0
+
+ dense_1 (Dense)             (None, 10)                10010
+=================================================================
+Total params: 13,533,580
+Trainable params: 13,533,580
+Non-trainable params: 0
+'''
+# compile & fit
+start_time = time.time()
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
+es = EarlyStopping(monitor='val_acc', mode='auto', restore_best_weights=True)
+hist = model.fit(x_train, y_train, batch_size=128, epochs=100, validation_split=0.2, verbose=2 )
+end_time = time.time()
+# evaluate & predict
+loss = model.evaluate(x_test,y_test, verbose=0)
+y_predict = model.predict(x_test, verbose=0)
+
+print(f"time: {end_time - start_time}sec")
+print(f"LOSS: {loss[0]}\nACC:  {loss[1]}")
+
+# LOSS: 0.22471864521503448
+# ACC:  0.983299970626831
+
+# RNN 
+# time: 98.54098010063171sec
+# LOSS: 0.12344855070114136
+# ACC:  0.9781000018119812

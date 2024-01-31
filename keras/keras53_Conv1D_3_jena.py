@@ -5,12 +5,26 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 # from function_package import split_x, split_xy
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import time
 '''
 5일분(720행)을 훈련 시켜서 하루 뒤(144행)를 예측
 '''
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  try:
+    # Currently, memory growth needs to be the same across GPUs
+    for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Memory growth must be set before GPUs have been initialized
+    print(e)
+
+
 start_time = time.time()
 path = "C:\_data\KAGGLE\Jena_Climate_Dataset\\"
 
@@ -22,7 +36,7 @@ col = datasets.columns
 # MinMaxScale
 minmax = MinMaxScaler()
 minmax_for_y = MinMaxScaler().fit(np.array(datasets['T (degC)']).reshape(-1,1))
-datasets = minmax.fit_transform(datasets)
+datasets = minmax.fit_transform(datasets).astype(np.float16)
 datasets = pd.DataFrame(datasets,columns=col)   # 다시 DataFrame으로, 이유는 밑의 함수들을 이용하기 위해서
 
 # print(row_x.isna().sum(),row_y.isna().sum())    #결측치 존재하지 않음
@@ -44,16 +58,29 @@ TRAIN_SIZE = 720
 PREDICT_GAP = 144
 x, y = split_xy(datasets,TRAIN_SIZE,'T (degC)',PREDICT_GAP)
 
+x = x[-10000:]
+y = y[-10000:]
+
 print("x, y: ",x.shape,y.shape)     #(419687, 720, 14) (419687,)
 print(x[0],y[0],sep='\n')           #검증완료
 
 # train test split
-x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2,shuffle=False)#,random_state=333)
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.5,shuffle=False)#,random_state=333)
 print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 # model
 model = Sequential()
-model.add(Conv1D(8,3,input_shape=x_train.shape[1:]))
+model.add(Conv1D(1,2,input_shape=x_train.shape[1:]))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
+model.add(Conv1D(1,2))
 model.add(Flatten())
 # model.add(Dense(1, input_shape=x_train.shape[1:]))
 # model.add(Dense(512, activation='relu'))
@@ -61,9 +88,11 @@ model.add(Flatten())
 # model.add(Dense(32, activation='relu'))
 model.add(Dense(1))
 
+model.summary()
+
 # compile & fit
 model.compile(loss='mse',optimizer='adam')
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=5,restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=3,restore_best_weights=True,verbose=1)
 hist = model.fit(x_train,y_train,epochs=4096,batch_size=1,validation_split=0.2,verbose=2,callbacks=[es])
 
 # model = load_model("C:\_data\KAGGLE\Jena_Climate_Dataset\model_save\\r2_0.9994.h5")
