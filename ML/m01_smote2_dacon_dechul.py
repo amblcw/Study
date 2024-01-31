@@ -22,7 +22,9 @@ trian_have_house = train_csv['대출등급']
 label_encoder = LabelEncoder()
 trian_have_house = label_encoder.fit_transform(trian_have_house)
 
-""" # print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
+"""
+"""
+# print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
 # print(train_csv.columns, test_csv.columns,sep='\n',end="\n======================\n")
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
 #        '최근_2년간_연체_횟수', '총상환원금', '총상환이자', '총연체금액', '연체계좌수', '대출등급'],
@@ -164,7 +166,6 @@ train_csv['대출등급'] = train_loan_grade
 # 연체계좌수           0.000000e+00
 # 대출등급            2.000000e+00
 # Name: 0.75, dtype: float64
-"""
 q1 = train_csv.quantile(q=0.25)
 q3 = train_csv.quantile(q=0.75)
 iqr = q3 - q1
@@ -177,7 +178,7 @@ print(upper_limit)
 print(train_csv.max())
 print(train_csv.min())
 for label in train_csv:
-    if label in ['연간소득','부채_대비_소득_비율']:
+    if label in ['연간소득','부채_대비_소득_비율','총상환원금']:
         lower = lower_limit[label]
         upper = upper_limit[label]
         
@@ -204,13 +205,13 @@ data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
 # np.save(data_path+"y.npy",arr=y)
 # np.save(data_path+"test_csv.npy",arr=test_csv)
 
-x = np.load(data_path+"x.npy")
-y = np.load(data_path+"y.npy")
-test_csv = np.load(data_path+"test_csv.npy")
+# x = np.load(data_path+"x.npy")
+# y = np.load(data_path+"y.npy")
+# test_csv = np.load(data_path+"test_csv.npy")
 
 f1 = 0
 r = int(np.random.uniform(1,1000))
-
+r = 529
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r,stratify=y)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
@@ -240,14 +241,14 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_train.shape=(67405, 7)
 # y_test.shape=(28888, 7)
 
-from imblearn.over_sampling import SMOTE, BorderlineSMOTE
-st_time = time.time()
-smote = BorderlineSMOTE(random_state=r)
-print(type(x_train),type(y_train))
-x_train, y_train = smote.fit_resample(x_train,y_train)
-ed_time = time.time()
-print("time: ",ed_time-st_time)
-print(np.unique(y_train,return_counts=True))
+# from imblearn.over_sampling import SMOTE, BorderlineSMOTE
+# st_time = time.time()
+# smote = BorderlineSMOTE(random_state=r)
+# print(type(x_train),type(y_train))
+# x_train, y_train = smote.fit_resample(x_train,y_train)
+# ed_time = time.time()
+# print("time: ",ed_time-st_time)
+# print(np.unique(y_train,return_counts=True))
 
 
 model = Sequential()
@@ -255,9 +256,9 @@ model.add(Dense(128, input_shape=(13,),activation='swish'))#, activation='sigmoi
 model.add(Dense(128, activation='swish'))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
-model.add(Dense(64, activation='swish'))
 model.add(Dense(128, activation='swish'))
-model.add(Dense(64, activation='swish'))
+model.add(Dense(128, activation='swish'))
+model.add(Dense(128, activation='swish'))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
 model.add(Dense(64, activation='swish'))
@@ -268,11 +269,16 @@ model.add(Dense(7, activation='softmax'))
 
 # model = Sequential()
 # model.add(Dense(1024, input_shape=(13,),activation='relu'))#, activation='sigmoid'))
-# model.add(Dense(512, activation='relu'))
-# model.add(Dense(256, activation='relu'))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dense(64, activation='relu'))
-# model.add(Dense(32, activation='relu'))  
+# model.add(Dropout(0.05))
+# model.add(Dense(16, activation='relu'))
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dropout(0.05))
+# model.add(Dense(6, activation='relu'))
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dropout(0.05))
+# model.add(Dense(16, activation='relu'))  
+# model.add(Dense(1024, activation='relu'))
+# model.add(Dropout(0.05))
 # model.add(Dense(16, activation='relu'))    
 # model.add(Dense(7, activation='softmax'))
 
@@ -286,7 +292,7 @@ x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],1)
 test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
 model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_acc',mode='auto',patience=200,restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_acc',mode='auto',patience=1024,restore_best_weights=True,verbose=1)
 # mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
 #                     filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
 hist = model.fit(x_train, y_train, epochs=16384, batch_size=2048, validation_data=(x_test,y_test), verbose=2, callbacks=[es])
