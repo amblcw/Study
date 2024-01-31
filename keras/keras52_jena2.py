@@ -33,7 +33,7 @@ def split_xy(data, time_step, y_col,y_gap=0):
     num = len(data) - (time_step+y_gap)                 # x만자른다면 len(data)-time_step+1이지만 y도 잘라줘야하므로 +1이 없어야함
     for i in range(num):
         result_x.append(data[i : i+time_step])  # i 부터  time_step 개수 만큼 잘라서 result_x에 추가
-        y_row = data.iloc[i+time_step]          # i+time_step번째 행, 즉 result_x에 추가해준 바로 다음순번 행
+        y_row = data.iloc[i+time_step+y_gap]          # i+time_step번째 행, 즉 result_x에 추가해준 바로 다음순번 행
         result_y.append(y_row[y_col])           # i+time_step번째 행에서 원하는 열의 값만 result_y에 추가
     
     return np.array(result_x), np.array(result_y)
@@ -58,7 +58,7 @@ model.add(Dense(1))
 # compile & fit
 model.compile(loss='mse',optimizer='adam')
 es = EarlyStopping(monitor='val_loss',mode='auto',patience=10,restore_best_weights=True)
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=128,validation_split=0.2,verbose=2,callbacks=[es])
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=256,validation_split=0.2,verbose=2,callbacks=[es])
 
 # model = load_model("C:\_data\KAGGLE\Jena_Climate_Dataset\model_save\\r2_0.9994.h5")
 
@@ -81,5 +81,6 @@ print(x_test.shape,y_predict.shape,predicted_degC.shape)
 submit = pd.DataFrame(np.array([y_true,predicted_degC]).reshape(-1,2),columns=['true','predict'])
 submit.to_csv(path+f"submit_r2_{r2}.csv",index=False)
 
-# LOSS: 1.1545700544957072e-05
-# R2:  0.9994092879419377
+# time:  353.28170108795166
+# LOSS: 1.2436596080078743e-05
+# R2:  0.9993100796981016
