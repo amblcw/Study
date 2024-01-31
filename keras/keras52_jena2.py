@@ -8,7 +8,9 @@ import numpy as np
 # from function_package import split_x, split_xy
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import time
-
+'''
+5일분(720행)을 훈련 시켜서 하루 뒤(144행)를 예측
+'''
 start_time = time.time()
 path = "C:\_data\KAGGLE\Jena_Climate_Dataset\\"
 
@@ -38,9 +40,11 @@ def split_xy(data, time_step, y_col,y_gap=0):
     
     return np.array(result_x), np.array(result_y)
 
-x, y = split_xy(datasets,144,'T (degC)')
+TRAIN_SIZE = 720
+PREDICT_GAP = 144
+x, y = split_xy(datasets,TRAIN_SIZE,'T (degC)',PREDICT_GAP)
 
-print("x, y: ",x.shape,y.shape)     #(420407, 144, 14) (420407,)
+print("x, y: ",x.shape,y.shape)     #(419687, 720, 14) (419687,)
 print(x[0],y[0],sep='\n')           #검증완료
 
 # train test split
@@ -57,8 +61,8 @@ model.add(Dense(1))
 
 # compile & fit
 model.compile(loss='mse',optimizer='adam')
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=10,restore_best_weights=True)
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=256,validation_split=0.2,verbose=2,callbacks=[es])
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=20,restore_best_weights=True)
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=128,validation_split=0.2,verbose=2,callbacks=[es])
 
 # model = load_model("C:\_data\KAGGLE\Jena_Climate_Dataset\model_save\\r2_0.9994.h5")
 
@@ -68,7 +72,7 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test,y_predict)
 end_time = time.time()
 
-print("time: ", end_time-start_time)
+print("time: ",end_time-start_time)
 print(f"LOSS: {loss}\nR2:  {r2}")
 model.save(path+f"model_save/r2_{r2:.4f}.h5")
 
@@ -81,6 +85,5 @@ print(x_test.shape,y_predict.shape,predicted_degC.shape)
 submit = pd.DataFrame(np.array([y_true,predicted_degC]).reshape(-1,2),columns=['true','predict'])
 submit.to_csv(path+f"submit_r2_{r2}.csv",index=False)
 
-# time:  353.28170108795166
-# LOSS: 1.2436596080078743e-05
-# R2:  0.9993100796981016
+# LOSS: 1.1545700544957072e-05
+# R2:  0.9994092879419377
