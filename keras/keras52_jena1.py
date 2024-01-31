@@ -7,7 +7,11 @@ import pandas as pd
 import numpy as np
 # from function_package import split_x, split_xy
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-
+import time
+'''
+5일분(720행)을 훈련 시켜서 하루 뒤(144행)를 예측
+'''
+start_time = time.time()
 path = "C:\_data\KAGGLE\Jena_Climate_Dataset\\"
 
 datasets = pd.read_csv(path+"jena_climate_2009_2016.csv", index_col=0)
@@ -24,19 +28,21 @@ datasets = pd.DataFrame(datasets,columns=col)   # 다시 DataFrame으로, 이유
 # print(row_x.isna().sum(),row_y.isna().sum())    #결측치 존재하지 않음
 
 # data RNN에 맞게 변환
-def split_xy(data, time_step, y_col):
+def split_xy(data, time_step, y_col,y_gap=0):
     result_x = []
     result_y = []
     
-    num = len(data) - time_step                 # x만자른다면 len(data)-time_step+1이지만 y도 잘라줘야하므로 +1이 없어야함
+    num = len(data) - (time_step+y_gap)                 # x만자른다면 len(data)-time_step+1이지만 y도 잘라줘야하므로 +1이 없어야함
     for i in range(num):
         result_x.append(data[i : i+time_step])  # i 부터  time_step 개수 만큼 잘라서 result_x에 추가
-        y_row = data.iloc[i+time_step]          # i+time_step번째 행, 즉 result_x에 추가해준 바로 다음순번 행
+        y_row = data.iloc[i+time_step+y_gap]          # i+time_step번째 행, 즉 result_x에 추가해준 바로 다음순번 행
         result_y.append(y_row[y_col])           # i+time_step번째 행에서 원하는 열의 값만 result_y에 추가
     
     return np.array(result_x), np.array(result_y)
 
-x, y = split_xy(datasets,3,'T (degC)')
+TRAIN_SIZE = 720
+PREDICT_GAP = 144
+x, y = split_xy(datasets,TRAIN_SIZE,'T (degC)',PREDICT_GAP)
 
 print("x, y: ",x.shape,y.shape)     #(420548, 3, 14) (420548,)
 print(x[0],y[0],sep='\n')           #검증완료
@@ -64,7 +70,9 @@ hist = model.fit(x_train,y_train,epochs=4096,batch_size=8192,validation_split=0.
 loss = model.evaluate(x_test,y_test)
 y_predict = model.predict(x_test)
 r2 = r2_score(y_test,y_predict)
+end_time = time.time()
 
+print("time: ",end_time-start_time)
 print(f"LOSS: {loss}\nR2:  {r2}")
 model.save(path+f"model_save/r2_{r2:.4f}.h5")
 

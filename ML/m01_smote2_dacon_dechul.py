@@ -178,7 +178,7 @@ print(upper_limit)
 print(train_csv.max())
 print(train_csv.min())
 for label in train_csv:
-    if label in ['연간소득','부채_대비_소득_비율','총상환원금']:
+    if label in ['연간소득','부채_대비_소득_비율','총상환원금','총상환이자']:
         lower = lower_limit[label]
         upper = upper_limit[label]
         
