@@ -1,5 +1,5 @@
 from keras.models import Sequential, load_model
-from keras.layers import Dense, LSTM, Bidirectional, GRU, SimpleRNN
+from keras.layers import Dense, LSTM, Bidirectional, GRU, SimpleRNN, Conv1D, Flatten
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -53,7 +53,9 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 # model
 model = Sequential()
-model.add(GRU(1, input_shape=x_train.shape[1:]))
+model.add(Conv1D(8,3,input_shape=x_train.shape[1:]))
+model.add(Flatten())
+# model.add(Dense(1, input_shape=x_train.shape[1:]))
 # model.add(Dense(512, activation='relu'))
 # model.add(Dense(128, activation='relu'))
 # model.add(Dense(32, activation='relu'))
