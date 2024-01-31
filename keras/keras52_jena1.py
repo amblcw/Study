@@ -44,7 +44,7 @@ TRAIN_SIZE = 720
 PREDICT_GAP = 144
 x, y = split_xy(datasets,TRAIN_SIZE,'T (degC)',PREDICT_GAP)
 
-print("x, y: ",x.shape,y.shape)     #(420548, 3, 14) (420548,)
+print("x, y: ",x.shape,y.shape)     #(419687, 720, 14) (419687,)
 print(x[0],y[0],sep='\n')           #검증완료
 
 # train test split
