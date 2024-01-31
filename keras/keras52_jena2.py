@@ -7,8 +7,9 @@ import pandas as pd
 import numpy as np
 # from function_package import split_x, split_xy
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-im
+import time
 
+start_time = time.time()
 path = "C:\_data\KAGGLE\Jena_Climate_Dataset\\"
 
 datasets = pd.read_csv(path+"jena_climate_2009_2016.csv", index_col=0)
@@ -65,7 +66,9 @@ hist = model.fit(x_train,y_train,epochs=4096,batch_size=8192,validation_split=0.
 loss = model.evaluate(x_test,y_test)
 y_predict = model.predict(x_test)
 r2 = r2_score(y_test,y_predict)
+end_time = time.time()
 
+print("time: ", end_time-start_time)
 print(f"LOSS: {loss}\nR2:  {r2}")
 model.save(path+f"model_save/r2_{r2:.4f}.h5")
 
