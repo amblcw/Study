@@ -40,7 +40,7 @@ def split_xy(data, time_step, y_col,y_gap=0):
 
 x, y = split_xy(datasets,144,'T (degC)')
 
-print("x, y: ",x.shape,y.shape)     #(420548, 3, 14) (420548,)
+print("x, y: ",x.shape,y.shape)     #(420407, 144, 14) (420407,)
 print(x[0],y[0],sep='\n')           #검증완료
 
 # train test split
@@ -58,7 +58,7 @@ model.add(Dense(1))
 # compile & fit
 model.compile(loss='mse',optimizer='adam')
 es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
-hist = model.fit(x_train,y_train,epochs=4096,batch_size=8192,validation_split=0.2,verbose=2,callbacks=[es])
+hist = model.fit(x_train,y_train,epochs=4096,batch_size=128,validation_split=0.2,verbose=2,callbacks=[es])
 
 # model = load_model("C:\_data\KAGGLE\Jena_Climate_Dataset\model_save\\r2_0.9994.h5")
 
