@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, GRU, Embedding
+from keras.layers import Dense, LSTM, GRU, Embedding, Dropout
 from keras.preprocessing.text import Tokenizer
 from keras.utils import pad_sequences, to_categorical
 from keras.callbacks import EarlyStopping
@@ -33,10 +33,9 @@ print(np.unique(y_test, return_counts=True))
 #          8,   4,  10,   4,  12,  13,  10,   5,   7,   6,  11,   2,   3,
 #          5,  10,   8,   3,   6,   5,   1], dtype=int64))
 
-x = np.concatenate([x_train,x_test])
-len_list = [len(i) for i in x_train] + [len(i) for i in x_test]
+len_list = [len(i) for i in x_train] + [len(i) for i in x_test] # 모든 데이터의 길이 모아둔 리스트
 len_list = pd.Series(len_list)
-w_length = int(len_list.quantile(q=0.75))  # 문장의 길이의 제3 사분위수 
+w_length = int(len_list.quantile(q=0.75))  # 문장의 길이의 제3 사분위수 (75% 지점)
 # print(max(len(i) for i in x_train))
 # print(max(len(i) for i in x_test))
 print(w_length) # 180
@@ -48,6 +47,7 @@ word_max = max([max(i) for i in x_train] + [max(i) for i in x_test]) # 단어 �
 print(word_max) # 99
 
 ### ohe ###
+# 확인결과 0부터 45까지 예쁘게 들어가 있으므로 to_categorical이 편하다
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
@@ -55,6 +55,7 @@ y_test = to_categorical(y_test)
 model = Sequential()
 model.add(Embedding(word_max+1,100))
 model.add(GRU(512, input_shape=(w_length,1)))
+model.add(Dropout(0.05))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
@@ -70,5 +71,5 @@ loss = model.evaluate(x_test,y_test)
 
 print(f"loss: {loss[0]}\nACC:  {loss[1]}")
 
-# loss: 3.364982843399048
-# ACC:  0.6478183269500732
+# loss: 3.5011134147644043
+# ACC:  0.6562778353691101
