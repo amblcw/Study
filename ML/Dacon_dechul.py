@@ -191,6 +191,7 @@ print(train_csv.min())
 x = train_csv.drop(['대출등급'],axis=1)
 y = train_csv['대출등급']
 cols = x.columns
+test_cols = test_csv.columns
 
 print(f"{test_csv.shape=}")
 print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16772, 28817, 27622, 13354,  7354,  1954,   420], dtype=int64))
@@ -262,6 +263,7 @@ print(f"{x1_train.shape=}\n{x1_test.shape=}\n{x2_train.shape=}\n{x2_test.shape=}
 # print(np.unique(y_train,return_counts=True))
 
 def model1():
+    # x[['대출금액','연간소득','총상환원금','총상환이자']]# 수가 크며 분류형이 아닌 데이터들
     input = Input(shape=(4,))
     d1 = Dense(128, activation='swish')(input)
     d2 = Dense(128, activation='swish')(d1)
@@ -274,6 +276,7 @@ def model1():
     return input, output 
 
 def model2():
+    # x[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]# 있으면 안좋은 데이터들
     input = Input(shape=(4,))
     d1 = Dense(128, activation='swish')(input)
     d2 = Dense(128, activation='swish')(d1)
@@ -286,6 +289,7 @@ def model2():
     return input, output 
 
 def model3():
+    # x[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]# 나머지 데이터들
     input = Input(shape=(5,))
     d1 = Dense(128, activation='swish')(input)
     d2 = Dense(128, activation='swish')(d1)
@@ -332,13 +336,13 @@ x3_train =np.asarray(x3_train).astype(np.float32)
 x3_test =np.asarray(x3_test).astype(np.float32)
 test_csv =np.asarray(test_csv).astype(np.float32)
 
-x1_train = x1_train.reshape(x1_train.shape[0],x1_train.shape[1],1)
-x1_test = x1_test.reshape(x1_test.shape[0],x1_test.shape[1],1)
-x2_train = x2_train.reshape(x2_train.shape[0],x2_train.shape[1],1)
-x2_test = x2_test.reshape(x2_test.shape[0],x2_test.shape[1],1)
-x3_train = x3_train.reshape(x3_train.shape[0],x3_train.shape[1],1)
-x3_test = x3_test.reshape(x3_test.shape[0],x3_test.shape[1],1)
-test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
+# x1_train = x1_train.reshape(x1_train.shape[0],x1_train.shape[1],1)
+# x1_test = x1_test.reshape(x1_test.shape[0],x1_test.shape[1],1)
+# x2_train = x2_train.reshape(x2_train.shape[0],x2_train.shape[1],1)
+# x2_test = x2_test.reshape(x2_test.shape[0],x2_test.shape[1],1)
+# x3_train = x3_train.reshape(x3_train.shape[0],x3_train.shape[1],1)
+# x3_test = x3_test.reshape(x3_test.shape[0],x3_test.shape[1],1)
+# test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
 model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['acc'])
 es = EarlyStopping(monitor='val_acc',mode='auto',patience=1024,restore_best_weights=True,verbose=1)
@@ -354,6 +358,8 @@ loss = model.evaluate([x1_test,x2_test,x3_test], y_test, verbose=0)
 y_predict = model.predict([x1_test,x2_test,x3_test],verbose=0)
 y_predict = np.argmax(y_predict,axis=1)
 
+test_csv = pd.DataFrame(test_csv,columns=test_cols)
+print("test_csv type: ",type(test_csv), test_csv)
 test_csv1 = test_csv[['대출금액','연간소득','총상환원금','총상환이자']]                         # 수가 크며 분류형이 아닌 데이터들
 test_csv2 = test_csv[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]   # 있으면 안좋은 데이터들
 test_csv3 = test_csv[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]
