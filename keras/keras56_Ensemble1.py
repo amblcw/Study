@@ -40,7 +40,8 @@ def make_model2():
 input1, output1 = make_model1()
 input2, output2 = make_model2()
 
-merge1 = concatenate([output1,output2], name='mg1')
+merge1 = Concatenate(name='mg1')([output1,output2])
+# merge1 = concatenate([output1,output2], name='mg1')
 merge2 = Dense(10,name='mg2')(merge1)
 merge3 = Dense(11,name='mg3')(merge2)
 last_output = Dense(1, name='last')(merge3)

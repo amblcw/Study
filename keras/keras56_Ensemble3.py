@@ -69,7 +69,7 @@ model1.summary()
 
 # compile
 model1.compile(loss='mse',optimizer='adam')
-model1.fit([x1_train,x2_train,x3_train],y1_train,epochs=500,verbose=2)
+model1.fit([x1_train,x2_train,x3_train],[y1_train,y2_train],epochs=500,verbose=2)
 
 # evaluate
 loss1 = model1.evaluate([x1_test,x2_test,x3_test],[y1_test,y2_test])
@@ -80,6 +80,6 @@ r22 = r2_score(y2_test,y1_predict[1])
 
 print(f"model 1 \nloss: {loss1}\nr21:  {r21}\nr22:  {r22}")
 
-# loss: [100000584.0, 0.0010568320285528898, 100000584.0]
-# r21:  0.9999982093122508
-# r22:  -169439.18452445182
+# loss: [1.9240567684173584, 0.6828665137290955, 1.2411903142929077]
+# r21:  0.998842956379219
+# r22:  0.9978969370960357
