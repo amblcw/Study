@@ -353,7 +353,11 @@ hist = model.fit([x1_train,x2_train,x3_train], y_train, epochs=16384, batch_size
 loss = model.evaluate([x1_test,x2_test,x3_test], y_test, verbose=0)    
 y_predict = model.predict([x1_test,x2_test,x3_test],verbose=0)
 y_predict = np.argmax(y_predict,axis=1)
-y_submit = np.argmax(model.predict(test_csv,verbose=0),axis=1)
+
+test_csv1 = test_csv[['대출금액','연간소득','총상환원금','총상환이자']]                         # 수가 크며 분류형이 아닌 데이터들
+test_csv2 = test_csv[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]   # 있으면 안좋은 데이터들
+test_csv3 = test_csv[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]
+y_submit = np.argmax(model.predict([test_csv1,test_csv2,test_csv3],verbose=0),axis=1)
 
 
 f1 = f1_score(y_test,y_predict,average='macro')
