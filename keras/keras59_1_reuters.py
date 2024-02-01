@@ -8,7 +8,7 @@ import numpy as np
 import function_package as fp
 from keras.datasets import reuters
 
-(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=100,
+(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=1000,
                                                          test_split=0.2
                                                          )
 
@@ -32,6 +32,8 @@ print(np.unique(y_test, return_counts=True))
 #         37,   2,   9,  99,  12,  20, 133,  70,  27,   7,  12,  19,  31,
 #          8,   4,  10,   4,  12,  13,  10,   5,   7,   6,  11,   2,   3,
 #          5,  10,   8,   3,   6,   5,   1], dtype=int64))
+labels_num = max(len(np.unique(y_train)),len(np.unique(y_test)))
+print(labels_num)
 
 len_list = [len(i) for i in x_train] + [len(i) for i in x_test] # 모든 데이터의 길이 모아둔 리스트
 len_list = pd.Series(len_list)
@@ -53,13 +55,13 @@ y_test = to_categorical(y_test)
 
 # model
 model = Sequential()
-model.add(Embedding(word_max+1,100))
+model.add(Embedding(word_max+1,512))
 model.add(GRU(512, input_shape=(w_length,1)))
 model.add(Dropout(0.05))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
-model.add(Dense(46, activation='softmax'))
+model.add(Dense(labels_num, activation='softmax'))
 
 # compile & fit
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
@@ -71,5 +73,5 @@ loss = model.evaluate(x_test,y_test)
 
 print(f"loss: {loss[0]}\nACC:  {loss[1]}")
 
-# loss: 3.5011134147644043
-# ACC:  0.6562778353691101
+# loss: 3.3554139137268066
+# ACC:  0.6647372841835022
