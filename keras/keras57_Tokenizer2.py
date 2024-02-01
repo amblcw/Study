@@ -32,7 +32,10 @@ print(x)
 all_text = np.array(all_text).reshape(-1,1)
 x = np.array(x).reshape(-1,1)
 x1 = to_categorical(x)
-x1 = x1[:,1:]
+# x1 = x1[:,1:]
+
+print(x1.shape) # (12, 8)
+x1 = np.delete(x1,0,1)
 print(x1.shape) # (12, 8)
 # sklearn
 ohe = OneHotEncoder(sparse=False).fit(all_text)
