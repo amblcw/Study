@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, GRU, Embedding, Dropout
+from keras.layers import Dense, LSTM, GRU, Embedding, Dropout, Conv1D
 from keras.preprocessing.text import Tokenizer
 from keras.utils import pad_sequences, to_categorical
 from keras.callbacks import EarlyStopping
@@ -7,8 +7,9 @@ import pandas as pd
 import numpy as np
 import function_package as fp
 from keras.datasets import reuters
+import time
 
-(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=1000,
+(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=None,
                                                          test_split=0.2
                                                          )
 
@@ -33,7 +34,7 @@ print(np.unique(y_test, return_counts=True))
 #          8,   4,  10,   4,  12,  13,  10,   5,   7,   6,  11,   2,   3,
 #          5,  10,   8,   3,   6,   5,   1], dtype=int64))
 labels_num = max(len(np.unique(y_train)),len(np.unique(y_test)))
-print(labels_num)
+print(labels_num) # 46
 
 len_list = [len(i) for i in x_train] + [len(i) for i in x_test] # 모든 데이터의 길이 모아둔 리스트
 len_list = pd.Series(len_list)
@@ -46,7 +47,7 @@ x_test = pad_sequences(x_test, maxlen=w_length)
 print(x_train.shape, x_test.shape)  # (8982, 180) (2246, 180)
 
 word_max = max([max(i) for i in x_train] + [max(i) for i in x_test]) # 단어 사전의 개수 세는 용
-print(word_max) # 99
+print(word_max) # 30979
 
 ### ohe ###
 # 확인결과 0부터 45까지 예쁘게 들어가 있으므로 to_categorical이 편하다
@@ -56,7 +57,10 @@ y_test = to_categorical(y_test)
 # model
 model = Sequential()
 model.add(Embedding(word_max+1,512))
-model.add(GRU(512, input_shape=(w_length,1)))
+model.add(Conv1D(512, 3, input_shape=x_train.shape[1:]))
+model.add(Conv1D(512, 2))
+model.add(LSTM(512))
+# model.add(GRU(512, input_shape=(w_length,1)))
 model.add(Dropout(0.05))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
@@ -64,14 +68,22 @@ model.add(Dense(64, activation='relu'))
 model.add(Dense(labels_num, activation='softmax'))
 
 # compile & fit
+start_time = time.time()
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-es = EarlyStopping(monitor='val_acc', mode='auto', patience=100, verbose=1)
-hist = model.fit(x_train,y_train, epochs=4096, batch_size=256, validation_data=(x_test,y_test), verbose=2, callbacks=[es])
+es = EarlyStopping(monitor='val_acc', mode='auto', patience=50, restore_best_weights=True, verbose=1)
+hist = model.fit(x_train,y_train, epochs=4096, batch_size=512, validation_data=(x_test,y_test), verbose=2, callbacks=[es])
+end_time = time.time()
 
 # evaluate
 loss = model.evaluate(x_test,y_test)
 
+print(f"time: {end_time-start_time}sec")
 print(f"loss: {loss[0]}\nACC:  {loss[1]}")
 
-# loss: 3.3554139137268066
-# ACC:  0.6647372841835022
+# 1000
+# loss: 2.6915290355682373
+# ACC:  0.7061442732810974
+
+# full size
+# loss: 2.5435328483581543
+# ACC:  0.6807658076286316
