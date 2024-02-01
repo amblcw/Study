@@ -61,5 +61,7 @@ print(xx1.shape)    # (9, 13)
 xx2 = ohe.transform(xx)
 print(xx2.shape)    # (9, 13)
 
-xx3 = pd.get_dummies(xx.reshape(-1))
-print(xx3.shape)    # (9, 6)
+all_text_ohe = pd.get_dummies(all_text.reshape(-1), dtype=int)
+print(all_text_ohe.shape)   # (21, 13)
+xx3 = all_text_ohe[12:]
+print(xx3.shape)            # (9, 13)
