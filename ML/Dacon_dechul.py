@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import matplotlib.pyplot as plt
+from keras.regularizers import l2
 import time
 
 import warnings
@@ -22,8 +23,34 @@ trian_have_house = train_csv['대출등급']
 label_encoder = LabelEncoder()
 trian_have_house = label_encoder.fit_transform(trian_have_house)
 
-"""
-"""
+from scipy import stats
+
+d1 = train_csv[train_csv['대출등급']== 'A']['대출금액']
+d0 = train_csv[train_csv['대출등급']== 'D']['대출금액']
+s1 = stats.ttest_ind(d1,d0)
+
+d1 = train_csv[train_csv['대출등급']== 'A']['연간소득']
+d0 = train_csv[train_csv['대출등급']== 'D']['연간소득']
+s2 = stats.ttest_ind(d1,d0)
+
+d1 = train_csv[train_csv['대출등급']== 'A']['총상환원금']
+d0 = train_csv[train_csv['대출등급']== 'D']['총상환원금']
+s3 = stats.ttest_ind(d1,d0)
+
+d1 = train_csv[train_csv['대출등급']== 'A']['부채_대비_소득_비율']
+d0 = train_csv[train_csv['대출등급']== 'D']['부채_대비_소득_비율']
+s4 = stats.ttest_ind(d1,d0)
+
+d1 = train_csv[train_csv['대출등급']== 'A']['총연체금액']
+d0 = train_csv[train_csv['대출등급']== 'D']['총연체금액']
+s5 = stats.ttest_ind(d1,d0)
+
+print(f"대출금액 t검정: {s1}")
+print(f"연간소득 t검정: {s2}")
+print(f"총상환원금 t검정: {s3}")
+print(f"부채_대비_소득_비율 t검정: {s4}")
+print(f"총연체금액 t검정: {s5}")
+
 # print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
 # print(train_csv.columns, test_csv.columns,sep='\n',end="\n======================\n")
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
@@ -203,12 +230,12 @@ y = y.to_frame(['대출등급'])
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-scaler = StandardScaler().fit(x)  #정규분포로 바꿔줘서 스케일링
+# scaler = StandardScaler().fit(x)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
 # scaler = RobustScaler().fit(x_train)    #
 
-x = scaler.transform(x)
-test_csv = scaler.transform(test_csv)
+# x = scaler.transform(x)
+# test_csv = scaler.transform(test_csv)
 
 scaler = MinMaxScaler().fit(x)    #최솟값을 0 최댓값을 1로 스케일링
 # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
@@ -219,6 +246,17 @@ x = scaler.transform(x)
 test_csv = scaler.transform(test_csv)
 x = pd.DataFrame(x,columns=cols)
 
+
+######### x, y save & load #########
+data_path = ".\\ML\\resource\\m01_smote2_dacon_dechul\\"
+# np.save(data_path+"x.npy",arr=x)
+# np.save(data_path+"y.npy",arr=y)
+# np.save(data_path+"test_csv.npy",arr=test_csv)
+
+# x = np.load(data_path+"x.npy")
+# y = np.load(data_path+"y.npy")
+# test_csv = np.load(data_path+"test_csv.npy")
+
 ######### input 분리 ######### 
 print(x.columns)
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
@@ -226,19 +264,19 @@ print(x.columns)
 x1 = x[['대출금액','연간소득','총상환원금','총상환이자']]                         # 수가 크며 분류형이 아닌 데이터들
 x2 = x[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]   # 있으면 안좋은 데이터들e
 x3 = x[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]              #나머지 데이터들
-data_path = ".\\ML\\resource\\m01_smote2_dacon_dechul\\"
-np.save(data_path+"x.npy",arr=x)
-np.save(data_path+"y.npy",arr=y)
-np.save(data_path+"test_csv.npy",arr=test_csv)
 
-# x = np.load(data_path+"x.npy")
-# y = np.load(data_path+"y.npy")
-# test_csv = np.load(data_path+"test_csv.npy")
+# import seaborn as sns
+# sns.set(font="Malgun Gothic")
+# round(x[cols].corr(),2)
+# corr = x[cols].corr()
+# annot_kws = {"ha": 'center', "va":'top'}
+# sns.heatmap(data=corr, annot=True, annot_kws=annot_kws, cmap="YlGnBu")
+
 
 
 f1 = 0
 r = int(np.random.uniform(1,1000))
-r = 529
+# r = 529
 x1_train, x1_test, x2_train, x2_test, x3_train, x3_test, y_train, y_test = train_test_split(x1,x2,x3,y,train_size=0.9,random_state=r,stratify=y)
 print(np.unique(y_train,return_counts=True))
 print(np.unique(y_test,return_counts=True))
@@ -268,28 +306,39 @@ def model1():
     d1 = Dense(128, activation='swish')(input)
     d2 = Dense(128, activation='swish')(d1)
     d3 = Dense(128, activation='swish')(d2)
-    b1 = BatchNormalization()(d3)
-    dr1 = Dropout(0.05)(b1)
-    d4 = Dense(256, activation='swish')(dr1)
-    d5 = Dense(256, activation='swish')(d4)
-    d6 = Dense(256, activation='swish')(d5)
-    b2 = BatchNormalization()(d6)
-    d7 = Dense(128, activation='swish')(b2)
-    output = Dense(128, activation='swish')(d7)
+    # b1 = BatchNormalization()(d3)
+    # dr1 = Dropout(0.05)(b1)
+    d4 = Dense(128, activation='swish', kernel_regularizer=l2(0.01))(d3)
+    d5 = Dense(128, activation='swish')(d4)
+    d6 = Dense(128, activation='swish')(d5)
+    output = BatchNormalization()(d6)
+    # b2 = BatchNormalization()(d6)
+    # d7 = Dense(128, activation='swish')(b2)
+    # output = Dense(128, activation='swish')(d7)
     
     return input, output 
 
 def model2():
     # x[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]# 있으면 안좋은 데이터들
+    # input = Input(shape=(4,))
+    # d1 = Dense(10, activation='swish')(input)
+    # d2 = Dense(70, activation='swish')(d1)
+    # d3 = Dense(10, activation='swish')(d2)
+    # b1 = BatchNormalization()(d3)
+    # dr1 = Dropout(0.05)(b1)
+    # d4 = Dense(50, activation='swish')(dr1)
+    # d5 = Dense(10, activation='swish')(d4)
+    # output = Dense(32, activation='swish')(d5)
     input = Input(shape=(4,))
-    d1 = Dense(128, activation='swish')(input)
-    d2 = Dense(128, activation='swish')(d1)
-    d3 = Dense(128, activation='swish')(d2)
+    d1 = Dense(1024, activation='swish')(input)
+    d2 = Dense(17, activation='swish')(d1)
+    d3 = Dense(1024, activation='swish', kernel_regularizer=l2(0.01))(d2)
     b1 = BatchNormalization()(d3)
     dr1 = Dropout(0.05)(b1)
-    d4 = Dense(256, activation='swish')(dr1)
-    d5 = Dense(64, activation='swish')(d4)
-    output = Dense(64, activation='swish')(d5)
+    d4 = Dense(512, activation='swish')(dr1)
+    d5 = Dense(17, activation='swish')(d4)
+    d6 = Dense(512, activation='swish')(d5)
+    output = BatchNormalization()(d6)
     
     return input, output 
 
@@ -298,15 +347,16 @@ def model3():
     input = Input(shape=(5,))
     d1 = Dense(128, activation='swish')(input)
     d2 = Dense(128, activation='swish')(d1)
-    d3 = Dense(128, activation='swish')(d2)
+    d3 = Dense(128, activation='swish', kernel_regularizer=l2(0.01))(d2)
     b1 = BatchNormalization()(d3)
     dr1 = Dropout(0.05)(b1)
-    d4 = Dense(256, activation='swish')(dr1)
-    d5 = Dense(256, activation='swish')(d4)
-    d6 = Dense(256, activation='swish')(d5)
-    b2 = BatchNormalization()(d6)
-    d7 = Dense(64, activation='swish')(b2)
-    output = Dense(64, activation='swish')(d7)
+    d4 = Dense(128, activation='swish')(dr1)
+    d5 = Dense(128, activation='swish')(d4)
+    d6 = Dense(128, activation='swish')(d5)
+    output = BatchNormalization()(d6)
+    # b2 = BatchNormalization()(d6)
+    # d7 = Dense(128, activation='swish')(b2)
+    # output = Dense(128, activation='swish')(d7)
     
     return input, output 
     
@@ -315,9 +365,9 @@ input2, output2 = model2()
 input3, output3 = model3()
 
 mg1 = concatenate([output1,output2,output3])
-d1 = Dense(32, activation='relu')(mg1)
-d2 = Dense(16, activation='relu')(d1)
-last_output = Dense(7, activation='softmax')(d2)
+# d1 = Dense(64, activation='relu')(mg1)
+# d2 = Dense(64, activation='relu')(d1)
+last_output = Dense(7, activation='softmax')(mg1)
 
 model = Model(inputs=[input1,input2,input3],outputs=last_output)
 
@@ -354,21 +404,22 @@ test_csv =np.asarray(test_csv).astype(np.float32)
 # test_csv = test_csv.reshape(test_csv.shape[0],test_csv.shape[1],1)
 
 model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['acc'])
-es = EarlyStopping(monitor='val_acc',mode='auto',patience=1024,restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_acc',mode='auto',patience=256,restore_best_weights=True,verbose=1)
 # mcp = ModelCheckpoint(monitor='val_loss',mode='min',save_best_only=True,
 #                     filepath="c:/_data/_save/MCP/loan/K28_"+"{epoch:04d}{val_loss:.4f}.hdf5")
-hist = model.fit([x1_train,x2_train,x3_train], y_train, epochs=16384, batch_size=2048, validation_data=([x1_test,x2_test,x3_test],y_test), verbose=2, callbacks=[es])
+hist = model.fit([x1_train,x2_train,x3_train], y_train, epochs=16384, batch_size=2048, validation_split=0.2, verbose=2, callbacks=[es])
 
+# validation_data=([x1_test,x2_test,x3_test],y_test)
 #evaluate & predict
 # y_test = y_test.reshape(-1)
 # print("x_test, y_test: ",x1_test.shape,y_test.shape)
 
-loss = model.evaluate([x1_test,x2_test,x3_test], y_test, verbose=0)    
+loss = model.evaluate([x1_test,x2_test,x3_test], y_test, verbose=1)    
 y_predict = model.predict([x1_test,x2_test,x3_test],verbose=0)
 y_predict = np.argmax(y_predict,axis=1)
 
 test_csv = pd.DataFrame(test_csv,columns=test_cols)
-print("test_csv type: ",type(test_csv), test_csv)
+# print("test_csv type: ",type(test_csv), test_csv)
 test_csv1 = test_csv[['대출금액','연간소득','총상환원금','총상환이자']]                         # 수가 크며 분류형이 아닌 데이터들
 test_csv2 = test_csv[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]   # 있으면 안좋은 데이터들
 test_csv3 = test_csv[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]

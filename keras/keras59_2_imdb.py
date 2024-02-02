@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Embedding, GRU, Dropout, Conv1D, BatchNormalization, MaxPooling1D, Flatten
+from keras.layers import Dense, LSTM, Embedding, GRU, Dropout, Conv1D, BatchNormalization, MaxPooling1D, Flatten, Bidirectional
 from keras.utils import pad_sequences
 from keras.callbacks import EarlyStopping
 from keras.datasets import imdb
@@ -50,15 +50,17 @@ model.add(Conv1D(128, 3, activation='tanh'))
 model.add(Conv1D(128, 3))
 model.add(Conv1D(128, 3))
 model.add(MaxPooling1D())
-# model.add(Conv1D(256, 3))
-# model.add(Conv1D(256, 3))
-# model.add(Conv1D(256, 3))
-# model.add(MaxPooling1D())
+model.add(Conv1D(256, 3))
+model.add(Conv1D(256, 3))
+model.add(Conv1D(256, 3))
+model.add(MaxPooling1D())
 # model.add(Flatten())
-model.add(LSTM(128))
-model.add(Dense(512, activation='relu'))
+# model.add(Bidirectional(GRU(128)))
+model.add(GRU(128, return_sequences=True))
+model.add(GRU(128))
 model.add(BatchNormalization())
-model.add(Dropout(0.1))    
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.05))    
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.05))
 model.add(Dense(128, activation='relu'))

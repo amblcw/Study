@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import f1_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.regularizers import l2
 import matplotlib.pyplot as plt
 import time
 
@@ -22,8 +23,7 @@ trian_have_house = train_csv['대출등급']
 label_encoder = LabelEncoder()
 trian_have_house = label_encoder.fit_transform(trian_have_house)
 
-"""
-"""
+
 # print(train_csv.shape, test_csv.shape) #(96294, 14) (64197, 13)
 # print(train_csv.columns, test_csv.columns,sep='\n',end="\n======================\n")
 # Index(['대출금액', '대출기간', '근로기간', '주택소유상태', '연간소득', '부채_대비_소득_비율', '총계좌수', '대출목적',
@@ -126,6 +126,9 @@ label_encoder = LabelEncoder()
 train_loan_grade = label_encoder.fit_transform(train_loan_grade)
 train_csv['대출등급'] = train_loan_grade
 
+#신규고객 제거
+train_csv = train_csv[train_csv['총상환이자'] != 0.0 ]
+
 # print(train_csv.isna().sum(),test_csv.isna().sum(), sep='\n') #결측치 제거 완료 확인함
 
 # for label in train_csv:                                       #모든 데이터가  또는 실수로 변경됨을 확인함
@@ -200,6 +203,7 @@ y = y.to_frame(['대출등급'])
 # y = ohe.fit_transform(y) 
 
 
+
 data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
 # np.save(data_path+"x.npy",arr=x)
 # np.save(data_path+"y.npy",arr=y)
@@ -215,10 +219,10 @@ r = 529
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r,stratify=y)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
+scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
 # scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
+# scaler = RobustScaler().fit(x_train)    #
 
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -253,17 +257,22 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 model = Sequential()
 model.add(Dense(128, input_shape=(13,),activation='swish'))#, activation='sigmoid'))
-model.add(Dense(128, activation='swish'))
+# model.add(BatchNormalization())
+model.add(Dense(32, activation='swish'))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
-model.add(Dense(128, activation='swish'))
-model.add(Dense(128, activation='swish'))
-model.add(Dense(128, activation='swish'))
+model.add(Dense(128, activation='swish', kernel_regularizer=l2(0.01)))
+# model.add(BatchNormalization())
+model.add(Dense(32, activation='swish'))
+# model.add(BatchNormalization())
+model.add(Dense(128, activation='swish', kernel_regularizer=l2(0.01)))
 # model.add(BatchNormalization())
 # model.add(Dropout(0.05))
-model.add(Dense(64, activation='swish'))
-model.add(Dense(64, activation='swish'))  
-model.add(Dense(64, activation='swish'))  
+# model.add(Dense(64, activation='swish'))
+# # model.add(BatchNormalization())
+# model.add(Dense(32, activation='swish'))  
+# # model.add(BatchNormalization())
+# model.add(Dense(64, activation='swish'))  
 # model.add(BatchNormalization())
 model.add(Dense(7, activation='softmax'))
 
