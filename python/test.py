@@ -8,4 +8,7 @@ import pandas as pd
 a = np.array([]).reshape(1,1,1,0)
 print(a.shape)
 
+a = b = c = 10
+print(a,b,c)
+
 #테스트 테스트

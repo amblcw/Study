@@ -227,9 +227,9 @@ x1 = x[['대출금액','연간소득','총상환원금','총상환이자']]     
 x2 = x[['최근_2년간_연체_횟수','연체계좌수','부채_대비_소득_비율','총연체금액']]   # 있으면 안좋은 데이터들
 x3 = x[['대출기간','근로기간','주택소유상태','총계좌수','대출목적']]              #나머지 데이터들
 data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
-# np.save(data_path+"x.npy",arr=x)
-# np.save(data_path+"y.npy",arr=y)
-# np.save(data_path+"test_csv.npy",arr=test_csv)
+np.save(data_path+"x.npy",arr=x)
+np.save(data_path+"y.npy",arr=y)
+np.save(data_path+"test_csv.npy",arr=test_csv)
 
 # x = np.load(data_path+"x.npy")
 # y = np.load(data_path+"y.npy")
@@ -269,9 +269,13 @@ def model1():
     d2 = Dense(128, activation='swish')(d1)
     d3 = Dense(128, activation='swish')(d2)
     b1 = BatchNormalization()(d3)
-    d4 = Dense(64, activation='swish')(b1)
-    d5 = Dense(64, activation='swish')(d4)
-    output = Dense(64, activation='swish')(d5)
+    dr1 = Dropout(0.05)(b1)
+    d4 = Dense(256, activation='swish')(dr1)
+    d5 = Dense(256, activation='swish')(d4)
+    d6 = Dense(256, activation='swish')(d5)
+    b2 = BatchNormalization()(d6)
+    d7 = Dense(128, activation='swish')(b2)
+    output = Dense(128, activation='swish')(d7)
     
     return input, output 
 
@@ -282,7 +286,8 @@ def model2():
     d2 = Dense(128, activation='swish')(d1)
     d3 = Dense(128, activation='swish')(d2)
     b1 = BatchNormalization()(d3)
-    d4 = Dense(64, activation='swish')(b1)
+    dr1 = Dropout(0.05)(b1)
+    d4 = Dense(256, activation='swish')(dr1)
     d5 = Dense(64, activation='swish')(d4)
     output = Dense(64, activation='swish')(d5)
     
@@ -295,9 +300,13 @@ def model3():
     d2 = Dense(128, activation='swish')(d1)
     d3 = Dense(128, activation='swish')(d2)
     b1 = BatchNormalization()(d3)
-    d4 = Dense(64, activation='swish')(b1)
-    d5 = Dense(64, activation='swish')(d4)
-    output = Dense(64, activation='swish')(d5)
+    dr1 = Dropout(0.05)(b1)
+    d4 = Dense(256, activation='swish')(dr1)
+    d5 = Dense(256, activation='swish')(d4)
+    d6 = Dense(256, activation='swish')(d5)
+    b2 = BatchNormalization()(d6)
+    d7 = Dense(64, activation='swish')(b2)
+    output = Dense(64, activation='swish')(d7)
     
     return input, output 
     
@@ -307,7 +316,7 @@ input3, output3 = model3()
 
 mg1 = concatenate([output1,output2,output3])
 d1 = Dense(32, activation='relu')(mg1)
-d2 = Dense(32, activation='relu')(d1)
+d2 = Dense(16, activation='relu')(d1)
 last_output = Dense(7, activation='softmax')(d2)
 
 model = Model(inputs=[input1,input2,input3],outputs=last_output)
