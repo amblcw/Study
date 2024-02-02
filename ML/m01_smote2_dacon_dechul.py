@@ -127,7 +127,7 @@ train_loan_grade = label_encoder.fit_transform(train_loan_grade)
 train_csv['대출등급'] = train_loan_grade
 
 #신규고객 제거
-train_csv = train_csv[train_csv['총상환이자'] != 0.0 ]
+# train_csv = train_csv[train_csv['총상환이자'] != 0.0 ]
 
 # print(train_csv.isna().sum(),test_csv.isna().sum(), sep='\n') #결측치 제거 완료 확인함
 
@@ -215,7 +215,7 @@ data_path = "C:\\Study\\ML\\resource\\m01_smote2_dacon_dechul\\"
 
 f1 = 0
 r = int(np.random.uniform(1,1000))
-r = 529
+# r = 529
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,random_state=r,stratify=y)
 
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
@@ -229,15 +229,25 @@ x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
 # scaler = RobustScaler().fit(x_train)    #
 
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
+# test_csv = scaler.transform(test_csv)
 print(np.unique(y_train,return_counts=True))
 print(np.unique(y_test,return_counts=True))
+
+#신규고객 처리
+# print(len(x_train[:,0]))
+# print(len(y_train))
+# new_guest = [np.where(x_train[:,10] == 0.0)] # 총 상환이자가 0 인 인덱스 
+# print(new_guest)
+# x_train = np.delete(x_train,new_guest,0)
+# y_train = np.delete(y_train,new_guest)
+# print(len(x_train[:,0]))
+# print(len(y_train))
 
 print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # x_train.shape=(67405, 13)
