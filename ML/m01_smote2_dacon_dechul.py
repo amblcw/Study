@@ -229,13 +229,13 @@ x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
 # scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
+scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
 # scaler = MaxAbsScaler().fit(x_train)    #
 # scaler = RobustScaler().fit(x_train)    #
 
-# x_train = scaler.transform(x_train)
-# x_test = scaler.transform(x_test)
-# test_csv = scaler.transform(test_csv)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
 print(np.unique(y_train,return_counts=True))
 print(np.unique(y_test,return_counts=True))
 
@@ -270,19 +270,19 @@ model.add(Dense(128, input_shape=(13,),activation='swish'))#, activation='sigmoi
 # model.add(BatchNormalization())
 model.add(Dense(32, activation='swish'))
 # model.add(BatchNormalization())
-# model.add(Dropout(0.05))
+model.add(Dropout(0.05))
 model.add(Dense(128, activation='swish', kernel_regularizer=l2(0.01)))
 # model.add(BatchNormalization())
 model.add(Dense(32, activation='swish'))
 # model.add(BatchNormalization())
 model.add(Dense(128, activation='swish', kernel_regularizer=l2(0.01)))
 # model.add(BatchNormalization())
-# model.add(Dropout(0.05))
-# model.add(Dense(64, activation='swish'))
+model.add(Dropout(0.05))
+model.add(Dense(64, activation='swish'))
 # # model.add(BatchNormalization())
-# model.add(Dense(32, activation='swish'))  
+model.add(Dense(32, activation='swish'))  
 # # model.add(BatchNormalization())
-# model.add(Dense(64, activation='swish'))  
+model.add(Dense(64, activation='swish'))  
 # model.add(BatchNormalization())
 model.add(Dense(7, activation='softmax'))
 
