@@ -46,14 +46,14 @@ def merge_image(img_iter, fail_stop=False):
     returns:
         data, label
     '''
-    x = []
-    y = []
-    failed_i = []
+    x = []          # x값을 담을 리스트
+    y = []          # y값을 담을 리스트
+    failed_i = []   # 예외가 발생한 번호를 저장할 리스트 
     
-    for i in range(len(img_iter)):
+    for i in range(len(img_iter)):      # iterator길이만큼 루프합니다 next()호출 과정에서 에러가 발생할 것을 대비하여 간접적인 방식으로 루프합니다
         try:
-            xy = img_iter.next()
-            new_x = np.array(xy[0])
+            xy = img_iter.next()        
+            new_x = np.array(xy[0])     
             new_y = np.array(xy[1])
             if i == 0:                  # 바로 병합시키려 하면 shape가 동일하지않다는 오류가 나기에 최초 1회는 그대로 대입
                 x = new_x
@@ -70,7 +70,7 @@ def merge_image(img_iter, fail_stop=False):
         except Exception as e:
             print("faied i: ",i)
             failed_i.append(i)
-            if fail_stop:       # fail_stop이 True로 설정되어있으면 발생한 예외를 그대로 던진다
+            if fail_stop:         # fail_stop이 True로 설정되어있으면 발생한 예외를 그대로 던진다
                 raise e
                 
         print("i: ",i)
@@ -80,9 +80,6 @@ def merge_image(img_iter, fail_stop=False):
     return x, y
 
 from keras.preprocessing.image import ImageDataGenerator
-import numpy as np
-from sklearn.model_selection import train_test_split
-
 '''
 image_size는 꼭 150,150,3으로 즉 컬러로 해야한다
 '''
