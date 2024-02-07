@@ -32,20 +32,34 @@ scaler = RobustScaler().fit(x_train)    #
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-#model
-model = LinearSVR(C=100)
+from sklearn.svm import SVR
+from sklearn.linear_model import Perceptron, LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
-#compile fit
-model.fit(x_train,y_train)
+model_list = [SVR(), 
+              LinearRegression(), 
+              KNeighborsRegressor(), 
+              DecisionTreeRegressor(), 
+              RandomForestRegressor(),
+              ]
+model_names = ['LinearSVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
+loss_list = []
 
-#evaluate predict
-loss = model.score(x_test,y_test )
-result = model.predict(x )
-y_predict = model.predict(x_test )
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
-r2 = r2_score(y_test,y_predict)
-end_time = time.time()
-print(f"{r=}\n{loss=}\n{r2=}")
+    #evaluate & predict
+    loss = round(model.score(x_test,y_test),4)
+    # y_predict = model.predict(x_test)
+    # acc = accuracy_score(y_test,y_predict)
+    loss_list.append(loss)
+    
+#결과값 출력
+print("ACC list: ", loss_list)
+print("Best ML: ",model_names[loss_list.index(max(loss_list))])
 
 # Epoch 236: early stopping
 # Time: 35.14sec
@@ -73,3 +87,6 @@ print(f"{r=}\n{loss=}\n{r2=}")
 # r=176
 # loss=0.5744965050202392
 # r2=0.5744965050202392
+
+# ACC list:  [0.6786, 0.6075, 0.6904, 0.6227, 0.8194]
+# Best ML:  RandomForestRegressor

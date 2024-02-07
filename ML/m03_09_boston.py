@@ -35,54 +35,34 @@ x_test = scaler.transform(x_test)
 # print(np.min(x_train),np.max(x_train))
 # print(np.min(x_test),np.max(x_test))
 
-#model
-model = LinearSVR(C=100)
+from sklearn.svm import SVR
+from sklearn.linear_model import Perceptron, LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
-#compile & fit
-model.fit(x_train,y_train)
+model_list = [SVR(), 
+              LinearRegression(), 
+              KNeighborsRegressor(), 
+              DecisionTreeRegressor(), 
+              RandomForestRegressor(),
+              ]
+model_names = ['SVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
+loss_list = []
 
-#evaluate & predict
-loss = model.score(x_test,y_test )
-result = model.predict(x)
-y_predict = model.predict(x_test)
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
-r2 = r2_score(y_test,y_predict)
+    #evaluate & predict
+    loss = round(model.score(x_test,y_test),4)
+    # y_predict = model.predict(x_test)
+    # acc = accuracy_score(y_test,y_predict)
+    loss_list.append(loss)
+    
+#결과값 출력
+print("ACC list: ", loss_list)
+print("Best ML: ",model_names[loss_list.index(max(loss_list))])
 
-def RMSE(y_test,y_predict):
-    return np.sqrt(mean_squared_error(y_test,y_predict))
-
-print(f"{r=}\n{loss=}\n{r2=}\nRMSE: {RMSE(y_test,y_predict)}")
-
-
-# Epoch 197: early stopping
-# Time: 8.06sec
-# r=88
-# loss=13.1826171875
-# r2=0.8213945466114984
-# RMSE: 3.6307874062998877
-
-# MinMax
-# r=88
-# loss=[5.607363700866699, 1.73788583278656]
-# r2=0.9240283091852217
-# RMSE: 2.3679872456140494
-
-# StandardScaler
-# loss=[4.916057586669922, 1.7392468452453613]
-# r2=0.9333945146886241
-# RMSE: 2.217218335403849
-
-# MaxAbsScaler
-# loss=[8.462682723999023, 2.279984474182129]
-# r2=0.885342850431518
-# RMSE: 2.909069072695939
-
-# RobustScaler
-# loss=[0.27136003971099854, 0.27136003971099854]
-# r2=0.796099072829003
-
-# LinearSVR
-# r=88
-# loss=0.8249537129985753
-# r2=0.8249537129985753
-# RMSE: 3.5944290404736883
+# ACC list:  [0.7791, 0.7918, 0.873, 0.8077, 0.902]
+# Best ML:  RandomForestRegressor

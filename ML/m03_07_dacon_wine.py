@@ -48,48 +48,35 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
-#model
-model = LinearSVC(C=100)
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import Perceptron, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
-#compile & fit
-model.fit(x_train,y_train)
+model_list = [LinearSVC(), 
+              Perceptron(), 
+              LogisticRegression(), 
+              KNeighborsClassifier(), 
+              DecisionTreeClassifier(), 
+              RandomForestClassifier(),
+              ]
+model_names = ['LinearSVC','Perceptron','LogisticRegression','KNeighborsClassifier','DecisionTreeClassifier','RandomForestClassifier']
+acc_list = []
 
-#evaluate & predict
-loss = model.score(x_test,y_test)
-print(loss)
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
+    #evaluate & predict
+    acc = round(model.score(x_test,y_test),4)
+    # y_predict = model.predict(x_test)
+    # acc = accuracy_score(y_test,y_predict)
+    acc_list.append(acc)
+    
+#결과값 출력
+print("ACC list: ", acc_list)
+print("Best ML: ",model_names[acc_list.index(max(acc_list))])
 
-# r=894
-# LOSS: 2.3342490196228027
-#  ACC:  0.5781818181818181(0.578181803226471 by loss[1])
-
-# r=912
-# LOSS: 1.0722206830978394
-#  ACC:  0.5536363636363636(0.553636372089386 by loss[1])
-
-# r=20
-# LOSS: 1.0789892673492432
-#  ACC:  0.5509090909090909(0.5509091019630432 by loss[1])
-
-# r=433
-# LOSS: 1.0544521808624268
-#  ACC:  0.5572727272727273(0.557272732257843 by loss[1])
-
-# MinMaxScaler
-# LOSS: 1.0109286308288574
-#  ACC:  0.5690909090909091(0.5690909028053284 by loss[1])
-
-# StandardScaler
-# LOSS: 1.0394665002822876
-#  ACC:  0.5745454545454546(0.5745454430580139 by loss[1])
-
-# MaxAbsScaler
-# LOSS: 1.0278842449188232
-#  ACC:  0.56(0.5600000023841858 by loss[1])
-
-# RobustScaler
-# LOSS: 1.058943510055542
-#  ACC:  0.5636363636363636(0.5636363625526428 by loss[1])
-
-# LinearSVC
-# 0.42363636363636364
+# ACC list:  [0.5336, 0.3373, 0.5491, 0.5536, 0.5636, 0.6727]
+# Best ML:  RandomForestClassifier

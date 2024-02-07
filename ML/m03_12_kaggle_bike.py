@@ -42,25 +42,35 @@ test_csv = scaler.transform(test_csv)
 print(f"{x_train.shape=},{x_test.shape=}")
 
 
-#model
-model = LinearSVR(C=100)
+from sklearn.svm import SVR
+from sklearn.linear_model import Perceptron, LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
-#compile & fit
-model.fit(x_train,y_train)
+model_list = [SVR(), 
+              LinearRegression(), 
+              KNeighborsRegressor(), 
+              DecisionTreeRegressor(), 
+              RandomForestRegressor(),
+              ]
+model_names = ['SVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
+loss_list = []
 
-#evaluate & predict 
-loss = model.score(x_test,y_test )
-y_predict = model.predict(x_test)
-r2 = r2_score(y_test,y_predict)
-y_submit = model.predict(test_csv)
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
-print(f"{r=}\n{loss=}\n{r2=}")
-time.sleep(1.5)
-
-y_submit = np.where(y_submit < 0, 0, y_submit)
-y_predict = np.where(y_predict < 0, 0, y_predict)
-print(np.where(y_submit<0))
-print(np.where(y_test<0))
+    #evaluate & predict
+    loss = round(model.score(x_test,y_test),4)
+    y_predict = model.predict(x_test)
+    y_submit = model.predict(test_csv)
+    # acc = accuracy_score(y_test,y_predict)
+    loss_list.append(loss)
+    
+#결과값 출력
+print("ACC list: ", loss_list)
+print("Best ML: ",model_names[loss_list.index(max(loss_list))])
 
 #### CSV파일 생성 ####
 submission_csv['count'] = y_submit
@@ -134,3 +144,6 @@ else:
 
 # LinearSVR
 # RMSLE:  1.256727136597206
+
+# ACC list:  [-0.096, 0.0603, 0.0309, -0.1751, 0.0938]
+# Best ML:  RandomForestRegressor

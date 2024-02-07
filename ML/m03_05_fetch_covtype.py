@@ -86,3 +86,10 @@ for model in model_list:
 #결과값 출력
 print("ACC list: ", acc_list)
 print("Best ML: ",model_names[acc_list.index(max(acc_list))])
+
+# r=994
+# LOSS: 0.1615818589925766
+# ACC:  0.9583371580686616(0.9583371877670288 by loss[1])
+
+# ACC list:  [0.7122, 0.5692, 0.7246, 0.9243, 0.9332, 0.9526]
+# Best ML:  RandomForestClassifier

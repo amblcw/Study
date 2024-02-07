@@ -32,25 +32,34 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
-#model
-model = LinearSVR(C=100)
+from sklearn.svm import SVR
+from sklearn.linear_model import Perceptron, LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
+model_list = [SVR(), 
+              LinearRegression(), 
+              KNeighborsRegressor(), 
+              DecisionTreeRegressor(), 
+              RandomForestRegressor(),
+              ]
+model_names = ['SVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
+loss_list = []
 
-#compile & fit
-model.fit(x_train,y_train)
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
-#evaluate & predeict
-loss = model.score(x_test,y_test )
-y_predict = model.predict(x_test )
-y_submit = model.predict(test_csv )
-
-import datetime
-dt = datetime.datetime.now()
-submission_csv['count'] = y_submit
-submission_csv.to_csv(path+f"submission_{dt.day}day{dt.hour}-{dt.minute}.csv",index=False)
-
-r2 = r2_score(y_test,y_predict)
-print(f"{loss=}\n{r2=}")
+    #evaluate & predict
+    loss = round(model.score(x_test,y_test),4)
+    # y_predict = model.predict(x_test)
+    # acc = accuracy_score(y_test,y_predict)
+    loss_list.append(loss)
+    
+#결과값 출력
+print("ACC list: ", loss_list)
+print("Best ML: ",model_names[loss_list.index(max(loss_list))])
 
 
 # Epoch 455: early stopping <= best
@@ -95,3 +104,6 @@ print(f"{loss=}\n{r2=}")
 # LinearSVR
 # loss=0.652966147154205
 # r2=0.652966147154205
+
+# ACC list:  [0.493, 0.6613, 0.7235, 0.417, 0.784]
+# Best ML:  RandomForestRegressor

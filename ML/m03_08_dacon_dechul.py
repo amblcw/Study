@@ -187,44 +187,35 @@ print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 # y_train.shape=(67405, 7)
 # y_test.shape=(28888, 7)
 
-model = LinearSVC(C=900)
-# C가 작을수록 직선에 가깝고 C가 클수록 굴곡이 많다
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import Perceptron, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
-#compile & fit
+model_list = [LinearSVC(), 
+              Perceptron(), 
+              LogisticRegression(), 
+              KNeighborsClassifier(), 
+              DecisionTreeClassifier(), 
+              RandomForestClassifier(),
+              ]
+model_names = ['LinearSVC','Perceptron','LogisticRegression','KNeighborsClassifier','DecisionTreeClassifier','RandomForestClassifier']
+acc_list = []
 
-x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-x_test =np.asarray(x_test).astype(np.float32)
-test_csv =np.asarray(test_csv).astype(np.float32)
+for model in model_list:
+    #compile & fit
+    model.fit(x_train,y_train)
 
-model.fit(x_train,y_train)
-
-#evaluate & predict
-loss = model.score(x_test, y_test)    
-y_predict = model.predict(x_test)
-y_submit = model.predict(test_csv)
-ohe_y_test = y_test
-y_test = np.argmax(y_test,axis=1)
-
-print(f"{r=}\n LOSS: {loss}")#\nF1:   {f1}")
-
-# y = y.to_frame(['대출등급'])
-# y_predict = y_predict.reshape(-1,1)
-# ohe = OneHotEncoder(sparse=False)
-# ohe_y_predict = ohe.fit_transform(y_predict)
-
-# print(ohe_y_test.shape, ohe_y_predict.shape)
-# print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
-# f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
-f1 = f1_score(y_test,y_predict,average='macro')
-print("=========================\nF1: ",f1)
-
-y_submit = label_encoder.inverse_transform(y_submit)
-
-import datetime
-dt = datetime.datetime.now()
-submission_csv['대출등급'] = y_submit
-submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
-
+    #evaluate & predict
+    acc = round(model.score(x_test,y_test),4)
+    # y_predict = model.predict(x_test)
+    # acc = accuracy_score(y_test,y_predict)
+    acc_list.append(acc)
+    
+#결과값 출력
+print("ACC list: ", acc_list)
+print("Best ML: ",model_names[acc_list.index(max(acc_list))])
 
 # r=657
 #  LOSS: 1237.2230224609375
@@ -242,9 +233,5 @@ submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4
 # RobustScaler
 # F1:  0.8429713541136693
 
-# LinearSVC
-# F1:  0.06656323877068558
-# F1:  0.06669620276531724
-# F1:  0.04583933551966162 (c=10)
-# F1:  0.06441135012563584 (C=300)
-# F1:  0.034895257354102815 (C=900)
+# ACC list:  [0.4196, 0.3526, 0.5284, 0.4595, 0.8271, 0.7964]
+# Best ML:  DecisionTreeClassifier
