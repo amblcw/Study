@@ -134,3 +134,5 @@ def split_xy(dataset,time_step,y_col='None'):
         return result[:,:-1,:] , result[:,-1,0]
     else:
         pass
+    
+acc = 1.0
