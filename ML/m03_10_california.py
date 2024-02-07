@@ -44,7 +44,7 @@ model_list = [SVR(),
               DecisionTreeRegressor(), 
               RandomForestRegressor(),
               ]
-model_names = ['LinearSVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
+model_names = ['SVR','LinearRegression','KNeighborsRegressor','DecisionTreeRegressor','RandomForestRegressor']
 loss_list = []
 
 for model in model_list:
