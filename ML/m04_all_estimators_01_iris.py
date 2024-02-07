@@ -27,7 +27,7 @@ from sklearn.utils import all_estimators
 all_algorithms = all_estimators(type_filter='classifier')
 # all_algorithms = all_estimators(type_filter='regressor')
 print(len(all_algorithms))  # 41(분류) 55(회귀) 
-
+result_list = []
 error_list = []
 for name, algorithm in all_algorithms:
     try:
@@ -40,7 +40,16 @@ for name, algorithm in all_algorithms:
     model.fit(x_train,y_train)
     acc = model.score(x_test,y_test)
     print(f"{name:30} ACC: {acc:.4f}")
+    result_list.append((name,acc))
 print('error_list: \n',error_list)
+best_result = max(result_list)[1]
+best_algirithm = result_list[result_list.index(max(result_list))][0]
+print(f'\nBest result : {best_algirithm}`s {best_result:.4f}')
 
-# ACC list:  [0.93, 0.5, 0.93, 0.93, 0.9, 0.9]
-# Best ML:  LinearSVC
+# Epoch 312: early stopping
+# 1/1 [==============================] - 0s 62ms/step
+# r=167
+# LOSS: 0.05837009474635124
+# ACC:  1.0
+
+# Best result : SVC`s 0.9333

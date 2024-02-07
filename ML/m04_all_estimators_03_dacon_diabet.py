@@ -6,7 +6,8 @@ from sklearn.model_selection import train_test_split
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 from sklearn.svm import LinearSVC
-
+import warnings
+warnings.filterwarnings(action='ignore')
 #data
 path = "C:\\_data\\DACON\\diabets\\"
 train_csv = pd.read_csv(path+"train.csv",index_col=0)
@@ -46,35 +47,33 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
 
-from sklearn.svm import LinearSVC
-from sklearn.linear_model import Perceptron, LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+#model
+from sklearn.utils import all_estimators
 
-model_list = [LinearSVC(), 
-              Perceptron(), 
-              LogisticRegression(), 
-              KNeighborsClassifier(), 
-              DecisionTreeClassifier(), 
-              RandomForestClassifier(),
-              ]
-model_names = ['LinearSVC','Perceptron','LogisticRegression','KNeighborsClassifier','DecisionTreeClassifier','RandomForestClassifier']
-acc_list = []
-
-for model in model_list:
-    #compile & fit
-    model.fit(x_train,y_train)
-
-    #evaluate & predict
-    acc = round(model.score(x_test,y_test),4)
-    # y_predict = model.predict(x_test)
-    # acc = accuracy_score(y_test,y_predict)
-    acc_list.append(acc)
+all_algorithms = all_estimators(type_filter='classifier')
+# all_algorithms = all_estimators(type_filter='regressor')
+print(len(all_algorithms))  # 41(분류) 55(회귀) 
+result_list = []
+error_list = []
+for name, algorithm in all_algorithms:
+    try:
+        model = algorithm()
+        model.fit(x_train,y_train)
+        acc = model.score(x_test,y_test)
+    except Exception as e:
+        print(f"{name:30} ERROR")
+        error_list.append(e)
+        continue
+    print(f"{name:30} ACC: {acc:.4f}")
+    result_list.append((name,acc))
     
-#결과값 출력
-print("ACC list: ", acc_list)
-print("Best ML: ",model_names[acc_list.index(max(acc_list))])
+# print('error_list: \n',error_list)
+best_result = max(result_list)[1]
+best_algirithm = result_list[result_list.index(max(result_list))][0]
+print(f'\nBest result : {best_algirithm}`s {best_result:.4f}')
 
-# ACC list:  [0.93, 0.5, 0.93, 0.93, 0.9, 0.9]
-# Best ML:  LinearSVC
+# Epoch 526: early stopping
+# LOSS: 1.219661831855774
+# ACC: 0.7653061151504517
+
+# Best result : SVC`s 0.7194
