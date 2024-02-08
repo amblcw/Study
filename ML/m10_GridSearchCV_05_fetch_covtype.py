@@ -19,6 +19,8 @@ datasets = fetch_covtype()
 x = datasets.data  
 y = datasets.target
 
+x = x[:100000]
+y = y[:100000]
 # print(x.shape,y.shape)      #(581012, 54) (581012,)
 # print(pd.value_counts(y))
 # 2    283301
@@ -59,3 +61,11 @@ m10(x,y,'c')
 
 # ACC:  [0.95458809 0.9541492  0.95613673 0.95528476 0.95555154]
 # 평균 ACC: 0.9551
+
+# 최적의 매개변수:  RandomForestClassifier(n_jobs=2)
+# 최적의 파라미터:  {'min_samples_split': 2, 'n_jobs': 2}
+# best score:  0.9430888888888889
+# model score:  0.9469
+# ACC:  0.9469
+# y_pred_best`s ACC: 0.9469
+# time: 296.03sec
