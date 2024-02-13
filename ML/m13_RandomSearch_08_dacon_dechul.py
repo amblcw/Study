@@ -156,8 +156,8 @@ y = y.to_frame(['대출등급'])
 # y = y.reshape(-1,1)
 
 
-from m10_addon import m10
-m10(x,y,'c')
+from m13_RandomSearch_00 import m13_classifier
+m13_classifier(x,y)
 
 # r=657
 #  LOSS: 1237.2230224609375
@@ -196,3 +196,7 @@ m10(x,y,'c')
 # ACC:  0.8065420560747664
 # y_pred_best`s ACC: 0.8065420560747664
 # time: 181.68sec
+
+# Random
+# acc :  0.7813489796978036
+# time:  30.677210092544556 sec

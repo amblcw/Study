@@ -11,11 +11,11 @@ def m10(x,y,c_r):
     x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, random_state=123)
 
     param = [
-        {'n_estimators' : [100,200], 'max_depth':[6,10,12], 'min_samples_leaf':[3,10]},
-        {'max_depth':[6,8,10,12], 'min_samples_leaf':[3,5,7,10]},
-        {'min_samples_leaf': [3,5,7,10], 'min_samples_split':[2,3,5,10]},
-        {'min_samples_split': [2,3,5,10]},
-        {'n_jobs': [-1,2,4], 'min_samples_split':[2,3,5,10]}
+        {'n_jobs': [-1],'n_estimators' : [100,200], 'max_depth':[6,10,12], 'min_samples_leaf':[3,10]}, # 12
+        {'n_jobs': [-1],'max_depth':[6,8,10,12], 'min_samples_leaf':[3,5,7,10]},                       # 16
+        {'n_jobs': [-1],'min_samples_leaf': [3,5,7,10], 'min_samples_split':[2,3,5,10]},               # 16
+        {'n_jobs': [-1],'min_samples_split': [2,3,5,10]},                                              # 4
+        {'n_jobs': [-1], 'min_samples_split':[2,3,5,10]}                                # 4 총 52
     ]
 
     N_SPLIT = 5
