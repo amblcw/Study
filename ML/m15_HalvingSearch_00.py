@@ -33,7 +33,6 @@ def m15_classifier(x,y,**kwargs):
     
     model = HalvingGridSearchCV(RandomForestClassifier(), param, cv=N_SPLIT, refit=True, verbose=1, factor=3)
     if 'min_resources' in kwargs:
-        print("is enter?")
         model = HalvingGridSearchCV(RandomForestClassifier(), param, cv=N_SPLIT, refit=True, verbose=1, factor=3, min_resources=kwargs['min_resources'])
             
     st = time.time()
