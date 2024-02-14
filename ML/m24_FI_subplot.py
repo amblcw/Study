@@ -36,7 +36,7 @@ def plot_FI(model_list):
         plt.ylim(-1,n_features)
         plt.title(type(model).__name__)
         
-    plt.subplots_adjust(wspace=1, hspace=1)
+    plt.subplots_adjust(left=0.2, wspace=1, hspace=1)
     plt.show()
 
 print(np.unique(y,return_counts=True))
