@@ -25,6 +25,34 @@ y = train_csv['count']
 
 print(x.shape, y.shape)
 
+''' 25퍼 미만 열 삭제 '''
+# columns = datasets.feature_names
+columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "0.06767629 0.00623194 0.04226798 0.04526605 0.1310375  0.24831268\
+ 0.25612224 0.20308532"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from xgboost import XGBRegressor
@@ -115,3 +143,16 @@ for model in model_list:
 # XGBRegressor`s ACC: 0.2979634934672556
 # XGBRegressor : [0.12239873 0.04252511 0.10369455 0.07675308 0.10646653 0.33821073
 #  0.14905396 0.06089731]
+
+# after
+# DecisionTreeRegressor`s ACC: -0.16076384979035274
+# DecisionTreeRegressor : [0.0720547  0.052627   0.13802408 0.24912474 0.26100102 0.22716845]
+
+# RandomForestRegressor`s ACC: 0.2383020948789052
+# RandomForestRegressor : [0.07410588 0.05326697 0.1474628  0.24514613 0.26586265 0.21415557]
+
+# GradientBoostingRegressor`s ACC: 0.3030279534078809
+# GradientBoostingRegressor : [0.0850965  0.01764199 0.20338207 0.32982783 0.34194393 0.02210767]
+
+# XGBRegressor`s ACC: 0.27455842263333274
+# XGBRegressor : [0.1554413  0.08725202 0.14018974 0.36397374 0.18003702 0.07310625]

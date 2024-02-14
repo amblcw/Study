@@ -22,6 +22,34 @@ test_csv = test_csv.fillna(test_csv.mean())
 x = train_csv.drop(['count'],axis=1) #count 를 드랍, axis=0은 행, axis=1은 열
 y = train_csv['count']
 
+''' 25퍼 미만 열 삭제 '''
+# columns = datasets.feature_names
+columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "0.58096191 0.17320882 0.02719788 0.01812347 0.03072869 0.05335738\
+ 0.04302835 0.04255812 0.03083538"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from xgboost import XGBRegressor
@@ -150,3 +178,20 @@ for model in model_list:
 # XGBRegressor`s ACC: 0.7632837109221342
 # XGBRegressor : [0.34626618 0.09873444 0.36363754 0.01909325 0.02808662 0.04098203
 #  0.04632215 0.03015554 0.02672229]
+
+# after
+# DecisionTreeRegressor`s ACC: 0.6038129282026836
+# DecisionTreeRegressor : [0.58410787 0.18609834 0.04564533 0.05353262 0.0514235  0.05039775
+#  0.02879459]
+
+# RandomForestRegressor`s ACC: 0.7967212630932444
+# RandomForestRegressor : [0.59225627 0.19045739 0.04652447 0.05288092 0.04990394 0.04043135
+#  0.02754568]
+
+# GradientBoostingRegressor`s ACC: 0.7551113507739712
+# GradientBoostingRegressor : [0.64719976 0.21400846 0.02499513 0.04166271 0.03834928 0.02191041
+#  0.01187424]
+
+# XGBRegressor`s ACC: 0.7701087884483183
+# XGBRegressor : [0.54293376 0.16813059 0.05376956 0.06909224 0.06736376 0.05250703
+#  0.04620307]

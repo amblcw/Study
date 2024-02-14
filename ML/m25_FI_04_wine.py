@@ -23,6 +23,26 @@ y = datasets.target
 # 1    71
 # 0    59
 # 2    48
+
+''' 25퍼 미만 열 삭제 '''
+columns = datasets.feature_names
+# columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+fi_list = pd.Series([0.0420676,  0.05312189, 0.,         0.,         0.03888017, 0.,
+ 0.12962152, 0.,         0.,         0.,         0.02912372, 0.27920685,
+ 0.42797824])
+
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+low_col_list = [x.columns[index] for index in low_idx_list]
+if len(low_col_list) > len(x.columns) * 0.25:
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
@@ -101,3 +121,8 @@ for model in model_list:
 # XGBClassifier : [0.0363352  0.05855075 0.0201256  0.00602301 0.02279056 0.01907869
 #  0.06725097 0.0003421  0.02408856 0.14139089 0.13685898 0.3411003
 #  0.12606439]
+
+# after
+# DecisionTreeClassifier`s ACC: 0.9166666666666666
+# DecisionTreeClassifier : [0.01585625 0.05312189 0.02621135 0.12962152 0.         0.
+#  0.         0.05052966 0.29668109 0.42797824]

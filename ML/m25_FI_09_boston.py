@@ -8,6 +8,7 @@ import time
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 from sklearn.svm import LinearSVR
+import pandas as pd
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -17,6 +18,35 @@ x = datasets.data
 y = datasets.target
 
 r2 = 0
+
+''' 25퍼 미만 열 삭제 '''
+columns = datasets.feature_names
+# columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "0.03975657 0.00070606 0.00619758 0.00133015 0.0214521  0.61806582\
+ 0.00812987 0.05990651 0.00313737 0.01269828 0.01219055 0.00519019\
+ 0.21123894"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
 
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -69,3 +99,20 @@ for model in model_list:
 # XGBRegressor : [0.01676424 0.00214259 0.01079342 0.00273458 0.04193499 0.4363328
 #  0.02148097 0.05215991 0.01775352 0.04331461 0.03744346 0.01197497
 #  0.30516994]
+
+# after
+# DecisionTreeRegressor`s ACC: 0.4492743117079012
+# DecisionTreeRegressor : [0.0406138  0.00472457 0.02330789 0.62058219 0.00622547 0.0616007
+#  0.01450596 0.01146437 0.00655538 0.21041969]
+
+# RandomForestRegressor`s ACC: 0.7729849169407195
+# RandomForestRegressor : [0.02920261 0.00548395 0.02237045 0.51650164 0.01455211 0.04108818
+#  0.01590827 0.01384595 0.00929459 0.33175225]
+
+# GradientBoostingRegressor`s ACC: 0.8104832534527571
+# GradientBoostingRegressor : [0.0159612  0.00180914 0.03178777 0.48946006 0.01271472 0.0587632
+#  0.01298416 0.02444633 0.00609386 0.34597958]
+
+# XGBRegressor`s ACC: 0.8037710183512754
+# XGBRegressor : [0.01644142 0.00784428 0.03727875 0.49134448 0.02142194 0.04706337
+#  0.03374919 0.03786127 0.01057633 0.29641888]

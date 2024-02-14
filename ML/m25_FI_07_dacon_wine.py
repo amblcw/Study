@@ -43,7 +43,33 @@ x.loc[x['type'] == 'white', 'type'] = 0
 test_csv.loc[test_csv['type'] == 'red', 'type'] = 1 
 test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
 
+''' 25퍼 미만 열 삭제 '''
+# columns = datasets.feature_names
+columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "0.06746041 0.11007581 0.07139835 0.09299866 0.0788758  0.09011881\
+ 0.08798086 0.09026043 0.08147442 0.09051516 0.13795934 0.00088197"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
 
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
 
 # print(test_csv)
 from sklearn.tree import DecisionTreeClassifier
@@ -129,3 +155,20 @@ for model in model_list:
 # XGBClassifier`s ACC: 0.6327272727272727
 # XGBClassifier : [0.05545606 0.08902279 0.05532062 0.06314326 0.05454681 0.06951984
 #  0.06095583 0.05880075 0.05955473 0.06543217 0.17134504 0.19690208]
+
+# after
+# DecisionTreeClassifier`s ACC: 0.5781818181818181
+# DecisionTreeClassifier : [0.11939486 0.1092837  0.0859856  0.12301797 0.11380312 0.11232065
+#  0.09448999 0.09970356 0.14200055]
+
+# RandomForestClassifier`s ACC: 0.6627272727272727
+# RandomForestClassifier : [0.11677523 0.1011286  0.10417485 0.10177385 0.10887689 0.11860152
+#  0.10192236 0.10523231 0.1415144 ]
+
+# GradientBoostingClassifier`s ACC: 0.5518181818181818
+# GradientBoostingClassifier : [0.16331767 0.08065742 0.05845606 0.07324493 0.07270332 0.08289926
+#  0.05819632 0.08308675 0.32743827]
+
+# XGBClassifier`s ACC: 0.6309090909090909
+# XGBClassifier : [0.12764792 0.09491804 0.08684283 0.10239169 0.08970191 0.08778723
+#  0.08439869 0.09798248 0.22832918]

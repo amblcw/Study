@@ -155,6 +155,36 @@ print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16
 y = y.to_frame(['대출등급'])
 # y = y.reshape(-1,1)
 
+''' 25퍼 미만 열 삭제 '''
+# columns = datasets.feature_names
+columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "1.89481583e-02 1.12573081e-01 3.72493071e-05 8.62489322e-04\
+ 1.63976671e-02 6.71188692e-03 1.36131405e-03 5.90038758e-03\
+ 9.48149687e-04 3.94208833e-01 4.42022364e-01 1.15162202e-05\
+ 1.69034509e-05"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
@@ -237,3 +267,22 @@ for model in model_list:
 # XGBClassifier : [0.04650098 0.41125202 0.01180101 0.01636909 0.0325508  0.01734266
 #  0.01371949 0.02511661 0.01913969 0.18784563 0.19910412 0.01163159
 #  0.00762636]
+
+# after
+# DecisionTreeClassifier`s ACC: 0.836024715717327
+# DecisionTreeClassifier : [6.33324092e-02 3.38371608e-02 3.97277801e-02 3.69644380e-02
+#  2.80491764e-02 9.04587947e-03 6.31328061e-03 4.26060169e-01
+#  3.56356924e-01 3.12782689e-04]
+
+# RandomForestClassifier`s ACC: 0.8458902331377538
+# RandomForestClassifier : [0.1036061  0.02793278 0.07548263 0.08144864 0.06341335 0.02215726
+#  0.01473566 0.318722   0.29174761 0.00075398]
+
+# GradientBoostingClassifier`s ACC: 0.7499350952801288
+# GradientBoostingClassifier : [1.87568424e-02 1.09154681e-01 1.68592949e-02 6.85544837e-03
+#  1.56947559e-03 6.16161886e-03 9.82762216e-04 3.99324376e-01
+#  4.40318643e-01 1.68572856e-05]
+
+# XGBClassifier`s ACC: 0.8566903785243263
+# XGBClassifier : [0.04684655 0.43226427 0.03187074 0.01740447 0.01369627 0.02478606
+#  0.0180938  0.19347166 0.21088879 0.01067743]

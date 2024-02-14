@@ -35,6 +35,23 @@ train_csv['BloodPressure'] = test
 x = train_csv.drop(['Outcome','Insulin','SkinThickness'],axis=1)
 y = train_csv['Outcome']
 
+''' 25퍼 미만 열 삭제 '''
+# columns = datasets.feature_names
+columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+fi_list = pd.Series([0.0412366,  0.35054714, 0.09804412, 0.17476757, 0.19195972, 0.14344486])
+
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+low_col_list = [x.columns[index] for index in low_idx_list]
+if len(low_col_list) > len(x.columns) * 0.25:
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier

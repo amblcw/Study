@@ -14,6 +14,44 @@ print(x.shape, y.shape) # (1797, 64) (1797,)
 print(np.unique(y,return_counts=True))  # 다중분류 확인
 # (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), array([178, 182, 177, 183, 181, 182, 181, 179, 174, 180], dtype=int64)) 
 
+
+''' 25퍼 미만 열 삭제 '''
+columns = datasets.feature_names
+# columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "0.         0.00077333 0.0026385  0.01104499 0.00600033 0.04942167\
+ 0.         0.         0.         0.00380811 0.00412737 0.00144355\
+ 0.00796947 0.01158992 0.00521998 0.00103111 0.         0.00636011\
+ 0.00521263 0.01073529 0.04922624 0.09467774 0.00340266 0.\
+ 0.00153333 0.00077333 0.07689658 0.0610088  0.0518341  0.01383698\
+ 0.0143471  0.         0.         0.0555721  0.0097232  0.00483742\
+ 0.07193319 0.01344586 0.01620286 0.         0.         0.00408443\
+ 0.07616199 0.05744186 0.02086224 0.0117224  0.01384963 0.\
+ 0.         0.         0.01103088 0.         0.00429678 0.01028292\
+ 0.02135063 0.         0.         0.         0.01913081 0.00537631\
+ 0.06711274 0.001392   0.00927655 0.        "
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
@@ -118,3 +156,13 @@ XGBClassifier : [0.         0.03191047 0.01254289 0.00459743 0.00548403 0.038407
 # best_param: {'random_state': 160}
 # RandomizedSearchCV`s ACC: 0.9638888888888889
 # best_param: {'random_state': 515}
+
+# after
+# RandomizedSearchCV`s ACC: 0.8222222222222222
+# best_param: {'random_state': 634}
+# RandomizedSearchCV`s ACC: 0.9805555555555555
+# best_param: {'random_state': 287}
+# RandomizedSearchCV`s ACC: 0.9666666666666667
+# best_param: {'random_state': 101}
+# RandomizedSearchCV`s ACC: 0.9555555555555556
+# best_param: {'random_state': 149}

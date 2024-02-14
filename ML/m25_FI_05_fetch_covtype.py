@@ -48,6 +48,46 @@ print(np.count_nonzero(y[:,0])) # 0
 '''
 # print(y.shape)
 
+''' 25퍼 미만 열 삭제 '''
+columns = datasets.feature_names
+# columns = x.columns
+x = pd.DataFrame(x,columns=columns)
+print("x.shape",x.shape)
+''' 이 밑에 숫자에 얻은 feature_importances 넣고 줄 끝마다 \만 붙여주기'''
+fi_str = "4.46842335e-01 1.38249521e-02 9.27712685e-04 2.92568562e-02\
+ 2.44928354e-02 1.23747845e-01 1.05562913e-02 1.41471436e-02\
+ 6.28549704e-03 7.66222227e-02 1.53146669e-01 3.16958049e-04\
+ 9.93362669e-03 2.87529990e-03 5.29233424e-04 2.02555098e-03\
+ 9.36328676e-03 4.56934971e-03 3.48696866e-04 1.07938832e-03\
+ 5.02625012e-05 3.20391290e-05 0.00000000e+00 1.63049638e-02\
+ 6.13580823e-04 1.76237332e-02 2.02402255e-03 2.00982153e-05\
+ 0.00000000e+00 4.74047505e-03 8.28128172e-04 3.93862481e-04\
+ 0.00000000e+00 1.36680499e-03 7.13315031e-06 3.63092778e-04\
+ 8.87596604e-03 2.21868961e-03 7.15811331e-06 1.05431572e-04\
+ 7.04759531e-05 9.59406397e-05 1.64066023e-03 7.29775233e-03\
+ 4.62955810e-04 6.96162034e-04 6.28847674e-04 6.87266976e-05\
+ 3.25595675e-04 8.50824712e-05 1.14701808e-05 1.15808897e-03\
+ 8.94536347e-04 9.65115017e-05"
+ 
+''' str에서 숫자로 변환하는 구간 '''
+fi_str = fi_str.split()
+fi_float = [float(s) for s in fi_str]
+print(fi_float)
+fi_list = pd.Series(fi_float)
+
+''' 25퍼 미만 인덱스 구하기 '''
+low_idx_list = fi_list[fi_list <= fi_list.quantile(0.25)].index
+print('low_idx_list',low_idx_list)
+
+''' 25퍼 미만 제거하기 '''
+low_col_list = [x.columns[index] for index in low_idx_list]
+# 이건 혹여 중복되는 값들이 많아 25퍼이상으로 넘어갈시 25퍼로 자르기
+if len(low_col_list) > len(x.columns) * 0.25:   
+    low_col_list = low_col_list[:int(len(x.columns)*0.25)]
+print('low_col_list',low_col_list)
+x.drop(low_col_list,axis=1,inplace=True)
+print("after x.shape",x.shape)
+
 # print(y,y.shape,sep='\n')       # (581012, 7)
 # print(np.count_nonzero(y[:,0])) # 211840
 from sklearn.tree import DecisionTreeClassifier
