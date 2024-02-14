@@ -5,10 +5,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 
-a = np.array([]).reshape(1,1,1,0)
-print(a.shape)
+a = 1,3,4,5,6,7,9
 
-a = b = c = 10
-print(a,b,c)
+print(a)
 
 #테스트 테스트
