@@ -93,8 +93,8 @@ for cut_idx, cut_num in cutline:
 # compile & fit
     start_time = time.time()
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-    es = EarlyStopping(monitor='val_acc', mode='auto', patience=100, restore_best_weights=True)
-    hist = model.fit(x_train, y_train, batch_size=256, epochs=100, validation_split=0.2, verbose=2 )
+    es = EarlyStopping(monitor='val_acc', mode='auto', patience=256, restore_best_weights=True)
+    hist = model.fit(x_train, y_train, batch_size=256, epochs=256, validation_split=0.2, verbose=2 )
     end_time = time.time()
     # evaluate & predict
     loss = model.evaluate(x_test,y_test, verbose=0)
@@ -105,16 +105,18 @@ for cut_idx, cut_num in cutline:
     acc_list.append((round(end_time - start_time,4), cut_num,round(loss[1],4)))
     
 for time, c_n , acc in acc_list:
-    print(f"{c_n}의 ACC:  {acc}") 
+    print(f"{c_n:<6}의 ACC:  {acc}") 
     print(f"time: {time}sec")
     
 """ 
-0.9500의 ACC:  0.9735999703407288
-14.4050772190094sec
-0.9901의 ACC:  0.9684000015258789
-14.647950172424316sec
-0.9990의 ACC:  0.968999981880188
-15.83549952507019sec
-1.0000의 ACC:  0.9660999774932861
-15.605440616607666sec 
+0.95의 ACC:  0.9731
+time: 25.5278sec
+0.9901의 ACC:  0.9689
+time: 25.5964sec
+0.999의 ACC:  0.9696
+time: 26.2743sec
+1.0의 ACC:  0.9685
+time: 26.3754sec
+전체 데이터의 ACC:  0.9681
+time: 25.9777sec
 """
