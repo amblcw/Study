@@ -11,7 +11,11 @@ from sklearn.svm import LinearSVC
 
 import warnings
 warnings.filterwarnings(action='ignore')
-
+'''
+tree_mothod='gpu_hist',
+predictor='gou_predictor',
+gpu_id=0
+'''
 # data
 datasets = load_breast_cancer()
 # print(datasets)
