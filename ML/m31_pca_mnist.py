@@ -36,6 +36,15 @@ print(len(EVR_sum[EVR_sum >= 0.99]))
 print(len(EVR_sum[EVR_sum >= 0.999]))
 print(len(EVR_sum[EVR_sum >= 1.0]))
 
+print("0.95  커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.95]))
+print("0.99  커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.99]))
+print("0.999 커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.999]))
+print("1.0   커트라인 n_components: ",len(EVR_sum[EVR_sum < 1.0]))
+
+import matplotlib.pyplot as plt
+plt.plot(EVR_sum)
+plt.grid()
+plt.show()
 """ 
 x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2])
 x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2])
