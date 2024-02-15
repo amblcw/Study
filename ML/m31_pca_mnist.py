@@ -9,6 +9,7 @@ from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import time
 
@@ -33,7 +34,7 @@ pca = PCA(n_components=x.shape[1])
 x1 = pca.fit_transform(x)
 EVR = pca.explained_variance_ratio_
 EVR_sum = np.cumsum(EVR)
-evr_sum = pd.Series(EVR_sum).round(decimals=4)
+evr_sum = pd.Series(EVR_sum).round(decimals=6)
 print(evr_sum)
 print(len(evr_sum[evr_sum >= 0.95]))
 print(len(evr_sum[evr_sum >= 0.99]))
@@ -43,12 +44,26 @@ print("0.95  커트라인 n_components: ",len(evr_sum[evr_sum < 0.95]))
 print("0.99  커트라인 n_components: ",len(evr_sum[evr_sum < 0.99]))
 print("0.999 커트라인 n_components: ",len(evr_sum[evr_sum < 0.999]))
 print("1.0   커트라인 n_components: ",len(evr_sum[evr_sum < 1.0]))
+print(evr_sum.iloc[331])    # 0.950031
+print(evr_sum.iloc[543])    # 0.990077
+print(evr_sum.iloc[682])    # 0.999023
+print(evr_sum.iloc[712])    # 1.0
+
+cutline = [
+    (len(evr_sum[evr_sum < 0.95]), round(evr_sum.iloc[331],4)),
+    (len(evr_sum[evr_sum < 0.99]), round(evr_sum.iloc[543],4)),
+    (len(evr_sum[evr_sum < 0.999]), round(evr_sum.iloc[682],4)),
+    (len(evr_sum[evr_sum < 1.0]), round(evr_sum.iloc[712],4)),
+    (784, '전체 데이터')
+]
+
+
 
 import matplotlib.pyplot as plt
 plt.plot(evr_sum)
 plt.grid()
-plt.show()
-""" 
+# plt.show()
+
 x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2])
 x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2])
 
@@ -56,41 +71,50 @@ pca = PCA(n_components=x_train.shape[1]-1).fit(x_train)
 x_train = pca.transform(x_train)
 x_test = pca.transform(x_test)
 
-### 간단한 스케일링 방법 ###
-x_train = np.asarray(x_train.reshape(60000,28,28,1)).astype(np.float32)/255
-x_test = np.asarray(x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2],1)).astype(np.float32)/255
-
-# print(np.min(x_train),np.max(x_train))  #0.0 1.0
-
-print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
 
 y_train = to_categorical(y_train, num_classes=10)
 y_test = to_categorical(y_test, num_classes=10)
 
-# model
-model = Sequential()
-model.add(Conv2D(filters=30, kernel_size=(2,2), input_shape=(28,28,1))) #Conv2D(filter:출력갯수,kernel_size=(2,2),input_shape=(28,28,1))
-# model.add(Dropout(0.05))
-model.add(Conv2D(20, (2,2)))
-model.add(Conv2D(10, (2,2)))
-model.add(Flatten())                                #일렬로 쭉 펴야마지막에 (batch_size, 10)을 맞춰줄수있다
-model.add(Dense(1000, activation='relu'))           
-model.add(Dropout(0.05))
-# model.add(Dense(100, activation='relu'))
-model.add(Dense(units=10, activation='softmax'))
+acc_list = []
+for cut_idx, cut_num in cutline:
+    pca = PCA(n_components=cut_idx)
+    pca_x = pca.fit_transform(x)
+    
+    x_train = pca_x[:60000]
+    x_test = pca_x[60000:]
+    print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
+    # model
+    model = Sequential()
+    model.add(Dense(200, input_shape=x_train.shape[1:],activation='relu'))          
+    model.add(Dense(100, activation='relu'))
+    model.add(Dropout(0.05))
+    model.add(Dense(units=10, activation='softmax'))
 
 # compile & fit
-start_time = time.time()
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-es = EarlyStopping(monitor='val_acc', mode='auto', restore_best_weights=True)
-hist = model.fit(x_train, y_train, batch_size=128, epochs=100, validation_split=0.2, verbose=2 )
-end_time = time.time()
-# evaluate & predict
-loss = model.evaluate(x_test,y_test, verbose=0)
-y_predict = model.predict(x_test, verbose=0)
+    start_time = time.time()
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
+    es = EarlyStopping(monitor='val_acc', mode='auto', patience=100, restore_best_weights=True)
+    hist = model.fit(x_train, y_train, batch_size=256, epochs=100, validation_split=0.2, verbose=2 )
+    end_time = time.time()
+    # evaluate & predict
+    loss = model.evaluate(x_test,y_test, verbose=0)
+    y_predict = model.predict(x_test, verbose=0)
 
-print(f"time: {end_time - start_time}sec")
-print(f"LOSS: {loss[0]}\nACC:  {loss[1]}") """
-
-# LOSS: 0.22471864521503448
-# ACC:  0.983299970626831
+    print(f"time: {end_time - start_time}sec")
+    print(f"{cut_num}의 ACC:  {loss[1]}\n\n") 
+    acc_list.append((round(end_time - start_time,4), cut_num,round(loss[1],4)))
+    
+for time, c_n , acc in acc_list:
+    print(f"{c_n}의 ACC:  {acc}") 
+    print(f"time: {time}sec")
+    
+""" 
+0.9500의 ACC:  0.9735999703407288
+14.4050772190094sec
+0.9901의 ACC:  0.9684000015258789
+14.647950172424316sec
+0.9990의 ACC:  0.968999981880188
+15.83549952507019sec
+1.0000의 ACC:  0.9660999774932861
+15.605440616607666sec 
+"""
