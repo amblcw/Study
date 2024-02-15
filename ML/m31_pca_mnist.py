@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, MinMaxScaler
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import time
 
@@ -25,26 +26,30 @@ x = np.vstack([x_train,x_test])
 print(x.shape)  # (70000, 28, 28)
 x = x.reshape(x.shape[0], x.shape[1]*x.shape[2])
 
+scaler = StandardScaler()
+x = scaler.fit_transform(x)
+
 pca = PCA(n_components=x.shape[1])
 x1 = pca.fit_transform(x)
 EVR = pca.explained_variance_ratio_
 EVR_sum = np.cumsum(EVR)
-print(EVR_sum)
-evr_sum = pd.Series(EVR_sum)
-print(len(EVR_sum[EVR_sum >= 0.95]))
-print(len(EVR_sum[EVR_sum >= 0.99]))
-print(len(EVR_sum[EVR_sum >= 0.999]))
-print(len(EVR_sum[EVR_sum >= 1.0]))
-
-print("0.95  커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.95]))
-print("0.99  커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.99]))
-print("0.999 커트라인 n_components: ",len(EVR_sum[EVR_sum < 0.999]))
-print("1.0   커트라인 n_components: ",len(EVR_sum[EVR_sum < 1.0]))
-
+evr_sum = pd.Series(EVR_sum).round(decimals=4)
+print(evr_sum)
+print(len(evr_sum[evr_sum >= 0.95]))
+print(len(evr_sum[evr_sum >= 0.99]))
+print(len(evr_sum[evr_sum >= 0.999]))
+print(len(evr_sum[evr_sum >= 1.0]))
+332/ 544/ 683
+print("0.95  커트라인 n_components: ",len(evr_sum[evr_sum < 0.95]))
+print("0.99  커트라인 n_components: ",len(evr_sum[evr_sum < 0.99]))
+print("0.999 커트라인 n_components: ",len(evr_sum[evr_sum < 0.999]))
+print("1.0   커트라인 n_components: ",len(evr_sum[evr_sum < 1.0]))
+print(evr_sum.iloc[-1])
+print(evr_sum.iloc[-1] == 1.)
 import matplotlib.pyplot as plt
-plt.plot(EVR_sum)
+plt.plot(evr_sum)
 plt.grid()
-plt.show()
+# plt.show()
 """ 
 x_train = x_train.reshape(x_train.shape[0], x_train.shape[1]*x_train.shape[2])
 x_test = x_test.reshape(x_test.shape[0], x_test.shape[1]*x_test.shape[2])
