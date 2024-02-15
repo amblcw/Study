@@ -10,6 +10,9 @@ from keras.callbacks import EarlyStopping
 from keras.utils import to_categorical
 import sklearn.preprocessing
 from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.preprocessing import StandardScaler
 
 path = "C:\\_data\\DACON\\와인품질분류\\"
 train_csv = pd.read_csv(path+"train.csv",index_col=0)
@@ -33,30 +36,29 @@ x.loc[x['type'] == 'white', 'type'] = 0
 # print(x)
 test_csv.loc[test_csv['type'] == 'red', 'type'] = 1 
 test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
-# print(test_csv)
-r = int(np.random.uniform(1,1000))
-# r = 894
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r,stratify=y)
 
-from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-# scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
+x = StandardScaler().fit_transform(x)
+lda = LinearDiscriminantAnalysis().fit(x,y)
+x = lda.transform(x)
+print(x.shape)  # (5497, 6)
 
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
+acc_list = []
+for i in range(1,x.shape[1]+1):
+    r = 894
+    x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=r,stratify=y)
 
-#model
-model = LinearSVC(C=100)
+    #model
+    model = RandomForestClassifier()
 
-#compile & fit
-model.fit(x_train,y_train)
+    #compile & fit
+    model.fit(x_train,y_train)
 
-#evaluate & predict
-loss = model.score(x_test,y_test)
-print(loss)
+    #evaluate & predict
+    loss = model.score(x_test,y_test)
+    print(loss)
+    acc_list.append(loss)
+    
+print(acc_list)
 
 
 # r=894
@@ -93,3 +95,5 @@ print(loss)
 
 # LinearSVC
 # 0.42363636363636364
+
+# [0.6718181818181819, 0.6809090909090909, 0.6727272727272727, 0.66, 0.68, 0.6772727272727272]

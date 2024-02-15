@@ -9,6 +9,9 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 import matplotlib.pyplot as plt
 import time
 from sklearn.svm import LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -155,75 +158,35 @@ print(np.unique(y,return_counts=True)) #(array([0, 1, 2, 3, 4, 5, 6]), array([16
 y = y.to_frame(['대출등급'])
 # y = y.reshape(-1,1)
 
-
-f1 = 0
+x = StandardScaler().fit_transform(x)
+lda = LinearDiscriminantAnalysis().fit(x,y)
+x = lda.transform(x)
+print(x.shape)  # (96293, 6)
 
 r = int(np.random.uniform(1,1000))
-
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.7,random_state=r,stratify=y)
-
-from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
-# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-# scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-# scaler = MaxAbsScaler().fit(x_train)    #
-scaler = RobustScaler().fit(x_train)    #
-
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
-
-# scaler = MinMaxScaler().fit(x_train)    #최솟값을 0 최댓값을 1로 스케일링
-scaler = StandardScaler().fit(x_train)  #정규분포로 바꿔줘서 스케일링
-# scaler = MaxAbsScaler().fit(x_train)    #
-# scaler = RobustScaler().fit(x_train)    #
-
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
-
-print(f"{x_train.shape=}\n{x_test.shape=}\n{y_train.shape=}\n{y_test.shape=}")
-# x_train.shape=(67405, 13)
-# x_test.shape=(28888, 13)
-# y_train.shape=(67405, 7)
-# y_test.shape=(28888, 7)
 
 model = LinearSVC(C=900)
 # C가 작을수록 직선에 가깝고 C가 클수록 굴곡이 많다
 
 #compile & fit
-
-x_train =np.asarray(x_train).astype(np.float32) #Numpy는 기본적으로 float32 연산이기 때문에 되도록 맞춰주는게 좋다
-x_test =np.asarray(x_test).astype(np.float32)
-test_csv =np.asarray(test_csv).astype(np.float32)
-
 model.fit(x_train,y_train)
 
 #evaluate & predict
 loss = model.score(x_test, y_test)    
 y_predict = model.predict(x_test)
-y_submit = model.predict(test_csv)
-ohe_y_test = y_test
-y_test = np.argmax(y_test,axis=1)
 
 print(f"{r=}\n LOSS: {loss}")#\nF1:   {f1}")
 
-# y = y.to_frame(['대출등급'])
-# y_predict = y_predict.reshape(-1,1)
-# ohe = OneHotEncoder(sparse=False)
-# ohe_y_predict = ohe.fit_transform(y_predict)
 
-# print(ohe_y_test.shape, ohe_y_predict.shape)
-# print(np.unique(ohe_y_test),np.unique(ohe_y_predict))
-# f1 = f1_score(ohe_y_test,ohe_y_predict,average='samples')
-f1 = f1_score(y_test,y_predict,average='macro')
-print("=========================\nF1: ",f1)
 
-y_submit = label_encoder.inverse_transform(y_submit)
 
-import datetime
-dt = datetime.datetime.now()
-submission_csv['대출등급'] = y_submit
-submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
+# y_submit = label_encoder.inverse_transform(y_submit)
+
+# import datetime
+# dt = datetime.datetime.now()
+# submission_csv['대출등급'] = y_submit
+# submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4f}.csv",index=False)
 
 
 # r=657
@@ -248,3 +211,6 @@ submission_csv.to_csv(path+f"submit_{dt.day}day{dt.hour:2}{dt.minute:2}_F1{f1:.4
 # F1:  0.04583933551966162 (c=10)
 # F1:  0.06441135012563584 (C=300)
 # F1:  0.034895257354102815 (C=900)
+
+# r=761
+#  LOSS: 0.3213445029077817
