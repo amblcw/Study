@@ -13,6 +13,12 @@ columns = ["종목명","시가","종가"]
 
 datasets = pd.DataFrame(data, index=index, columns=columns)
 print(datasets)
+#      종목명    시가    종가
+# 031   삼성  1000  2000
+# 059   현대  1100  3000
+# 033   LG  2000   500
+# 045  아모레  3500  6000
+# 023  네이버   100  1500
 print("=====================================")
 # datasets[0] <= 에러
 # datasets["031"] <= 에러
