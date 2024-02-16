@@ -37,9 +37,7 @@ def fit_outlier(data):
         data[label] = series
         return data
 
-print(x.isna().sum())
 x = fit_outlier(x)
-print(x.isna().sum())
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.9,shuffle=False,random_state=333)
 
