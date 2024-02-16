@@ -32,7 +32,7 @@ def fit_outlier(data):
         lower_bound = q1 - iqr
         
         series[series > upper_bound] = np.nan
-        series[series > q1] = np.nan
+        # series[series > q1] = np.nan
         print(series.isna().sum())
         data[label] = series
         return data
