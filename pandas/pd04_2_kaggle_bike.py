@@ -100,6 +100,7 @@ submission_csv.to_csv(path+f"submission_{dt.hour}-{dt.minute}_loss{loss}.csv",in
 #### 음수 개수와 RMSLE출력 ####
 num_of_minus = submission_csv[submission_csv['count']<0].count()
 # print(num_of_minus['count'])
+ 
 
 def RMSLE(y_test,y_predict):
     return np.sqrt(mean_squared_log_error(y_test,y_predict))
