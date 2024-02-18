@@ -96,7 +96,6 @@ dt = datetime.datetime.now()
 # submission_csv.to_csv(path+f"submission_{dt.day}day{dt.hour}-{dt.minute}.csv",index=False)
 submission_csv.to_csv(path+f"submission_{dt.hour}-{dt.minute}_loss{loss}.csv",index=False)
 
-
 #### 음수 개수와 RMSLE출력 ####
 num_of_minus = submission_csv[submission_csv['count']<0].count()
 # print(num_of_minus['count'])
