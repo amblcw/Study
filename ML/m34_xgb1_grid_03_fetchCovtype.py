@@ -93,5 +93,5 @@ y_predict = model.best_estimator_.predict(x_test)
 acc = accuracy_score(y_test, y_predict)
 print("ACC score  : ",acc)
 
-# best param :  {'n_estimators': 400, 'min_child_weight': 0.01, 'max_depth': 6, 'learning_rate': 0.1, 'gamma': 0, 'early_stoppint_rounds': 50}
-# ACC score  :  0.9527777777777777
+# best param :  {'n_estimators': 500, 'min_child_weight': 10, 'max_depth': 8, 'learning_rate': 1, 'gamma': 1}
+# ACC score  :  0.9102174642651223

@@ -21,8 +21,6 @@ submit_csv = pd.read_csv(path+"sample_submission.csv")
 x = train_csv.drop(['quality'],axis=1)
 y = train_csv['quality']
 
-print(np.unique(y,return_counts=True))
-
 # print(x.shape,y.shape)  #(5497, 12) (5497,)
 print(np.unique(y,return_counts=True))
 # print(y.shape)          #(5497, 7)
@@ -36,12 +34,18 @@ test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
 import matplotlib.pyplot as plt
 plt.yscale('symlog')
 plt.boxplot(x)
-plt.show()
+# plt.show()
 
 def fit_outlier(data):  
-    data = pd.DataFrame(data)
+    label_list = []
     for label in data:
-        series = data[label]
+        # print("회귀 분류 판단: ",len(np.unique(data[label])))
+        if len(np.unique(data[label])) > 10:
+            label_list.append(label)
+    
+    data = pd.DataFrame(data)
+    for label in label_list:
+        series = data[label].copy()
         q1 = series.quantile(0.25)      
         q3 = series.quantile(0.75)
         iqr = q3 - q1
@@ -50,7 +54,7 @@ def fit_outlier(data):
         
         series[series > upper_bound] = np.nan
         series[series < lower_bound] = np.nan
-        print(series.isna().sum())
+        print(f"{label:<20}의 이상치 개수: ",series.isna().sum())
         series = series.interpolate()
         data[label] = series
         
@@ -60,6 +64,11 @@ def fit_outlier(data):
 
 x = fit_outlier(x)
 # print(x.isna().sum())
+
+from sklearn.preprocessing import LabelEncoder
+
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y)
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, random_state=333, train_size=0.8,
@@ -114,5 +123,5 @@ y_predict = model.best_estimator_.predict(x_test)
 acc = accuracy_score(y_test, y_predict)
 print("ACC score  : ",acc)
 
-# best param :  {'n_estimators': 400, 'min_child_weight': 0.01, 'max_depth': 6, 'learning_rate': 0.1, 'gamma': 0, 'early_stoppint_rounds': 50}
-# ACC score  :  0.9527777777777777
+# best param :  {'n_estimators': 500, 'min_child_weight': 0.1, 'max_depth': 6, 'learning_rate': 1, 'gamma': 0}
+# ACC score  :  0.6263636363636363

@@ -9,6 +9,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.metrics import accuracy_score, r2_score
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
 import warnings
 warnings.filterwarnings(action='ignore')
@@ -161,9 +162,15 @@ plt.boxplot(x)
 plt.show()
 
 def fit_outlier(data):  
-    data = pd.DataFrame(data)
+    label_list = []
     for label in data:
-        series = data[label]
+        # print("회귀 분류 판단: ",len(np.unique(data[label])))
+        if len(np.unique(data[label])) > 10:
+            label_list.append(label)
+    
+    data = pd.DataFrame(data)
+    for label in label_list:
+        series = data[label].copy()
         q1 = series.quantile(0.25)      
         q3 = series.quantile(0.75)
         iqr = q3 - q1
@@ -172,7 +179,7 @@ def fit_outlier(data):
         
         series[series > upper_bound] = np.nan
         series[series < lower_bound] = np.nan
-        print(series.isna().sum())
+        print(f"{label:<20}의 이상치 개수: ",series.isna().sum())
         series = series.interpolate()
         data[label] = series
         
@@ -236,5 +243,5 @@ y_predict = model.best_estimator_.predict(x_test)
 acc = accuracy_score(y_test, y_predict)
 print("ACC score  : ",acc)
 
-# best param :  {'n_estimators': 400, 'min_child_weight': 0.01, 'max_depth': 6, 'learning_rate': 0.1, 'gamma': 0, 'early_stoppint_rounds': 50}
-# ACC score  :  0.9527777777777777
+# best param :  {'n_estimators': 1000, 'min_child_weight': 0, 'max_depth': 7, 'learning_rate': 0.3, 'gamma': 0}
+# ACC score  :  0.8060646970247677
