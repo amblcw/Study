@@ -1,5 +1,5 @@
 from xgboost import XGBClassifier, XGBRFRegressor
-from sklearn.datasets import fetch_covtype
+from sklearn.datasets import load_diabetes
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold, StratifiedKFold
@@ -9,26 +9,8 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.metrics import accuracy_score, r2_score
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-import matplotlib.pyplot as plt
-from sklearn.datasets import fetch_california_housing
 
-import warnings
-warnings.filterwarnings(action='ignore')
-
-#data
-path = "C:\\_data\\DACON\\ddarung\\"
-train_csv = pd.read_csv(path+"train.csv",index_col=['id'])  
-test_csv = pd.read_csv(path+"test.csv",index_col=0)         
-submission_csv = pd.read_csv(path+"submission.csv")
-
-train_csv = train_csv.fillna(train_csv.mean())
-test_csv = test_csv.fillna(test_csv.mean())
-
-x = train_csv.drop(['count'],axis=1) #count 를 드랍, axis=0은 행, axis=1은 열
-y = train_csv['count']
-
-# print(np.unique(y,return_counts=True)) # 회귀 
+x, y = load_diabetes(return_X_y=True)
 
 import matplotlib.pyplot as plt
 plt.yscale('symlog')
@@ -37,16 +19,8 @@ plt.boxplot(x)
 
 def fit_outlier(data):  
     data = pd.DataFrame(data)
-    label_list = []
     for label in data:
-        # print(label)
-        print("회귀 분류 판단: ",len(np.unique(data[label])))
-        if len(np.unique(data[label])) > 10:
-            label_list.append(label)
-    
-    data = pd.DataFrame(data)
-    for label in label_list:
-        series = data[label].copy()
+        series = data[label]
         q1 = series.quantile(0.25)      
         q3 = series.quantile(0.75)
         iqr = q3 - q1
@@ -55,7 +29,7 @@ def fit_outlier(data):
         
         series[series > upper_bound] = np.nan
         series[series < lower_bound] = np.nan
-        print(f"{label:<20}의 이상치 개수: ",series.isna().sum())
+        print(series.isna().sum())
         series = series.interpolate()
         data[label] = series
         
@@ -71,7 +45,8 @@ x_train, x_test, y_train, y_test = train_test_split(
     # stratify=y
 )
 
-sclaer = MinMaxScaler().fit(x_train)
+# sclaer = MinMaxScaler().fit(x_train)
+sclaer = StandardScaler().fit(x_train)
 x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
@@ -93,32 +68,54 @@ kfold = KFold(n_splits=N_SPLITS, shuffle=True, random_state=333)
 'reg_lamda'         : [0,0.1,0.01,0.001,1,2,10] defalut 1               | 0~inf | L2 절대값 가중치 규제 lamda
 '''
 parameters = {
+    'early_stopping_rounds' : [10],
     'n_estimators'      : [100,500,1000],
     'learning_rate'     : [0.01,0.05,0.07,0.1,0.5,1,3],     # eta
     'max_depth'         : [None,3,5,7,9],
     'gamma'             : [0,5,10,100],
-    'min_child_weight'  : [0,0.01,0.1,1,10],                # 총 2100개
-    # 'early_stoppint_rounds' : [50],
-    # 'tree_method'       : ['hist'],
-    # 'device'            : ['cuda'],
+    'min_child_weight'  : [0,0.01,0.1,1,10],  
     # 'reg_alpth'         : [0,0.1,0.01,0.001,1,2,10],
     # 'reg_lamda'         : [0,0.1,0.01,0.001,1,2,10],
 }
 
+params = {
+                'gamma':0.1,
+                'learning_rate':0.7,
+                'max_depth':15,
+                'n_estimators':4000,
+}
+
 # model
-xgb = XGBRFRegressor(random_state=333)
-# model = RandomizedSearchCV(xgb, parameters, refit=True, cv=kfold, n_iter=500, n_jobs=22, verbose=1)
-model = HalvingGridSearchCV(xgb, parameters, factor=3, verbose=1)
+# model = RandomizedSearchCV(xgb, parameters, refit=True, cv=kfold, n_iter=50, n_jobs=22)
+model = XGBRFRegressor()
+model.set_params(
+                **params,
+                early_stopping_rounds=30,
+                )
+
 
 # fit
-model.fit(x_train,y_train)
+model.fit(x_train,y_train,eval_set=[(x_train,y_train),(x_test,y_test)],verbose=True,
+          eval_metric='rmse',       # 회귀 디폴트
+        #   eval_metric='rmsle',    # 회귀
+        #   eval_metric='mae',      # 회귀
+        #   eval_metric='error',    # 이진분류용
+        #   eval_metric='merror',   # 다중분류 전용
+        #   eval_metric='logloss',  # 이진분류 디폴트
+        #   eval_metric='mlogloss', # 다중분류 디폴트
+        #   eval_metric='auc',      # 이진, 다중 다
+          )
 
 # evaluate
-print("best param : ",model.best_params_)
-y_predict = model.best_estimator_.predict(x_test)
+# print("best param : ",model.best_params_)
+# y_predict = model.best_estimator_.predict(x_test)
+print(model.score(x_test,y_test))
+y_predict = model.predict(x_test)
 
 r2 = r2_score(y_test, y_predict)
 print("R2 score  : ",r2)
+# print(model.get_params())
 
-# best param :  {'n_estimators': 500, 'min_child_weight': 0, 'max_depth': 10, 'learning_rate': 1, 'gamma': 4}
-# R2 score  :  0.7273294700618949
+
+# R2 score  :  0.8392818063775671
+# R2 score  :  0.31847838839109377
