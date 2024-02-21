@@ -5,8 +5,9 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 
-a = 1,3,4,5,6,7,9
+a = [1,2,3]
+b = [4,5,6]
 
-print(a)
+print(a+b)
 
 #테스트 테스트
