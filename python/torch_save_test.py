@@ -10,10 +10,6 @@ import numpy as np
 from torchvision.io import read_image
 print(torch.__version__)    # 2.2.0+cu118
 
-x = np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7],[6,7,8],[7,8,9]]).reshape(-1,3,1)
-y = np.array([4,5,6,7,8,9,10])
-print(x.shape,y.shape) # (7, 3, 1) (7,)
-
 (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
 print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 print(y_train[0],y_test[0])
