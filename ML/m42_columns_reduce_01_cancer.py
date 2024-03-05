@@ -71,8 +71,8 @@ for i in range(len(drop_feature_idx_list)-1): # 1바퀴에는 1개, 마지막 �
           eval_metric='logloss',
           )
     new_result = model2.score(new_x_test,y_test)
-    print(f"{i}개 컬럼이 삭제되었을 때 Score: ",new_result)
-    result_dict[i] = new_result - result    # 그대로 보면 숫자가 비슷해서 구분하기 힘들기에 얼마나 변했는지 체크
+    print(f"{i+1}개 컬럼이 삭제되었을 때 Score: ",new_result)
+    result_dict[i+1] = new_result - result    # 그대로 보면 숫자가 비슷해서 구분하기 힘들기에 얼마나 변했는지 체크
     
     
 print(result_dict)
