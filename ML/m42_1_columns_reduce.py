@@ -53,12 +53,12 @@ print("ACC: ",acc)
 feature_importances_list = list(model.feature_importances_)
 feature_importances_list_sorted = sorted(feature_importances_list)
 # print(feature_importances_list)
-drop_feature_idx_list = [feature_importances_list.index(feature) for feature in feature_importances_list_sorted]
+drop_feature_idx_list = [feature_importances_list.index(feature) for feature in feature_importances_list_sorted] # 중요도가 낮은 column인덱스 부터 기재한 리스트
 print(drop_feature_idx_list)
 
 result_dict = {}
-for i in range(len(drop_feature_idx_list)-1):
-    drop_idx = drop_feature_idx_list[:i+1]
+for i in range(len(drop_feature_idx_list)-1): # 1바퀴에는 1개, 마지막 바퀴에는 29개 지우기, len -1해준 이유는 30개 지우면 안되니까
+    drop_idx = drop_feature_idx_list[:i+1] # +1 해준 이유는 첫바퀴에 0개가 아니라 1개를 지워야하니까
     new_x_train = np.delete(x_train,drop_idx,axis=1)
     new_x_test = np.delete(x_test,drop_idx,axis=1)
     print(new_x_train.shape,new_x_test.shape)
@@ -72,7 +72,7 @@ for i in range(len(drop_feature_idx_list)-1):
           )
     new_result = model2.score(new_x_test,y_test)
     print(f"{i}개 컬럼이 삭제되었을 때 Score: ",new_result)
-    result_dict[i] = new_result - result
+    result_dict[i] = new_result - result    # 그대로 보면 숫자가 비슷해서 구분하기 힘들기에 얼마나 변했는지 체크
     
     
 print(result_dict)
