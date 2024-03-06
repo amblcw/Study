@@ -34,7 +34,7 @@ y = pd.concat([y,y])
 
 import time
 
-st = time.time()
+st = time.time()    # pandas로 해보기
 y_fix = y.copy()
 y_fix.loc[y_fix == 3] = 5
 y_fix.loc[y_fix == 4] = 5
@@ -45,7 +45,7 @@ y = y_fix
 et = time.time()
 print(et-st,"sec")
 
-st = time.time()
+st = time.time()    # numpy로 해보기
 y_fix = np.asarray(y.copy())
 y_fix_3 = np.where(y_fix == 3)
 y_fix_4 = np.where(y_fix == 4)
@@ -61,7 +61,7 @@ y = y_fix
 et = time.time()
 print(et-st,"sec")
 
-st = time.time()
+st = time.time()    # for문으로 해보기
 y_fix2 = np.asarray(y.copy())
 for idx, data in enumerate(y_fix2):
     if data == 3:
