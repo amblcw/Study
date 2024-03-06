@@ -41,11 +41,44 @@ x.loc[x['type'] == 'white', 'type'] = 0
 test_csv.loc[test_csv['type'] == 'red', 'type'] = 1 
 test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
 
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=42,stratify=y)
+def remove_outlier(dataset:pd.DataFrame):
+    for label in dataset:
+        data = dataset[label]
+        q1 = data.quantile(0.25)
+        q3 = data.quantile(0.75)
+        iqr = q3-q1
+        upbound    = q3 + iqr*1.5
+        underbound = q1 - iqr*1.5
+        dataset.loc[dataset[label] < underbound, label] = underbound
+        dataset.loc[dataset[label] > upbound, label] = upbound
+        
+    return dataset
+
+print(train_csv.head(10))
+print(test_csv.head(10))
+
+x = remove_outlier(x)
+print(train_csv.shape,x.shape,sep='\n')
+print(train_csv.max(),train_csv.min())
+print(x.max(),x.min())
+
+x = x.astype(np.float32)
+y = y.astype(np.float32)
+
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=770,stratify=y)
 
 sclaer = MinMaxScaler().fit(x_train)
 x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
+
+print("train test shapes: ",x_train.shape,y_train.shape,x_test.shape,y_test.shape)
+
+from imblearn.over_sampling import SMOTE, BorderlineSMOTE
+smote = SMOTE(random_state=770)
+x_train, y_train = smote.fit_resample(x_train,y_train)
+
+print("train test shapes: ",x_train.shape,y_train.shape,x_test.shape,y_test.shape)
+
 
 # model
 from xgboost import XGBClassifier
@@ -62,16 +95,12 @@ xgb_params = {'learning_rate': 0.13349839953884737,
                 'tree_method' : 'gpu_hist',
                 'predictor' : 'gpu_predictor',
                 }
-model = XGBClassifier()
-model.set_params(early_stopping_rounds=10,**xgb_params)
+model = RandomForestClassifier()
+# model.set_params(early_stopping_rounds=10,**xgb_params)
 # model = XGBClassifier(**xgb_params)
 
 # fit & pred
-model.fit(x_train,y_train,
-          eval_set=[(x_train,y_train), (x_test,y_test)],
-          verbose=1,
-          eval_metric='mlogloss',
-          )
+model.fit(x_train,y_train,)
 # model.fit(x_train,y_train)
 pred = model.predict(x_test)
 result = model.score(x_test,y_test)
@@ -81,3 +110,4 @@ print(result)
 from sklearn.metrics import accuracy_score
 acc = accuracy_score(y_test,pred)
 print("ACC: ",acc)
+
