@@ -52,7 +52,7 @@ print("ACC: ",acc)
 # print(type(model.feature_importances_))
 feature_importances_list = list(model.feature_importances_)
 feature_importances_list_sorted = sorted(feature_importances_list)
-# print(feature_importances_list)
+print(feature_importances_list_sorted)
 drop_feature_idx_list = [feature_importances_list.index(feature) for feature in feature_importances_list_sorted] # 중요도가 낮은 column인덱스 부터 기재한 리스트
 print(drop_feature_idx_list)
 

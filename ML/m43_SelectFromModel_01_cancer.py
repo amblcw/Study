@@ -26,8 +26,8 @@ xgb_params = {'learning_rate': 0.13349839953884737,
                 'gamma': 4.5485144879936555e-06,
                 'reg_alpha': 0.014276113125688179,
                 'reg_lambda': 10.121476098960851,
-                'tree_method' : 'gpu_hist',
-                'predictor' : 'gpu_predictor',
+                # 'tree_method' : 'gpu_hist',
+                # 'predictor' : 'gpu_predictor',
                 }
 
 model = XGBClassifier()
