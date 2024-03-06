@@ -20,7 +20,6 @@ test_csv = pd.read_csv(path+"test.csv",index_col=0)
 submit_csv = pd.read_csv(path+"sample_submission.csv")
 
 # print(train_csv.isna().sum(),test_csv.isna().sum()) 결측치 존재안함
-
 # print(train_csv,test_csv,sep='\n') #[5497 rows x 13 columns], [1000 rows x 12 columns]
 x = train_csv.drop(['quality'],axis=1)
 y = train_csv['quality']
@@ -30,6 +29,59 @@ print(np.unique(y,return_counts=True))
 from sklearn.preprocessing import LabelEncoder
 import warnings
 warnings.filterwarnings('ignore')
+
+y = pd.concat([y,y])
+
+import time
+
+st = time.time()
+y_fix = y.copy()
+y_fix.loc[y_fix == 3] = 5
+y_fix.loc[y_fix == 4] = 5
+y_fix.loc[y_fix == 8] = 7
+y_fix.loc[y_fix == 9] = 7
+
+y = y_fix
+et = time.time()
+print(et-st,"sec")
+
+st = time.time()
+y_fix = np.asarray(y.copy())
+y_fix_3 = np.where(y_fix == 3)
+y_fix_4 = np.where(y_fix == 4)
+y_fix_8 = np.where(y_fix == 8)
+y_fix_9 = np.where(y_fix == 9)
+
+y_fix[y_fix_3] = 5
+y_fix[y_fix_4] = 5
+y_fix[y_fix_8] = 7
+y_fix[y_fix_9] = 7
+
+y = y_fix
+et = time.time()
+print(et-st,"sec")
+
+st = time.time()
+y_fix2 = np.asarray(y.copy())
+for idx, data in enumerate(y_fix2):
+    if data == 3:
+        y_fix2[idx] = 5
+    elif data == 4:
+        y_fix2[idx] = 5
+    elif data == 8:
+        y_fix2[idx] = 7
+    elif data == 9:
+        y_fix2[idx] = 7
+
+y = y_fix2
+et = time.time()
+print(et-st,"sec")
+
+for a, b in zip(y_fix,y_fix2):
+    if a != b:
+        raise Exception("y_fix not same y_fix2")
+        
+print(np.unique(y,return_counts=True))
 
 y = LabelEncoder().fit_transform(y)
 print(np.unique(y,return_counts=True))
@@ -54,13 +106,13 @@ def remove_outlier(dataset:pd.DataFrame):
         
     return dataset
 
-print(train_csv.head(10))
-print(test_csv.head(10))
+# print(train_csv.head(10))
+# print(test_csv.head(10))
 
 x = remove_outlier(x)
-print(train_csv.shape,x.shape,sep='\n')
-print(train_csv.max(),train_csv.min())
-print(x.max(),x.min())
+# print(train_csv.shape,x.shape,sep='\n')
+# print(train_csv.max(),train_csv.min())
+# print(x.max(),x.min())
 
 x = x.astype(np.float32)
 y = y.astype(np.float32)
@@ -71,13 +123,6 @@ sclaer = MinMaxScaler().fit(x_train)
 x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
-print("train test shapes: ",x_train.shape,y_train.shape,x_test.shape,y_test.shape)
-
-# from imblearn.over_sampling import SMOTE, BorderlineSMOTE
-# smote = SMOTE()
-# x_train, y_train = smote.fit_resample(x_train,y_train)
-
-print("train test shapes: ",x_train.shape,y_train.shape,x_test.shape,y_test.shape)
 
 
 # model
@@ -93,4 +138,5 @@ print(result)
 from sklearn.metrics import accuracy_score
 acc = accuracy_score(y_test,pred)
 print("ACC: ",acc)
-
+# ACC:  0.69
+# 3->4, 9->8 ACC:  0.7
