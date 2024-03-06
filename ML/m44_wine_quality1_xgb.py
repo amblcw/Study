@@ -82,49 +82,49 @@ from sklearn.metrics import accuracy_score
 acc = accuracy_score(y_test,pred)
 print("ACC: ",acc)
 
-import optuna
+# import optuna
 
-def objectiveXGB(trial):
-    param = {
-        'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
-        'max_depth' : trial.suggest_int('max_depth', 8, 16),
-        'min_child_weight' : trial.suggest_int('min_child_weight', 1, 300),
-        'gamma' : trial.suggest_int('gamma', 1, 3),
-        'learning_rate' : 0.01,
-        'colsample_bytree' : trial.suggest_discrete_uniform('colsample_bytree', 0.5, 1, 0.1),
-        'nthread' : -1,
-        # 'tree_method' : 'gpu_hist',
-        # 'predictor' : 'gpu_predictor',
-        'lambda' : trial.suggest_loguniform('lambda', 1e-3, 10.0),
-        'alpha' : trial.suggest_loguniform('alpha', 1e-3, 10.0),
-        'subsample' : trial.suggest_categorical('subsample', [0.6,0.7,0.8,1.0]),
-        'random_state' : 1127
-    }
+# def objectiveXGB(trial):
+#     param = {
+#         'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
+#         'max_depth' : trial.suggest_int('max_depth', 8, 16),
+#         'min_child_weight' : trial.suggest_int('min_child_weight', 1, 300),
+#         'gamma' : trial.suggest_int('gamma', 1, 3),
+#         'learning_rate' : 0.01,
+#         'colsample_bytree' : trial.suggest_discrete_uniform('colsample_bytree', 0.5, 1, 0.1),
+#         'nthread' : -1,
+#         # 'tree_method' : 'gpu_hist',
+#         # 'predictor' : 'gpu_predictor',
+#         'lambda' : trial.suggest_loguniform('lambda', 1e-3, 10.0),
+#         'alpha' : trial.suggest_loguniform('alpha', 1e-3, 10.0),
+#         'subsample' : trial.suggest_categorical('subsample', [0.6,0.7,0.8,1.0]),
+#         'random_state' : 1127
+#     }
     
-    # 학습 모델 생성
-    xgb_model = XGBClassifier(**xgb_params)
-    xgb_model.fit(x_train,y_train,
-          eval_set=[(x_train,y_train), (x_test,y_test)],
-          verbose=0,
-          eval_metric='mlogloss',
-          )
+#     # 학습 모델 생성
+#     xgb_model = XGBClassifier(**xgb_params)
+#     xgb_model.fit(x_train,y_train,
+#           eval_set=[(x_train,y_train), (x_test,y_test)],
+#           verbose=0,
+#           eval_metric='mlogloss',
+#           )
     
-    # 모델 성능 확인
-    score = accuracy_score(xgb_model.predict(x_test), y_test)
+#     # 모델 성능 확인
+#     score = accuracy_score(xgb_model.predict(x_test), y_test)
     
-    return score
+#     return score
 
-study = optuna.create_study(direction='maximize')
-study.optimize(objectiveXGB, n_trials=200)
+# study = optuna.create_study(direction='maximize')
+# study.optimize(objectiveXGB, n_trials=200)
 
-model.fit(x_train,y_train,
-          eval_set=[(x_train,y_train), (x_test,y_test)],
-          verbose=0,
-          eval_metric='mlogloss',
-          )
+# model.fit(x_train,y_train,
+#           eval_set=[(x_train,y_train), (x_test,y_test)],
+#           verbose=0,
+#           eval_metric='mlogloss',
+#           )
 
-acc = model.score(x_test,y_test)
+# acc = model.score(x_test,y_test)
 
-print("optuna AAC: ",acc)
-best_params = study.best_params
-print(best_params)
+# print("optuna AAC: ",acc)
+# best_params = study.best_params
+# print(best_params)

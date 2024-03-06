@@ -41,30 +41,21 @@ x.loc[x['type'] == 'white', 'type'] = 0
 test_csv.loc[test_csv['type'] == 'red', 'type'] = 1 
 test_csv.loc[test_csv['type'] == 'white', 'type'] = 0
 
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=770,stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=42,stratify=y)
 
 sclaer = MinMaxScaler().fit(x_train)
 x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
-# model
-from xgboost import XGBClassifier
-xgb_params = {'learning_rate': 0.13349839953884737,
-                'n_estimators': 99,
-                'max_depth': 8,
-                'min_child_weight': 3.471164143831403e-06,
-                'subsample': 0.6661302167437514,            #dropout 비슷
-                'colsample_bytree': 0.9856906281904222,
-                'gamma': 4.5485144879936555e-06,
-                'reg_alpha': 0.014276113125688179,
-                'reg_lambda': 10.121476098960851,
-                # 'nthread' : 20,
-                'tree_method' : 'gpu_hist',
-                'predictor' : 'gpu_predictor',
-                }
+############## smote ############## 
+print("===== smote =====")
+from imblearn.over_sampling import SMOTE
+
+smote = SMOTE(random_state=47, k_neighbors=3)
+x_train, y_train = smote.fit_resample(x_train,y_train)
+print(pd.value_counts(y_train))
+
 model = RandomForestClassifier()
-# model.set_params(early_stopping_rounds=10,**xgb_params)
-# model = XGBClassifier(**xgb_params)
 
 # fit & pred
 model.fit(x_train,y_train,)
@@ -74,6 +65,16 @@ result = model.score(x_test,y_test)
 
 print(result)
 
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 acc = accuracy_score(y_test,pred)
+f1  = f1_score(y_test,pred,average='macro')
 print("ACC: ",acc)
+print("F1 : ",f1)
+
+# 기본
+# ACC:  0.6518181818181819
+# F1 :  0.38253859683408253
+
+# SMOTE
+# ACC:  0.6281818181818182
+# F1 :  0.3760407800734257

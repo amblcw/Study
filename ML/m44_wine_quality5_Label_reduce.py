@@ -19,6 +19,11 @@ train_csv = pd.read_csv(path+"train.csv",index_col=0)
 test_csv = pd.read_csv(path+"test.csv",index_col=0)
 submit_csv = pd.read_csv(path+"sample_submission.csv")
 
+# train_csv = pd.concat([train_csv,train_csv])
+# train_csv = pd.concat([train_csv,train_csv])
+# train_csv = pd.concat([train_csv,train_csv])
+# train_csv = pd.concat([train_csv,train_csv])
+
 # print(train_csv.isna().sum(),test_csv.isna().sum()) 결측치 존재안함
 # print(train_csv,test_csv,sep='\n') #[5497 rows x 13 columns], [1000 rows x 12 columns]
 x = train_csv.drop(['quality'],axis=1)
@@ -30,18 +35,15 @@ from sklearn.preprocessing import LabelEncoder
 import warnings
 warnings.filterwarnings('ignore')
 
-y = pd.concat([y,y])
-
-import time
-
+""" import time
 st = time.time()    # pandas로 해보기
-y_fix = y.copy()
-y_fix.loc[y_fix == 3] = 5
-y_fix.loc[y_fix == 4] = 5
-y_fix.loc[y_fix == 8] = 7
-y_fix.loc[y_fix == 9] = 7
+y_fix0 = y.copy()
+y_fix0.loc[y_fix0 == 3] = 5
+y_fix0.loc[y_fix0 == 4] = 5
+y_fix0.loc[y_fix0 == 8] = 7
+y_fix0.loc[y_fix0 == 9] = 7
 
-y = y_fix
+# y = y_fix0
 et = time.time()
 print(et-st,"sec")
 
@@ -52,12 +54,12 @@ y_fix_4 = np.where(y_fix == 4)
 y_fix_8 = np.where(y_fix == 8)
 y_fix_9 = np.where(y_fix == 9)
 
-y_fix[y_fix_3] = 5
-y_fix[y_fix_4] = 5
-y_fix[y_fix_8] = 7
-y_fix[y_fix_9] = 7
+y_fix[y_fix_3] = 4
+# y_fix[y_fix_4] = 5
+y_fix[y_fix_9] = 8
+# y_fix[y_fix_8] = 7
 
-y = y_fix
+# y = y_fix
 et = time.time()
 print(et-st,"sec")
 
@@ -75,11 +77,7 @@ for idx, data in enumerate(y_fix2):
 
 y = y_fix2
 et = time.time()
-print(et-st,"sec")
-
-for a, b in zip(y_fix,y_fix2):
-    if a != b:
-        raise Exception("y_fix not same y_fix2")
+print(et-st,"sec") """
         
 print(np.unique(y,return_counts=True))
 
@@ -116,6 +114,7 @@ x = remove_outlier(x)
 
 x = x.astype(np.float32)
 y = y.astype(np.float32)
+print(x.shape,y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,random_state=770,stratify=y)
 
@@ -135,8 +134,20 @@ result = model.score(x_test,y_test)
 
 print(result)
 
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 acc = accuracy_score(y_test,pred)
 print("ACC: ",acc)
+f1 = f1_score(y_test,pred,average='macro')
+print("F1 : ",f1)
+
+# 7개 전부
+# ACC:  0.6963636363636364
+# F1 :  0.4172314374211008
+
+# 5개
+# ACC:  0.9345156889495225
+# F1 :  0.9258579831112991
+
+# 3개
 # ACC:  0.69
-# 3->4, 9->8 ACC:  0.7
+# F1 :  0.6783743403213683
