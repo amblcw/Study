@@ -34,7 +34,7 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
         trained_model_dict[name] = model    # 출력을 위해서 이름도 같이 저장
         
     voted_pred = np.asarray(pred_list).T    # (n,3)형태를 위해서 Transpose
-    final_model.fit(voted_pred,y_train)
+    final_model.fit(voted_pred,y_train)     # 훈련 완료된 모델들 저장
     
     pred_list = []
     print_dict = {}
@@ -54,7 +54,7 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
 self_Stacking([
     ('xgb',XGBClassifier()),
     ('RF',RandomForestClassifier()),
-    ('LG',LogisticRegression()),
+    ('LR',LogisticRegression()),
 ],CatBoostClassifier(verbose=0),x_train,x_test,y_train,y_test)
 
 '''============== sklearn의 StackingClassifier =============='''
@@ -62,7 +62,7 @@ self_Stacking([
 model = StackingClassifier([
     ('xgb',XGBClassifier()),
     ('RF',RandomForestClassifier()),
-    ('LG',LogisticRegression()),
+    ('LR',LogisticRegression()),
 ],final_estimator=CatBoostClassifier(verbose=0))
 
 model.fit(x_train,y_train)
@@ -71,6 +71,6 @@ print("sklearn Stacking의 ACC : ",result)
 
 # xgb ACC : 0.9473684210526315
 # RF ACC : 0.9473684210526315
-# LG ACC : 0.9824561403508771
+# LR ACC : 0.9824561403508771
 # 스태킹 결과:  0.9649122807017544
 # sklearn Stacking의 ACC :  0.9649122807017544
