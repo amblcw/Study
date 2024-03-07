@@ -47,7 +47,8 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
     voted_pred = np.asarray(pred_list).T
     final_result = final_model.score(voted_pred,y_test)
     
-    print(print_dict)
+    for name , acc in print_dict.items():
+        print(name,":",acc)
     print("스태킹 결과: ",final_result)
     
 self_Stacking([
@@ -68,6 +69,8 @@ model.fit(x_train,y_train)
 result = model.score(x_test,y_test)
 print("sklearn Stacking의 ACC : ",result)
 
-# {'xgb ACC': 0.9473684210526315, 'RF ACC': 0.9473684210526315, 'LG ACC': 0.9824561403508771}
+# xgb ACC : 0.9473684210526315
+# RF ACC : 0.9473684210526315
+# LG ACC : 0.9824561403508771
 # 스태킹 결과:  0.9649122807017544
 # sklearn Stacking의 ACC :  0.9649122807017544
