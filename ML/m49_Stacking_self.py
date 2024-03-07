@@ -10,6 +10,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, r2_score, mean_squared_error
 import warnings
 warnings.filterwarnings('ignore')
+import random as rn
+import tensorflow as tf
+rn.seed(333)
+tf.random.set_seed(333)
+np.random.seed(333)
 
 # data
 x, y = load_breast_cancer(return_X_y=True)
@@ -23,7 +28,7 @@ model = StackingClassifier([
     ('xgb',XGBClassifier()),
     ('RF',RandomForestClassifier()),
     ('LG',LogisticRegression()),
-],final_estimator=CatBoostClassifier())
+],final_estimator=CatBoostClassifier(verbose=0))
 
 def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_test):
     pred_list = []
@@ -58,12 +63,10 @@ self_Stacking([
     ('LG',LogisticRegression()),
 ],CatBoostClassifier(verbose=0),x_train,x_test,y_train,y_test)
 
-# model.fit(x_train,y_train)
-# result = model.score(x_test,y_test)
-# print("ACC : ",result)
-
-# StackingClassifier by sklearn
-# ACC :  0.9649122807017544
+model.fit(x_train,y_train)
+result = model.score(x_test,y_test)
+print("sklearn Stacking의 ACC : ",result)
 
 # {'xgb ACC': 0.9473684210526315, 'RF ACC': 0.9473684210526315, 'LG ACC': 0.9824561403508771}
 # 스태킹 결과:  0.9649122807017544
+# sklearn Stacking의 ACC :  0.9649122807017544
