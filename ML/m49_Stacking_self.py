@@ -24,12 +24,6 @@ sclaer = MinMaxScaler().fit(x_train)
 x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
-model = StackingClassifier([
-    ('xgb',XGBClassifier()),
-    ('RF',RandomForestClassifier()),
-    ('LG',LogisticRegression()),
-],final_estimator=CatBoostClassifier(verbose=0))
-
 def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_test):
     pred_list = []
     trained_model_dict = {}
@@ -62,6 +56,14 @@ self_Stacking([
     ('RF',RandomForestClassifier()),
     ('LG',LogisticRegression()),
 ],CatBoostClassifier(verbose=0),x_train,x_test,y_train,y_test)
+
+'''============== sklearn의 StackingClassifier =============='''
+
+model = StackingClassifier([
+    ('xgb',XGBClassifier()),
+    ('RF',RandomForestClassifier()),
+    ('LG',LogisticRegression()),
+],final_estimator=CatBoostClassifier(verbose=0))
 
 model.fit(x_train,y_train)
 result = model.score(x_test,y_test)
