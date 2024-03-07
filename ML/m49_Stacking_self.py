@@ -31,10 +31,10 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
         model.fit(x_train,y_train)
         pred = model.predict(x_train)       # x_test로 하면 나중에 final_model도 테스트 셋으로 학습해야하기에 테스트 셋 의미가 없어진다
         pred_list.append(pred)              # 예측값 저장 쉽게 append로
-        trained_model_dict[name] = model    # 출력을 위해서 이름도 같이 저장
+        trained_model_dict[name] = model    # 훈련 완료된 모델들 저장, 출력을 위해서 이름도 같이 저장
         
-    voted_pred = np.asarray(pred_list).T    # (n,3)형태를 위해서 Transpose
-    final_model.fit(voted_pred,y_train)     # 훈련 완료된 모델들 저장
+    stacked_train_pred = np.asarray(pred_list).T    # (n,3)형태를 위해서 Transpose
+    final_model.fit(stacked_train_pred,y_train)     
     
     pred_list = []
     print_dict = {}
@@ -44,8 +44,8 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
         pred_list.append(pred)              # 예측값 저장 쉽게 append로
         print_dict[f'{name} ACC'] = result  # 이름과 함께 ACC 저장
     
-    voted_pred = np.asarray(pred_list).T
-    final_result = final_model.score(voted_pred,y_test)
+    stacked_test_pred = np.asarray(pred_list).T
+    final_result = final_model.score(stacked_test_pred,y_test)
     
     for name , acc in print_dict.items():
         print(name,":",acc)
