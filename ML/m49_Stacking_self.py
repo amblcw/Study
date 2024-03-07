@@ -30,7 +30,7 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
     trained_model_dict = {}
     for name, model in models:
         model.fit(x_train,y_train)
-        pred = model.predict(x_train)   # x_train 여야하나?
+        pred = model.predict(x_train)  
         pred_list.append(pred)
         trained_model_dict[name] = model
         
@@ -40,7 +40,7 @@ def self_Stacking(models:list[tuple], final_model, x_train, x_test, y_train, y_t
     pred_list = []
     print_dict = {}
     for name, model in trained_model_dict.items():
-        pred = model.predict(x_test)   # x_train 여야하나?
+        pred = model.predict(x_test)   
         result = model.score(x_test,y_test)
         pred_list.append(pred)
         print_dict[f'{name} ACC'] = result
