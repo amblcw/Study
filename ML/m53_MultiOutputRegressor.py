@@ -11,6 +11,8 @@ import numpy as np
 
 x, y = load_linnerud(return_X_y=True)
 
+from sklearn.multioutput import MultiOutputRegressor
+
 print(x.shape, y.shape)
 # (20, 3) (20, 3)
 print(x[-1],y[-1])
@@ -20,10 +22,10 @@ model_list = [RandomForestRegressor(),
               LinearRegression(),
               Ridge(),
               Lasso(),
-              SVR(),                # 안됨
+              MultiOutputRegressor(SVR()),                # 안됨
               XGBRegressor(),
-              CatBoostRegressor(),  # 안됨
-              LGBMRegressor()       # 안됨
+              MultiOutputRegressor(CatBoostRegressor()),  # 안됨
+              MultiOutputRegressor(LGBMRegressor())       # 안됨
               ]
 
 error_list = []
@@ -42,5 +44,5 @@ for model in model_list:
         print(f"{model.__class__.__name__} error")
         error_list.append(model_name)
 else:
-    print(error_list)
+    print("error list: ",error_list)
         
