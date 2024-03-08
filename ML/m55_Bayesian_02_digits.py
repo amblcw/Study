@@ -25,27 +25,62 @@ x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
 # model 
-from sklearn.ensemble import BaggingClassifier, VotingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-model = VotingClassifier([
-    ('LR',LogisticRegression()),
-    ('RF',RandomForestClassifier()),
-    ('XGB',XGBClassifier()),
-    ], voting='hard')
+import warnings
+warnings.filterwarnings('ignore')
+params = {
+    'learning_rate':(0.001,1),
+    'max_depth':(3,10),
+    'num_leaves':(24,40),
+    'min_child_samples':(10,200),
+    'min_child_weight':(1,50),
+    'subsample':(0.5,1),
+    'colsample_bytree':(0.5,1),
+    'max_bin':(9,500),
+    'reg_lambda':(0.001,10),
+    'reg_alpha':(0.01,50),
+}
 
-# fit & pred
-model.fit(x_train,y_train,
-        #   eval_set=[(x_train,y_train), (x_test,y_test)],
-        #   verbose=1,
-        #   eval_metric='logloss',
-          )
+def xgb_function(learning_rate,max_depth,num_leaves,min_child_samples,min_child_weight,subsample,colsample_bytree,max_bin,reg_lambda,reg_alpha):
+    params={
+        'n_estimators':100,
+        'learning_rate':learning_rate,
+        'max_depth':int(round(max_depth)),
+        'num_leaves':int(round(num_leaves)),
+        'min_child_samples':int(round(min_child_samples)),
+        'min_child_weight':int(round(min_child_weight)),
+        'subsample':max(min(subsample,1),0),
+        'colsample_bytree':colsample_bytree,
+        'max_bin':max(int(round(max_bin)),10),
+        'reg_lambda':reg_lambda,
+        'reg_alpha':reg_alpha,
+        'n_jobs':-1,
+    }
+    
+    model = XGBClassifier(**params)
+    model.fit(x_train,y_train,
+              eval_set=[(x_train,y_train),(x_test,y_test)],
+            #   eval_metric='mlogloss',
+              verbose=0,
+              early_stopping_rounds=50,
+              )
+    y_pred = model.predict(x_test)
+    acc = accuracy_score(y_test,y_pred)
+    return acc
 
-result = model.score(x_test,y_test)
-print("Score: ",result)
+from bayes_opt import BayesianOptimization
+bay = BayesianOptimization(f=xgb_function,
+                           pbounds=params,
+                           random_state=47,
+                           )
 
-pred = model.predict(x_test)
-acc = accuracy_score(y_test,pred)
-print("ACC: ",acc)
+import time
+N_ITER = 100
+st = time.time()
+bay.maximize(init_points=5,n_iter=N_ITER)
+et = time.time()
+
+print(bay.max)
+print(N_ITER,'번 걸린시간: ',round(et-st,2))
 
 # Score:  0.9555555555555556
 # ACC:  0.9555555555555556
@@ -55,3 +90,6 @@ print("ACC: ",acc)
 
 # VotingClassifier soft 
 # ACC:  0.9638888888888889
+
+# {'target': 0.9638888888888889, 'params': {'colsample_bytree': 0.5, 'learning_rate': 1.0, 'max_bin': 355.56452061592904, 'max_depth': 10.0, 'min_child_samples': 87.543093474296, 'min_child_weight': 1.0, 'num_leaves': 24.0, 'reg_alpha': 0.01, 'reg_lambda': 10.0, 'subsample': 0.5249646844785438}}
+# 100 번 걸린시간:  38.72

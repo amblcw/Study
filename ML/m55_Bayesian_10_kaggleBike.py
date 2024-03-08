@@ -45,28 +45,70 @@ x_train = sclaer.transform(x_train)
 x_test = sclaer.transform(x_test)
 
 # model 
-from sklearn.ensemble import VotingRegressor, RandomForestRegressor
-from sklearn.svm import SVR
 from xgboost import XGBRegressor
-model = VotingRegressor([
-    ('LR',SVR()),
-    ('RF',RandomForestRegressor()),
-    ('XGB',XGBRegressor()),
-    ],)
-
-# fit & pred
 from sklearn.metrics import r2_score
-model.fit(x_train,y_train,)
+import warnings
+warnings.filterwarnings('ignore')
+params = {
+    'learning_rate':(0.001,1),
+    'max_depth':(3,10),
+    'num_leaves':(24,40),
+    'min_child_samples':(10,200),
+    'min_child_weight':(1,50),
+    'subsample':(0.5,1),
+    'colsample_bytree':(0.5,1),
+    'max_bin':(9,500),
+    'reg_lambda':(0.001,10),
+    'reg_alpha':(0.01,50),
+}
 
-result = model.score(x_test,y_test)
-print("Score: ",result)
+def xgb_function(learning_rate,max_depth,num_leaves,min_child_samples,min_child_weight,subsample,colsample_bytree,max_bin,reg_lambda,reg_alpha):
+    params={
+        'n_estimators':100,
+        'learning_rate':learning_rate,
+        'max_depth':int(round(max_depth)),
+        'num_leaves':int(round(num_leaves)),
+        'min_child_samples':int(round(min_child_samples)),
+        'min_child_weight':int(round(min_child_weight)),
+        'subsample':max(min(subsample,1),0),
+        'colsample_bytree':colsample_bytree,
+        'max_bin':max(int(round(max_bin)),10),
+        'reg_lambda':reg_lambda,
+        'reg_alpha':reg_alpha,
+        'n_jobs':-1,
+    }
+    
+    model = XGBRegressor(**params)
+    model.fit(x_train,y_train,
+              eval_set=[(x_train,y_train),(x_test,y_test)],
+            #   eval_metric='mlogloss',
+              verbose=0,
+              early_stopping_rounds=50,
+              )
+    y_pred = model.predict(x_test)
+    r2 = r2_score(y_test,y_pred)
+    return r2
 
-pred = model.predict(x_test)
-r2 = r2_score(y_test,pred)
-print("R2: ",r2)
+from bayes_opt import BayesianOptimization
+bay = BayesianOptimization(f=xgb_function,
+                           pbounds=params,
+                           random_state=47,
+                           )
+
+import time
+N_ITER = 50
+st = time.time()
+bay.maximize(init_points=5,n_iter=N_ITER)
+et = time.time()
+
+print(bay.max)
+print(N_ITER,'번 걸린시간: ',round(et-st,2))
 
 # Score:  0.25116103778243737
 # R2:  0.25116103778243737
 
 # VotingRegressor
 # R2:  0.37283425591431385
+
+# {'target': 0.35604378552118077, 'params': {'colsample_bytree': 0.7701789895667739, 'learning_rate': 0.10448186862549219, 'max_bin': 113.40516176906813, 'max_depth': 8.767878059823051, 'min_child_samples': 141.0320574111848, 'min_child_weight': 40.649159104658466, 'num_leaves': 35.516275858104635, 'reg_alpha': 8.986784220861649, 'reg_lambda': 6.840993867503437, 'subsample': 0.7782268243424347}}
+# 50 번 걸린시간:  6.61
