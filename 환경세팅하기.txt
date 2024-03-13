@@ -39,3 +39,16 @@ conda remove --name 가상환경이름 --all
 CUDA 11.4
 python 3.9
 tensorflow-gpu==2.9
+
+###### tf114cpu만들기 ######
+conda create -n tf114cpu python=3.7.4 anaconda
+pip install tensorflow==1.14
+protobuf 다운그레이드 하라는 에러뜨면
+pip uninstall protobuf
+pip install protbuf==3.19.6
+conda install pip==19.22.2(pip version 19.22.2로 맞추기)
+tensorflow 버전확인
+numpy future waring발생
+numpy 1.16.X버전 설치
+
+
