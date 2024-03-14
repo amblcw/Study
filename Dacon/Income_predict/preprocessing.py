@@ -5,7 +5,8 @@ import os
 import tensorflow as tf
 import random
 
-RANDOM_STATE = 47
+# RANDOM_STATE = 47
+RANDOM_STATE = 15288
 tf.random.set_seed(RANDOM_STATE)
 random.seed(RANDOM_STATE)
 np.random.seed(RANDOM_STATE)
@@ -107,7 +108,11 @@ for label in x:
     # 마냥 처리해주기에는 문제가 많다 
     if label in target_label:
         data.loc[data > upper] = upper
-    
+        
+# columns 제거
+x = x.drop(['Household_Status'],axis=1)
+test_csv = test_csv.drop(['Household_Status'],axis=1)
+
 # 스케일링
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # scaler = MinMaxScaler().fit(x)

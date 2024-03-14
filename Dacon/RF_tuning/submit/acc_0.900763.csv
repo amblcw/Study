@@ -1,0 +1,2 @@
+n_estimators,criterion,max_depth,min_samples_split,min_samples_leaf,min_weight_fraction_leaf,max_features,max_leaf_nodes,min_impurity_decrease,bootstrap
+759,entropy,29,0.21095899366648163,0.8217522344636811,0.47857863324593314,auto,None,0,False
