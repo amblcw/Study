@@ -43,31 +43,32 @@ def objectiveRF(trial):
     
     return score
 
-study = optuna.create_study(direction='maximize')
-study.optimize(objectiveRF, n_trials=2000)
+while True:
+    study = optuna.create_study(direction='maximize')
+    study.optimize(objectiveRF, n_trials=2000)
 
-best_params = study.best_params
-print(best_params)
+    best_params = study.best_params
+    print(best_params)
 
-optuna.visualization.plot_param_importances(study)      # 파라미터 중요도 확인 그래프
-optuna.visualization.plot_optimization_history(study)   # 최적화 과정 시각화
+    optuna.visualization.plot_param_importances(study)      # 파라미터 중요도 확인 그래프
+    optuna.visualization.plot_optimization_history(study)   # 최적화 과정 시각화
 
-# model = RandomForestClassifier(**best_params)
-model = RandomForestClassifier(**best_params)
-model.fit(x_train,y_train)
-score = model.score(x_test,y_test)
-pred_list = model.predict_proba(x_test)[:,1]
-print("score: ",score)
-from sklearn.metrics import roc_auc_score
-auc = roc_auc_score(y_test,pred_list)
-print("AUC:  ",auc)
+    # model = RandomForestClassifier(**best_params)
+    model = RandomForestClassifier(**best_params)
+    model.fit(x_train,y_train)
+    score = model.score(x_test,y_test)
+    pred_list = model.predict_proba(x_test)[:,1]
+    print("score: ",score)
+    from sklearn.metrics import roc_auc_score
+    auc = roc_auc_score(y_test,pred_list)
+    print("AUC:  ",auc)
 
-#  Trial 99 finished with value: 0.9007633587786259 and parameters: {'n_estimators': 879, 'criterion': 'gini', 'bootstrap': False, 'max_depth': 29, 'min_samples_split': 0.19835986327450797, 'min_samples_leaf': 0.2229979795940108, 'min_weight_fraction_leaf': 0.3422843335377289}. Best is trial 89 with value: 0.9122137404580153.
-# {'n_estimators': 662, 'criterion': 'gini', 'bootstrap': False, 'max_depth': 32, 'min_samples_split': 0.3746056675007304, 'min_samples_leaf': 0.029695340582856743, 'min_weight_fraction_leaf': 0.04368839461045142}
+    #  Trial 99 finished with value: 0.9007633587786259 and parameters: {'n_estimators': 879, 'criterion': 'gini', 'bootstrap': False, 'max_depth': 29, 'min_samples_split': 0.19835986327450797, 'min_samples_leaf': 0.2229979795940108, 'min_weight_fraction_leaf': 0.3422843335377289}. Best is trial 89 with value: 0.9122137404580153.
+    # {'n_estimators': 662, 'criterion': 'gini', 'bootstrap': False, 'max_depth': 32, 'min_samples_split': 0.3746056675007304, 'min_samples_leaf': 0.029695340582856743, 'min_weight_fraction_leaf': 0.04368839461045142}
 
-submit_csv = pd.read_csv('c:/Study/Dacon/RF_tuning/sample_submission.csv')
-for label in submit_csv:
-    if label in best_params.keys():
-        submit_csv[label] = best_params[label]
-    
-submit_csv.to_csv(f'c:/Study/Dacon/RF_tuning/submit/AUC_{auc:.6f}.csv',index=False)
+    submit_csv = pd.read_csv('c:/Study/Dacon/RF_tuning/sample_submission.csv')
+    for label in submit_csv:
+        if label in best_params.keys():
+            submit_csv[label] = best_params[label]
+        
+    submit_csv.to_csv(f'c:/Study/Dacon/RF_tuning/submit/19_AUC_{auc:.6f}.csv',index=False)
