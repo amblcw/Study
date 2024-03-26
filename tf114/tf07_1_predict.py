@@ -30,6 +30,11 @@ with tf.Session() as sess:
         if step % 100 == 0:
             print(f"{step}epo | loss:{loss:<30} | weight: {weight[0]:<30} | bias: {bias:<30}")
         
-    x_test = [6,7,8]
-    final_pred = sess.run(pred,feed_dict={_x:x_test})
-    print("Predict: ",final_pred)
+    # x_test = [6,7,8]
+    # final_pred = sess.run(pred,feed_dict={_x:x_test})
+    # print(final_pred)
+    # 이렇게도 가능하다
+    
+    x_test = tf.compat.v1.placeholder(tf.float32,shape=[None])
+    predict = x_test*w + b
+    print("Predict: ",sess.run(predict,feed_dict={x_test:[6,7,8]}))
