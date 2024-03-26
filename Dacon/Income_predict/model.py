@@ -9,7 +9,7 @@ tf.random.set_seed(RANDOM_STATE)
 random.seed(RANDOM_STATE)
 np.random.seed(RANDOM_STATE)
 
-from sklearn.ensemble import RandomForestRegressor, VotingRegressor
+from sklearn.ensemble import RandomForestRegressor, VotingRegressor, StackingRegressor
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
 from lightgbm import LGBMRegressor
@@ -123,18 +123,18 @@ lr = LinearRegression()
 ada = AdaBoostRegressor()
 svr = SVR()
 
-def get_model(bitmask:int=0):
+def get_model(bitmask:int=0, final_estimator=None):
     model_list = [
     ('Catboost',cat),
     ('LightGBM',lgbm),
-    ('XGBoost',xgb),
-    ('RandomForest',rf),
-    ('LinearRegressor',lr),
-    ('AdaBoost',ada),
-    ('SVR',svr),
+    # ('XGBoost',xgb),
+    # ('RandomForest',rf),
+    # ('LinearRegressor',lr),
+    # ('AdaBoost',ada),
+    # ('SVR',svr),
     ]
     if bitmask == 0:
-        return VotingRegressor(estimators=model_list)
+        return StackingRegressor(estimators=model_list,final_estimator=final_estimator)
 
     estimator_models = []
     for n in range(len(model_list)):
@@ -143,10 +143,10 @@ def get_model(bitmask:int=0):
             estimator_models.append(model_list[n])
     
     print(estimator_models)
-    return VotingRegressor(estimators=estimator_models)
+    return StackingRegressor(estimators=estimator_models,final_estimator=final_estimator)
 
 
-def columns_test(model):
+def columns_test(model)->None:
     # print(type(model.feature_importances_))
     feature_importances_list = list(model.feature_importances_)
     feature_importances_list_sorted = sorted(feature_importances_list)
@@ -179,12 +179,21 @@ def columns_test(model):
 
 if __name__ == '__main__':
     print("============== main.py ==============")
+    # columns_test(RandomForestRegressor())
     from preprocessing import submit_csv, PATH
     
+    final_estimator_list = [
+                            # XGBRegressor(**xgb_params),
+                            CatBoostRegressor(**cat_params),
+                            # LGBMRegressor(**lgbm_params),
+                            # RandomForestRegressor(),
+                            # AdaBoostRegressor(),
+                            ]
     train_result = []
-    for n in range(0b10000000): 
+    # for n in range(0b1000): 
+    for estimator in final_estimator_list:
         st = time.time()    
-        model = get_model(n)
+        model = get_model(final_estimator=estimator)
         model.fit(x_train,y_train)
         pred = model.predict(x_test)
         y_submit = model.predict(test_csv)
@@ -200,7 +209,9 @@ if __name__ == '__main__':
         print("R2:   ",r2)
         print("RMSE: ",rmse)
         print(f"time: {et-st:.2f}sec")
-        train_result.append((f'{n:b}',rmse))
+        train_result.append((f'{estimator.__class__.__name__}',rmse))
+        
+        columns_test(model)
         
     print("Train Done")
     for d in train_result:

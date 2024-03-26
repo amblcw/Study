@@ -1,2 +1,2 @@
 n_estimators,criterion,max_depth,min_samples_split,min_samples_leaf,min_weight_fraction_leaf,max_features,max_leaf_nodes,min_impurity_decrease,bootstrap
-660,gini,22,14,1,0.0002561726440959627,auto,,0,True
+930,gini,15,13,1,0.00022615471833363964,auto,None,0,True

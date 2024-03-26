@@ -21,13 +21,13 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8, random_s
 
 def objectiveRF(trial):
     param = {
-        'n_estimators' : trial.suggest_int('n_estimators', 10, 1000, 10),
+        'n_estimators' : trial.suggest_int('n_estimators', 10, 5000, 1),
         'criterion' : trial.suggest_categorical('criterion', ['gini','entropy']),
         'bootstrap' : trial.suggest_categorical('bootstrap', [True,False]),
-        'max_depth' : trial.suggest_int('max_depth', 4, 32),
+        'max_depth' : trial.suggest_int('max_depth', 2, 64),
         'random_state' : RANDOM_STATE,
-        'min_samples_split' : trial.suggest_int('min_samples_split', 2, 100),
-        'min_samples_leaf' : trial.suggest_int('min_samples_leaf', 1, 100),
+        'min_samples_split' : trial.suggest_int('min_samples_split', 2, 200),
+        'min_samples_leaf' : trial.suggest_int('min_samples_leaf', 1, 200),
         # 'min_samples_split' : trial.suggest_uniform('min_samples_split',0,1),
         # 'min_samples_leaf' : trial.suggest_uniform('min_samples_leaf',0,1),
         'min_weight_fraction_leaf' : trial.suggest_uniform('min_weight_fraction_leaf',0,0.5),
@@ -45,7 +45,7 @@ def objectiveRF(trial):
 
 while True:
     study = optuna.create_study(direction='maximize')
-    study.optimize(objectiveRF, n_trials=2000)
+    study.optimize(objectiveRF, n_trials=3000)
 
     best_params = study.best_params
     print(best_params)
@@ -70,5 +70,7 @@ while True:
     for label in submit_csv:
         if label in best_params.keys():
             submit_csv[label] = best_params[label]
-        
-    submit_csv.to_csv(f'c:/Study/Dacon/RF_tuning/submit/19_AUC_{auc:.6f}.csv',index=False)
+    
+    from datetime import datetime
+    dt = datetime.now()
+    submit_csv.to_csv(f'c:/Study/Dacon/RF_tuning/submit/{dt.day}_AUC_{auc:.6f}.csv',index=False)
