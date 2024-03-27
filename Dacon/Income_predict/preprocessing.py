@@ -5,8 +5,8 @@ import os
 import tensorflow as tf
 import random
 
-# RANDOM_STATE = 47
-RANDOM_STATE = 15288
+# RandomState:  18947
+RANDOM_STATE = 37082
 tf.random.set_seed(RANDOM_STATE)
 random.seed(RANDOM_STATE)
 np.random.seed(RANDOM_STATE)
@@ -93,7 +93,7 @@ y = train_csv['Income']
 target_label = ['Gains','Losses','Dividends']
 for label in x:
     data = x[label]
-    data = data[data != 0]
+    # data = data[data != 0]
     q1 = data.quantile(0.25)
     q3 = data.quantile(0.75)
     iqr = (q3-q1) * 3.0
@@ -116,6 +116,8 @@ test_csv = test_csv.drop(['Household_Status'],axis=1)
 # 스케일링
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # scaler = MinMaxScaler().fit(x)
+# x = scaler.transform(x)
+# test_csv = scaler.transform(test_csv)
 scaler = StandardScaler().fit(x)
 x = scaler.transform(x)
 test_csv = scaler.transform(test_csv)

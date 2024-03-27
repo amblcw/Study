@@ -12,9 +12,9 @@ w = tf.Variable(tf.random_normal([1]),dtype=tf.float32)
 b = tf.Variable(0,dtype=tf.float32)
 
 # model
-pred = _x*w + b
+hypothesis = _x*w + b
 
-loss_fn = tf.reduce_mean(tf.abs(pred - _y))  # mae
+loss_fn = tf.reduce_mean(tf.abs(hypothesis - _y))  # mae
 optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
 train = optimizer.minimize(loss_fn)
 
@@ -31,7 +31,7 @@ with tf.Session() as sess:
             print(f"{step}epo | loss:{loss:<30} | weight: {weight[0]:<30} | bias: {bias:<30}")
         
     # x_test = [6,7,8]
-    # final_pred = sess.run(pred,feed_dict={_x:x_test})
+    # final_pred = sess.run(hypothesis,feed_dict={_x:x_test})
     # print(final_pred)
     # 이렇게도 가능하다
     

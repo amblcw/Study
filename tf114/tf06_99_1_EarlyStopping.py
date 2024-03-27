@@ -47,11 +47,12 @@ with tf.Session() as sess:
     b = tf.compat.v1.constant(best_setting['b'])
     new_pred = _x*w + b
     new_loss_fn = tf.reduce_mean(tf.abs(new_pred - _y))  # mae
-    print(best_setting)
+    # print(best_setting)
     # print(f"conpare final loss: {sess.run(loss_fn,feed_dict=data_set)}")
     print(f"final loss: {sess.run(new_loss_fn,feed_dict=data_set)}")    
     # comepare loss와 final이 서로 다르다
     # 새로 pred와 loss등 뒤의 노드를 재정의 해주지 않으면 덮어씌워지기 이전 노드를 가르킨다
-    print(f"w: {sess.run(w)}, b: {sess.run(b)}")
+    print("final setting")
+    print(f"w: {sess.run(w)}, b: {sess.run(b)}")    # best_setting과 똑같다
     final_pred = sess.run(pred,feed_dict=data_set)
-    print(final_pred)
+    print("Predict",final_pred)
