@@ -5,8 +5,8 @@ import os
 import tensorflow as tf
 import random
 
-# RandomState:  18947
-RANDOM_STATE = 37082
+# RandomState:  42250
+RANDOM_STATE = 70809
 tf.random.set_seed(RANDOM_STATE)
 random.seed(RANDOM_STATE)
 np.random.seed(RANDOM_STATE)
