@@ -1,5 +1,5 @@
 from preprocessing import submit_csv, PATH
-from model import y_submit, r2, rmse
+from model import y_submit, r2, rmse, if_main
 import pandas as pd
 import time
 

@@ -177,7 +177,35 @@ def columns_test(model)->None:
         
     print(result_dict)
 
-if __name__ == '__main__':
+from keras.layers import *
+
+def attention_gate(F_g, F_l, inter_channel):
+    """
+    An attention gate.
+
+    Arguments:
+    - F_g: Gating signal typically from a coarser scale.
+    - F_l: The feature map from the skip connection.
+    - inter_channel: The number of channels/filters in the intermediate layer.
+    """
+    # Intermediate transformation on the gating signal
+    W_g = Conv1D(inter_channel, kernel_size=1, strides=1, padding='same', kernel_initializer='he_normal')(F_g)
+    W_g = BatchNormalization()(W_g)
+
+    # Intermediate transformation on the skip connection feature map
+    W_x = Conv1D(inter_channel, kernel_size=1, strides=1, padding='same', kernel_initializer='he_normal')(F_l)
+    W_x = BatchNormalization()(W_x)
+
+    # Combine the transformations
+    psi = Activation('relu')(add([W_g, W_x]))
+    psi = Conv1D(1, kernel_size=1, strides=1, padding='same', kernel_initializer='he_normal')(psi)
+    psi = BatchNormalization()(psi)
+    psi = Activation('sigmoid')(psi)
+
+    # Apply the attention coefficients to the feature map from the skip connection
+    return multiply([F_l, psi])
+
+def if_main():
     print("============== main.py ==============")
     # columns_test(RandomForestRegressor())
     from preprocessing import submit_csv, PATH
@@ -219,6 +247,9 @@ if __name__ == '__main__':
     for d in train_result:
         print(d)
     print("next random: ",random.randint(1,100000))
+
+if __name__ == '__main__':
+    if_main()
 # RandomState:  18947
 # R2:    0.31553474445210017
 # RMSE:  542.5834662845339
