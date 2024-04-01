@@ -6,7 +6,7 @@ import tensorflow as tf
 import random
 
 # RandomState:  42250
-RANDOM_STATE = 80564
+RANDOM_STATE = 78956
 tf.random.set_seed(RANDOM_STATE)
 random.seed(RANDOM_STATE)
 np.random.seed(RANDOM_STATE)

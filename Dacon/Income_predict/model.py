@@ -234,7 +234,7 @@ def if_main():
         submit_csv['Income'] = y_submit
         print(submit_csv.head(10))
         if rmse < 550:
-            submit_csv.to_csv(PATH+f'submit/rmse_{rmse:4f}.csv',index=False)
+            submit_csv.to_csv(PATH+f'submit/rmse_{rmse:4f}_random{RANDOM_STATE}.csv',index=False)
         et = time.time()
         print("RandomState: ",RANDOM_STATE)
         print("R2:   ",r2)
