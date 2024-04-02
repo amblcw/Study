@@ -170,13 +170,13 @@ FAF                           : max=3.0         min=0.0         q1=0.008013    q
 TUE                           : max=2.0         min=0.0         q1=0.0         q3=1.0
 '''
 
-
-from sklearn.preprocessing import LabelEncoder
+# model 
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import warnings
 warnings.filterwarnings('ignore')
 
 y = LabelEncoder().fit_transform(y)
-
+y = OneHotEncoder(sparse=False).fit_transform(y.reshape(-1,1))
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, random_state=333, train_size=0.8,
     stratify=y
@@ -186,36 +186,61 @@ print(x_train.shape,y_train.shape)
 print(np.unique(y_train,return_counts=True))
 
 
-sclaer = MinMaxScaler().fit(x_train)
-x_train = sclaer.transform(x_train)
-x_test = sclaer.transform(x_test)
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+scaler = StandardScaler().fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
 
-# model 
-from sklearn.ensemble import BaggingClassifier, VotingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-model = VotingClassifier([
-    ('LR',LogisticRegression()),
-    ('RF',RandomForestClassifier()),
-    ('XGB',XGBClassifier()),
-    ], voting='hard')
+print(x_train.shape,y_train.shape,x_test.shape,y_test.shape)
+# (77034, 13) (77034,) (19259, 13) (19259,)
 
-# fit & pred
+x = tf.compat.v1.placeholder(tf.float32,shape=[None,x_train.shape[1]])
+y = tf.compat.v1.placeholder(tf.float32,shape=[None,y_train.shape[1]])
+
+class Dense_layer():
+    def __init__(self, output_dim, input_dim, activation=None) -> None:
+        self.w = tf.compat.v1.Variable(tf.random_normal([input_dim,output_dim]))
+        self.b = tf.compat.v1.Variable(tf.zeros([1,output_dim]),dtype=tf.float32)
+        self.activation = activation
+    def get_layer(self,x):
+        result = tf.matmul(x,self.w) + self.b
+        if self.activation is not None:
+            return self.activation(result)
+        return result
+
+
+layer1 = Dense_layer(512,x_train.shape[1],tf.nn.relu).get_layer(x)
+layer2 = Dense_layer(256,512,tf.nn.relu).get_layer(layer1)
+layer3 = Dense_layer(256,256,tf.nn.sigmoid).get_layer(layer2)
+layer4 = Dense_layer(128,256,tf.nn.relu).get_layer(layer3)
+layer5 = Dense_layer(64,128,tf.nn.relu).get_layer(layer4)
+layer6 = Dense_layer(32,64,tf.nn.sigmoid).get_layer(layer5)
+hypothesis = Dense_layer(y_train.shape[1],32,tf.nn.softmax).get_layer(layer6)
+
+loss_fn = tf.compat.v1.losses.softmax_cross_entropy(y,hypothesis)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+
+train = optimizer.minimize(loss_fn)
+
+EPOCHS = 3000
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for step in range(1,EPOCHS+1):
+        _, loss = sess.run([train,loss_fn],feed_dict={x:x_train,y:y_train})
+        if step%100 == 0:
+            print(f"{step}epo loss={loss}")
+        
+    pred = sess.run(hypothesis,feed_dict={x:x_test})
+    pred = np.around(pred)
+    
+print("pred: ",pred)
 from sklearn.metrics import accuracy_score
-model.fit(x_train,y_train,)
+acc = accuracy_score(pred,y_test)
 
-result = model.score(x_test,y_test)
-print("Score: ",result)
-
-pred = model.predict(x_test)
-acc = accuracy_score(y_test,pred)
 print("ACC: ",acc)
+print("Random state: ",333)
 
-# Score:  0.8379476758953518
-# ACC:  0.8379476758953518
-
-# VotingClassifier hard
-# ACC:  0.9077978155956312
-
-# VotingClassifier soft
-# ACC:  0.9098298196596393
+# ACC:  0.8173736347472695
+# Random state:  333
