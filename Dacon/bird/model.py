@@ -98,7 +98,7 @@ model.compile(optimizer=Adam(learning_rate=0.01),loss='categorical_crossentropy'
 model.summary()
 
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=100,restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=30,restore_best_weights=True)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss',mode='auto',patience=50,factor=0.7)
 model.fit(x_train,y_train,epochs=1000,batch_size=128,validation_split=0.2,verbose=1,callbacks=[es,reduce_lr])
 
