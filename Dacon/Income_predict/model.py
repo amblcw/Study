@@ -172,7 +172,7 @@ def columns_test(model)->None:
             )
         new_result = model2.score(new_x_test,y_test)
         print(f"{i+1}개 컬럼이 삭제되었을 때 Score: ",new_result)
-        result_dict[i+1] = new_result - r2    # 그대로 보면 숫자가 비슷해서 구분하기 힘들기에 얼마나 변했는지 체크
+        result_dict[i+1] = new_result 
         
         
     print(result_dict)
@@ -249,7 +249,8 @@ def if_main():
     print("next random: ",random.randint(1,100000))
 
 if __name__ == '__main__':
-    if_main()
+    while True:
+        if_main()
 # RandomState:  18947
 # R2:    0.31553474445210017
 # RMSE:  542.5834662845339
