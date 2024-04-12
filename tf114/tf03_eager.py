@@ -15,4 +15,17 @@ print(sess.run(hellow))
 1.14.0  enable  X
 2.9.0   disable O
 2.9.0   enable  X
+
+Tensor 1 그래프 연산모드
+Tensor 2 즉시실행모드
+
+tf.compat.v1.enable_eager_execution()
+    -> Tensor2의 디폴트
+    
+tf.compat.v1.disable_eager_execution()
+    -> Tensor1의 코드를 쓸 수 있다
+    
+tf.executing_eagerly()  -> True면 즉시실행모드, Tensor2코드만 써야함
+                        -> False면 그래프연산모드, Tensor1코드만 쓸수있다
+
 '''

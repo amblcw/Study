@@ -77,19 +77,22 @@ x_train, x_test, y_train, y_test = train_test_split(np.array(x_data),np.array(y_
 print(x_train.shape,x_test.shape,y_train.shape,y_test.shape)
 # (12667, 64, 64, 3) (3167, 64, 64, 3) (12667, 25) (3167, 25)
 
-from keras.applications import EfficientNetV2M, VGG16, VGG19, ResNet101V2
+from keras.applications import EfficientNetV2M, VGG16, VGG19, ResNet101V2, ResNet152V2
 from keras.models import Model
-from keras.layers import Input, Dense, Flatten, Dropout
+from keras.layers import Input, Dense, Flatten, Dropout, BatchNormalization
 
 # base_model = EfficientNetV2M(include_top=False,input_shape=(64,64,3),classes=25,weights='imagenet')
-# base_model = VGG16(weights='imagenet', include_top=False, input_shape=(64,64,3))
-base_model = ResNet101V2(weights='imagenet', include_top=False, input_shape=(64,64,3))
+base_model = VGG16(weights='imagenet', include_top=False, input_shape=(64,64,3))
+# base_model = ResNet152V2(weights='imagenet', include_top=False, input_shape=(64,64,3))
+MODEL_NAME = 'VGG16'
+
 base_model.trainable = False
 inputs = base_model.input
 
 fl = Flatten()(base_model.output)
-d1 = Dense(512,activation='swish',name='d1')(fl)
-dr1 = Dropout(0.05)(d1)
+d1 = Dense(1024,activation='swish',name='d1')(fl)
+b1 = BatchNormalization()(d1)
+dr1 = Dropout(0.01)(b1)
 outputs = Dense(25,activation='softmax',name='final')(dr1)
 model = Model(inputs=[inputs],outputs=[outputs])
 
@@ -98,7 +101,7 @@ model.compile(optimizer=Adam(learning_rate=0.01),loss='categorical_crossentropy'
 model.summary()
 
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-es = EarlyStopping(monitor='val_loss',mode='auto',patience=30,restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss',mode='auto',patience=1000,restore_best_weights=True)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss',mode='auto',patience=50,factor=0.7)
 model.fit(x_train,y_train,epochs=1000,batch_size=128,validation_split=0.2,verbose=1,callbacks=[es,reduce_lr])
 
@@ -115,4 +118,4 @@ pred = label_encoder.inverse_transform(pred)
 submit_csv = pd.read_csv(path+"sample_submission.csv")
 submit_csv['label'] = pred
 print(submit_csv.head)
-submit_csv.to_csv(path+f'submit/VGG16_acc{score[1]:.6f}_random{RANDOM_STATE}.csv',index=False)
+submit_csv.to_csv(path+f'submit/{MODEL_NAME}_acc{score[1]:.6f}_random{RANDOM_STATE}.csv',index=False)
