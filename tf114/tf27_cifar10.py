@@ -162,5 +162,5 @@ acc = accuracy_score(pred,y_test)
 print("ACC: ",acc)
 print("Random state: ",47)
 
-# ACC:  0.9704
+# ACC:  0.7024
 # Random state:  47
