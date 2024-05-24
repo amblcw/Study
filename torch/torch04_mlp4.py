@@ -67,7 +67,6 @@ def evaluate(model, x, y, criterion):
     x, y = x.to(device), y.to(device)
     with torch.no_grad():
         pred = model(x)
-        pred = pred.to(device)
         loss = criterion(pred,y)
     pred = torch.Tensor.cpu(pred)
     y = torch.Tensor.cpu(y)
