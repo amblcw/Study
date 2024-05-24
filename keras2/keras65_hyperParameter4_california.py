@@ -55,7 +55,7 @@ hyperparameters = create_hyperparameter()
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 keras_model = KerasRegressor(build_fn=build_model, verbose=1)
-model = RandomizedSearchCV(keras_model,hyperparameters,cv=3,n_iter=30,verbose=1,n_jobs=10)
+model = RandomizedSearchCV(keras_model,hyperparameters,cv=3,n_iter=30,verbose=1,n_jobs=12)
 import time
 st = time.time()
 model.fit(x_train,y_train,epochs=30,verbose=2)
