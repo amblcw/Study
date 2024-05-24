@@ -5,24 +5,34 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as f
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #1 data
-x = np.array([1,2,3])
-y = np.array([1,2,3])
+x = np.array(range(10))   #주가, 금리, 환율
+print(x)
+print(x.shape)
 
-x = torch.FloatTensor(x)
+y = np.array([np.arange(1,11),                       #내일의 주가, 원유가격
+             np.arange(1,2,0.1),
+             np.arange(9,-1,-1)]
+             ).T 
+print(y)
+print(y.shape)
+
+x = torch.FloatTensor(x).unsqueeze(1)
 y = torch.FloatTensor(y)
 print(x.shape,y.shape) # torch.Size([3]) torch.Size([3])
 
-x = torch.unsqueeze(x,1)
-y = torch.unsqueeze(y,1)
-print(x.shape,y.shape) # torch.Size([3, 1]) torch.Size([3, 1])
-# x = x.reshape(-1,1)
-# y = y.reshape(-1,1)
 
 print(x,y,sep='\n')
 
 #2 model
-model = nn.Linear(out_features=1,in_features=1)    
+model = nn.Sequential(
+    nn.Linear(in_features=1,out_features=5),
+    nn.Linear(5,4),
+    nn.Linear(4,3),
+    nn.Linear(3,2),
+    nn.Linear(2,3),
+).to(device)
 
 #3 compile & fit
 # model.compile(loss='mse',optimizer='adam') keras 버전
@@ -34,9 +44,11 @@ optimizer.step()
 
 def train(model,criterion,optimizer,x,y):
     model.train()   # 훈련모드, default라서 안해도 상관없음
+    x, y = x.to(device), y.to(device)
 
     optimizer.zero_grad()   # 그라디언트 초기화
     hypothesis = model(x)   # 순전파
+    hypothesis = hypothesis.to(device)
     loss = criterion(hypothesis,y)  # loss 계산
     loss.backward() # 그라디언트 계산
     optimizer.step()# 가중치 갱신
@@ -52,9 +64,13 @@ else:
 # predict
 def evaluate(model, x, y, criterion):
     model.eval()
+    x, y = x.to(device), y.to(device)
     with torch.no_grad():
         pred = model(x)
+        pred = pred.to(device)
         loss = criterion(pred,y)
+    pred = torch.Tensor.cpu(pred)
+    y = torch.Tensor.cpu(y)
     print("pred\n",pred.detach().numpy())
     print("y\n",y.numpy())
     print("loss: ",loss.item())
@@ -62,6 +78,8 @@ def evaluate(model, x, y, criterion):
     
 evaluate(model,x,y,criterion)
 
-result = model(torch.tensor([4.]))
-# print("pred of 4 =",result.item()) 이것도 먹히지만 이건 결과값이 scalar일때만 가능하다
-print("pred of 4 =",result.detach().numpy())
+result = model(torch.tensor([[9.]]).to(device))
+result = torch.Tensor.cpu(result)# item()을 쓰면 이걸 안 해도 된다
+print("pred of [9.]=",result.detach().numpy())
+# loss:  1.3073272384644952e-06
+# pred of [9.]= [[9.996993e+00 1.899574e+00 1.842022e-03]]
