@@ -48,7 +48,6 @@ def train(model,criterion,optimizer,x,y):
 
     optimizer.zero_grad()   # 그라디언트 초기화
     hypothesis = model(x)   # 순전파
-    hypothesis = hypothesis.to(device)
     loss = criterion(hypothesis,y)  # loss 계산
     loss.backward() # 그라디언트 계산
     optimizer.step()# 가중치 갱신

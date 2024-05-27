@@ -1,7 +1,7 @@
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler
 from sklearn.model_selection import train_test_split
-import pandas as pd
 import numpy as np
+import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
