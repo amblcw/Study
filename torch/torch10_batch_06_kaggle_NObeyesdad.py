@@ -260,8 +260,8 @@ def train(model,criterion,optimizer,data_loader):
     total_loss = total_loss / len(data_loader) 
     return total_loss  # 이렇게 해야 tensor 형태로 반환됨
 
-EPOCH = 2000
-PATIENCE = 200
+EPOCH = 20
+PATIENCE = 100
 best_loss = 987654321
 patience = PATIENCE
 for i in range(1,EPOCH+1):
@@ -288,12 +288,12 @@ def evaluate(model, data_loader, criterion):
         with torch.no_grad():
             pred = model(x)
             total_loss += criterion(pred,y).item()
-        predict.append(pred.cpu().detach().numpy())
+        predict.append(np.argmax(pred.cpu().detach().numpy(),axis=1))
         y_true.append(y.cpu().numpy())
     total_loss /= len(data_loader)
     
-    predict = np.vstack(predict)
-    y_true = np.vstack(y_true)
+    predict = np.hstack(predict)
+    y_true = np.hstack(y_true)
     print("predict, y_true shape",predict.shape,y_true.shape)
     
     from sklearn.metrics import accuracy_score
@@ -301,8 +301,6 @@ def evaluate(model, data_loader, criterion):
     y_true = y_true.squeeze()
     acc = accuracy_score(predict,y_true)
     
-    # print("pred\n",pred.detach().numpy())
-    # print("y\n",y.numpy())
     print("loss: ",total_loss)
     print("ACC:  ",acc)
     return total_loss

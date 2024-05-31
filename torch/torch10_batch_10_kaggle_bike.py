@@ -43,6 +43,13 @@ y_train = torch.unsqueeze(y_train,1)
 y_test = torch.unsqueeze(y_test,1)
 print(x_train.shape,y_train.shape,x_test.shape,y_test.shape) 
 
+from torch.utils.data import TensorDataset, DataLoader
+train_set = TensorDataset(x_train,y_train)
+test_set = TensorDataset(x_test,y_test)
+
+train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=64)
+
 #2 model
 class Dnn(nn.Module):
     def __init__(self, input_dim, output_dim, final_activation=None, activation=nn.SiLU(),hidden_size_list:list=[64,32,16,8]) -> None:
@@ -61,7 +68,7 @@ class Dnn(nn.Module):
         output = self.mlp(x)
         return output
 
-model = Dnn(8,1,activation=nn.ELU(),hidden_size_list=[64,64,32,16,8])
+model = Dnn(8,1,activation=nn.ELU(),hidden_size_list=[64,32,32,16,8])
 print(model)
 
 #3 compile & fit
@@ -103,24 +110,29 @@ for i in range(1,EPOCH+1):
 print("======= train finish =======")
 
 # predict
-def evaluate(model, x, y, criterion):
+def evaluate(model, data_loader, criterion):
     model.eval()
-    x, y = x.to(device), y.to(device)
-    with torch.no_grad():
-        pred = model(x)
-        pred = pred.to(device)
-        loss = criterion(pred,y)
-    pred = torch.Tensor.cpu(pred).detach().numpy()
-    y = torch.Tensor.cpu(y).numpy()
+    total_loss = 0
+    predict = []
+    y_true = []
+    for x, y in data_loader:
+        x, y = x.to(device), y.to(device)
+        with torch.no_grad():
+            pred = model(x)
+            total_loss += criterion(pred,y).item()
+        predict.append(pred.cpu().detach().numpy())
+        y_true.append(y.cpu().numpy())
+        print(pred.shape,y.shape)
+    total_loss /= len(data_loader)
     
-    # print("pred\n",pred)
-    # print("y\n",y)
-    print("loss: ",loss.item())
+    predict = np.vstack(predict)
+    y_true = np.vstack(y_true)
     
     from sklearn.metrics import r2_score
-    score = r2_score(pred,y)
-    print("score: ",score)
+    r2 = r2_score(predict,y_true)
     
-    return loss.item()
+    print("loss: ",total_loss)
+    print("R2  : ",r2)
+    return total_loss
     
-evaluate(model,x_test,y_test,criterion)
+evaluate(model,test_loader,criterion)

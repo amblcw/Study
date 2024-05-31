@@ -99,7 +99,7 @@ def train(model,criterion,optimizer,data_loader):
     total_loss = total_loss / len(data_loader) 
     return total_loss  # 이렇게 해야 tensor 형태로 반환됨
 
-EPOCH = 2000
+EPOCH = 20
 PATIENCE = 200
 best_loss = 987654321
 patience = PATIENCE
@@ -134,13 +134,12 @@ def evaluate(model, data_loader, criterion):
     predict = np.vstack(predict)
     y_true = np.vstack(y_true)
     
-    from sklearn.metrics import accuracy_score
-    predict = np.round(predict.squeeze())
-    y_true = y_true.squeeze()
-    acc = accuracy_score(predict,y_true)
+    print(predict.shape,y_true.shape)
+    from sklearn.metrics import r2_score
+    r2 = r2_score(predict,y_true)
     
     print("loss: ",total_loss)
-    print("ACC:  ",acc)
+    print("R2  : ",r2)
     return total_loss
     
 evaluate(model,test_loader,criterion)

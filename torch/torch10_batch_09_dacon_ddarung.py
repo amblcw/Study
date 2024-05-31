@@ -125,18 +125,17 @@ def evaluate(model, data_loader, criterion):
             total_loss += criterion(pred,y).item()
         predict.append(pred.cpu().detach().numpy())
         y_true.append(y.cpu().numpy())
+        print(pred.shape,y.shape)
     total_loss /= len(data_loader)
     
     predict = np.vstack(predict)
     y_true = np.vstack(y_true)
     
-    from sklearn.metrics import accuracy_score
-    predict = np.round(predict.squeeze())
-    y_true = y_true.squeeze()
-    acc = accuracy_score(predict,y_true)
+    from sklearn.metrics import r2_score
+    r2 = r2_score(predict,y_true)
     
     print("loss: ",total_loss)
-    print("ACC:  ",acc)
+    print("R2  : ",r2)
     return total_loss
     
 evaluate(model,test_loader,criterion)
