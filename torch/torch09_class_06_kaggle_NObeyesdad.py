@@ -217,18 +217,24 @@ print(x_train.shape,y_train.shape,x_test.shape,y_test.shape)
 print(y_train[:5])
 
 #2 model
-model = nn.Sequential(
-    nn.Linear(in_features=17,out_features=64),
-    nn.SiLU(),
-    nn.Linear(64,32),
-    nn.BatchNorm1d(32),
-    nn.SiLU(),
-    nn.Linear(32,16),
-    nn.SiLU(),
-    nn.Linear(16,8),
-    nn.Linear(8,7),
-    nn.Softmax(),
-).to(device)
+class Dnn(nn.Module):
+    def __init__(self, input_dim, output_dim, final_activation,hidden_size_list:list=[64,32,16,8]) -> None:
+        super(Dnn,self).__init__()
+        layer_list = []
+        layer_list.append(nn.Linear(input_dim,hidden_size_list[0]))
+        for i_size, o_size in zip(hidden_size_list[:-1],hidden_size_list[1:]):
+            layer_list.append(nn.Linear(i_size,o_size))
+            layer_list.append(nn.SiLU())
+        layer_list.append(nn.Linear(hidden_size_list[-1],output_dim))
+        layer_list.append(final_activation)
+        self.mlp = nn.Sequential(*layer_list).to(device)
+        
+    def forward(self, x):
+        output = self.mlp(x)
+        return output
+
+model = Dnn(17,7,nn.Softmax())
+print(model)
 
 #3 compile & fit
 # model.compile(loss='mse',optimizer='adam') keras 버전
