@@ -36,6 +36,13 @@ y_train = torch.unsqueeze(y_train,1)
 y_test = torch.unsqueeze(y_test,1)
 print(x_train.shape,y_train.shape,x_test.shape,y_test.shape) 
 
+from torch.utils.data import TensorDataset, DataLoader
+train_set = TensorDataset(x_train,y_train)
+test_set = TensorDataset(x_test,y_test)
+
+train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=64)
+
 #2 model
 class Dnn(nn.Module):
     def __init__(self, input_dim, output_dim, final_activation=None,hidden_size_list:list=[64,32,16,8]) -> None:
@@ -78,42 +85,62 @@ def train(model,criterion,optimizer,x,y):
     optimizer.step()# 가중치 갱신
     return loss.item()  # 이렇게 해야 tensor 형태로 반환됨
 
+def train(model,criterion,optimizer,data_loader):
+    model.train()   # 훈련모드, default라서 안해도 상관없음
+    total_loss = 0
+    for x_batch, y_batch in data_loader:
+        x, y = x_batch.to(device), y_batch.to(device)
+        optimizer.zero_grad()   # 그라디언트 초기화
+        hypothesis = model(x)   # 순전파
+        loss = criterion(hypothesis,y)  # loss 계산
+        loss.backward() # 그라디언트 계산
+        optimizer.step()# 가중치 갱신
+        total_loss += loss.item()
+    total_loss = total_loss / len(data_loader) 
+    return total_loss  # 이렇게 해야 tensor 형태로 반환됨
+
 EPOCH = 2000
-PATIENCE = 100
+PATIENCE = 200
 best_loss = 987654321
 patience = PATIENCE
 for i in range(1,EPOCH+1):
     if patience <= 0:
         print("train stopped at",i,"epo")
         break
-    loss = train(model,criterion,optimizer,x_train,y_train)
+    loss = train(model,criterion,optimizer,train_loader)
     if loss < best_loss:
         best_loss = loss
         patience = PATIENCE
-    if i % 100 == 0:
+    if i % 10 == 0:
         print(f"epo={i} {loss=:.6f}")
     patience -= 1
 print("======= train finish =======")
 
 # predict
-def evaluate(model, x, y, criterion):
+def evaluate(model, data_loader, criterion):
     model.eval()
-    x, y = x.to(device), y.to(device)
-    with torch.no_grad():
-        pred = model(x)
-        pred = pred.to(device)
-        loss = criterion(pred,y)
-    pred = torch.Tensor.cpu(pred).detach().numpy()
-    y = torch.Tensor.cpu(y).numpy()
+    total_loss = 0
+    predict = []
+    y_true = []
+    for x, y in data_loader:
+        x, y = x.to(device), y.to(device)
+        with torch.no_grad():
+            pred = model(x)
+            total_loss += criterion(pred,y).item()
+        predict.append(pred.cpu().detach().numpy())
+        y_true.append(y.cpu().numpy())
+    total_loss /= len(data_loader)
     
-    # print("pred\n",pred)
-    # print("y\n",y)
-    print("loss: ",loss.item())
+    predict = np.vstack(predict)
+    y_true = np.vstack(y_true)
     
-    from sklearn.metrics import r2_score
-    score = r2_score(pred,y)
-    print("score: ",score)
+    from sklearn.metrics import accuracy_score
+    predict = np.round(predict.squeeze())
+    y_true = y_true.squeeze()
+    acc = accuracy_score(predict,y_true)
     
-    return loss.item()
+    print("loss: ",total_loss)
+    print("ACC:  ",acc)
+    return total_loss
     
-evaluate(model,x_test,y_test,criterion)
+evaluate(model,test_loader,criterion)

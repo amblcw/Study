@@ -79,12 +79,21 @@ def train(model,criterion,optimizer,x,y):
     return loss.item()  # 이렇게 해야 tensor 형태로 반환됨
 
 EPOCH = 2000
+PATIENCE = 100
+best_loss = 987654321
+patience = PATIENCE
 for i in range(1,EPOCH+1):
+    if patience <= 0:
+        print("train stopped at",i,"epo")
+        break
     loss = train(model,criterion,optimizer,x_train,y_train)
+    if loss < best_loss:
+        best_loss = loss
+        patience = PATIENCE
     if i % 100 == 0:
         print(f"epo={i} {loss=:.6f}")
-else:
-    print("======= train finish =======")
+    patience -= 1
+print("======= train finish =======")
 
 # predict
 def evaluate(model, x, y, criterion):
